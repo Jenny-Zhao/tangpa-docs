@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>镗钯 RaaS 管理平台 - 文档中心</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background: linear-gradient(135deg, #1e2a4a 0%, #2b3c6b 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.container { max-width: 960px; width: 92%; margin: 40px auto; }
+h1 { color: #fff; font-size: 28px; text-align: center; margin-bottom: 8px; }
+.sub { color: rgba(255,255,255,0.6); text-align: center; font-size: 14px; margin-bottom: 40px; }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+@media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+.card { background: rgba(255,255,255,0.95); border-radius: 12px; padding: 28px; text-decoration: none; transition: transform .2s, box-shadow .2s; display: block; }
+.card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
+.card .icon { font-size: 32px; margin-bottom: 12px; }
+.card h2 { color: #1e2a4a; font-size: 18px; margin-bottom: 8px; }
+.card p { color: #667; font-size: 13px; line-height: 1.6; }
+.card .tag { display: inline-block; margin-top: 12px; font-size: 11px; color: #3b6fe0; background: #eaf1ff; border-radius: 4px; padding: 3px 8px; }
+.footer { text-align: center; color: rgba(255,255,255,0.4); font-size: 12px; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>镗钯 RaaS 管理平台</h1>
+<p class="sub">文档中心 · 原型与产品需求文档</p>
+<div class="grid">
+<a class="card" href="tenant-proto/index.html"><div class="icon">🤖</div><h2>租户管理平台 · 原型</h2><p>设备管理、任务运行、脚本编辑器（基础版/Pro版）、素材库、智能体、知识库等完整交互原型</p><span class="tag">高保真原型</span></a>
+<a class="card" href="internal-proto/index.html"><div class="icon">🛠️</div><h2>内部管理平台 · 原型</h2><p>设备监控、内容审核（AI+人工）、动作库、租户管理等内部运营管理交互原型</p><span class="tag">高保真原型</span></a>
+<a class="card" href="tenant-prd/index.html"><div class="icon">📘</div><h2>租户管理平台 · PRD</h2><p>v1.0 产品需求文档：模块清单与优先级、功能逻辑、业务规则与状态机、自定义动作编辑器</p><span class="tag">PRD · 编写人：赵玉梅</span></a>
+<a class="card" href="internal-prd/index.html"><div class="icon">📗</div><h2>内部管理平台 · PRD</h2><p>产品需求文档：审核流程、动作库管理、租户管理、RBAC 权限模型等</p><span class="tag">PRD · 编写人：赵玉梅</span></a>
+</div>
+<p class="footer">TangPa RaaS Platform Documentation Center</p>
+</div>
+</body>
+</html>

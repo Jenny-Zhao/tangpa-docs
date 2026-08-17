@@ -1,0 +1,3942 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>成都人形内部管理平台</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<div class="layout">
+  <!-- ===== 侧边栏 ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🤖</div>
+      <div class="logo-text">成都人形<br><span style="font-size:10px;font-weight:400;opacity:0.6;">内部管理平台</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-title">镗钯机器人</div>
+      <div class="nav-item active" onclick="navigateTo('page-device-overview')">
+        <span class="nav-icon">📊</span> 设备总览
+      </div>
+      <div class="nav-item" onclick="navigateTo('page-device')">
+        <span class="nav-icon">📡</span> 设备列表
+      </div>
+      <div class="nav-group-title">镗钯租户资产</div>
+      <div class="nav-item" onclick="navigateTo('page-task')">
+        <span class="nav-icon">🎮</span> 运行任务
+      </div>
+      <div class="nav-item" onclick="navigateTo('page-agent')">
+        <span class="nav-icon">🧠</span> 智能体
+      </div>
+      <div class="nav-group-title">镗钯平台资源</div>
+      <div class="nav-item" onclick="navigateTo('page-material')">
+        <span class="nav-icon">🎨</span> 素材库
+      </div>
+      <div class="nav-item" onclick="navigateTo('page-action-library')">
+        <span class="nav-icon">🎭</span> 动作库
+      </div>
+      <div class="nav-group-title">审核管理</div>
+      <div class="nav-item" onclick="navigateTo('page-audit')">
+        <span class="nav-icon">🛡️</span> 内容审核
+      </div>
+      <div class="nav-group-title">系统管理</div>
+      <div class="nav-item" onclick="navigateTo('page-account')">
+        <span class="nav-icon">👤</span> 账号管理
+      </div>
+      <div class="nav-item" onclick="navigateTo('page-role')">
+        <span class="nav-icon">🔑</span> 角色权限
+      </div>
+      <div class="nav-item" onclick="navigateTo('page-tenant')">
+        <span class="nav-icon">🏢</span> 租户管理
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="avatar">OP</div>
+      <div class="user-info">
+        <div class="user-name">平台运营</div>
+        <div class="user-role">内部管理员</div>
+        <div style="font-size:10px;color:var(--text-sidebar);opacity:0.7;margin-top:2px;">创作者：yumei</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== 主内容区 ===== -->
+  <div class="main">
+    <header class="main-header">
+      <div class="breadcrumb">
+        <span>成都人形内部管理平台</span><span>/</span><span class="current" id="bc-current">设备总览</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon">🔔</button>
+        <button class="btn btn-outline btn-sm">帮助</button>
+      </div>
+    </header>
+    <div class="content">
+
+<div id="page-device-overview" class="page active">
+  <div class="page-header">
+    <div>
+      <div class="page-title">设备总览</div>
+      <div class="page-subtitle">全局掌握设备运行状态与地理分布</div>
+    </div>
+    <div class="flex gap-2">
+      <button class="btn btn-outline" onclick="navigateTo('device-list')">查看设备列表 →</button>
+    </div>
+  </div>
+
+  <!-- 统计卡片 -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--accent-bg);color:var(--accent);">🤖</div>
+      <div class="stat-label">设备总数</div>
+      <div class="stat-value">24</div>
+      <div class="stat-change up">↑ 较上月 +3</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--success-bg);color:var(--success);">✅</div>
+      <div class="stat-label">运行中</div>
+      <div class="stat-value">18</div>
+      <div class="stat-change up">在线率 75%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--warning-bg);color:var(--warning);">⚠️</div>
+      <div class="stat-label">故障/告警</div>
+      <div class="stat-value">2</div>
+      <div class="stat-change down">需处理</div>
+    </div>
+  </div>
+
+  <!-- 地图分布 -->
+  <div class="card" style="margin-top:16px;">
+    <div class="card-header">
+      <div class="card-title">设备地理分布</div>
+      <div class="flex gap-2 items-center">
+        <div class="flex gap-1" style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:3px;">
+          <button class="btn btn-sm map-filter-btn active" data-filter="all" onclick="filterMapDevices('all')" style="border:none;">全部</button>
+          <button class="btn btn-sm map-filter-btn" data-filter="online" onclick="filterMapDevices('online')" style="border:none;">在线</button>
+          <button class="btn btn-sm map-filter-btn" data-filter="offline" onclick="filterMapDevices('offline')" style="border:none;">离线</button>
+        </div>
+        <span style="font-size:12px;color:var(--text-tertiary);">共 <span id="map-device-count">24</span> 台设备 · 10 个区域</span>
+      </div>
+    </div>
+    <div style="position:relative;border-radius:var(--radius-md);height:480px;overflow:hidden;border:1px solid var(--border);">
+      <div id="leaflet-map" style="width:100%;height:100%;"></div>
+      <!-- 图例 -->
+      <div style="position:absolute;bottom:12px;left:12px;background:rgba(255,255,255,0.92);border-radius:var(--radius-sm);padding:8px 12px;font-size:11px;display:flex;gap:12px;align-items:center;border:1px solid var(--border);z-index:1000;">
+        <span style="font-weight:600;color:var(--text-secondary);">图例：</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:50%;background:#22c55e;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,0.3);"></span> 全部在线</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:50%;background:#f59e0b;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,0.3);"></span> 部分离线</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:50%;background:#ef4444;border:2px solid white;box-shadow:0 0 3px rgba(0,0,0,0.3);"></span> 全部离线</span>
+      </div>
+      <!-- 区域统计面板 -->
+      <div id="map-region-panel" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.95);border-radius:var(--radius-md);padding:14px 18px;z-index:1000;min-width:220px;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,0.08);display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span id="region-panel-title" style="font-size:14px;font-weight:700;"></span>
+          <button onclick="document.getElementById('map-region-panel').style.display='none'" style="border:none;background:none;cursor:pointer;font-size:16px;color:var(--text-tertiary);">×</button>
+        </div>
+        <div id="region-panel-content"></div>
+      </div>
+    </div>
+    <div style="padding:10px 20px;font-size:12px;color:var(--text-tertiary);border-top:1px solid var(--border-light);">
+      💡 支持滚轮缩放查看省/市/区/街道级别的设备分布，点击标记查看区域详情
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 页面1: 镗钯机器人 / 设备列表 -->
+<!-- ============================================================ -->
+<div id="page-device" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">设备列表</div>
+      <div class="page-subtitle">跨所有租户统一掌握设备运行状态（只读视角）</div>
+    </div>
+    <div class="flex gap-2">
+      <button class="btn btn-outline btn-sm">导出清单</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-device')">+ 添加设备</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--accent-bg);color:var(--accent);">📡</div>
+      <div class="stat-label">设备总数</div>
+      <div class="stat-value">1,284</div>
+      <div class="stat-change up">↑ 本周新增 36 台</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--success-bg);color:var(--success);">✅</div>
+      <div class="stat-label">在线</div>
+      <div class="stat-value">1,092</div>
+      <div class="stat-change up">↑ 85.0%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--danger-bg);color:var(--danger);">⚠️</div>
+      <div class="stat-label">故障</div>
+      <div class="stat-value">17</div>
+      <div class="stat-change down">需运维介入</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--bg-tag);color:var(--text-secondary);">⭘</div>
+      <div class="stat-label">离线</div>
+      <div class="stat-value">175</div>
+      <div class="stat-change down">↓ 13.6%</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">设备列表（全部租户）</div>
+      <div class="flex gap-2">
+        <input class="filter-input" placeholder="搜索设备ID">
+        <select class="filter-select">
+          <option>全部状态</option>
+          <option>在线</option>
+          <option>离线</option>
+          <option>故障</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>设备ID</th>
+              <th>设备名称</th>
+              <th>型号</th>
+              <th>所属租户</th>
+              <th>状态</th>
+              <th>最后在线</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>RB-2024-0001</td>
+              <td>小镋-01</td>
+              <td>TBot-X1 导览型</td>
+              <td>杭州文旅集团</td>
+              <td><span class="tag tag-success">在线</span></td>
+              <td>2026-08-10 09:42</td>
+              <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-device')">查看</button></td>
+            </tr>
+            <tr>
+              <td>RB-2024-0188</td>
+              <td>小镋-05</td>
+              <td>TBot-S2 表演型</td>
+              <td>西安大唐不夜城</td>
+              <td><span class="tag tag-danger">故障</span></td>
+              <td>2026-08-09 22:15</td>
+              <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-device')">查看</button></td>
+            </tr>
+            <tr>
+              <td>RB-2023-0742</td>
+              <td>小镋-12</td>
+              <td>TBot-X1 导览型</td>
+              <td>成都宽窄巷子</td>
+              <td><span class="tag tag-default">离线</span></td>
+              <td>2026-08-07 18:30</td>
+              <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-device')">查看</button></td>
+            </tr>
+            <tr>
+              <td>RB-2024-0225</td>
+              <td>小镋-18</td>
+              <td>TBot-P3 配送型</td>
+              <td>苏州园林景区</td>
+              <td><span class="tag tag-success">在线</span></td>
+              <td>2026-08-10 09:55</td>
+              <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-device')">查看</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="active">1</button>
+        <button>2</button>
+        <button>3</button>
+        <button>›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 页面2: 运行任务 -->
+<!-- ============================================================ -->
+<div id="page-task" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">运行任务</div>
+      <div class="page-subtitle">跨租户查看在执行的脚本/跟随任务</div>
+    </div>
+  </div>
+
+  <!-- 数据总览 -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:16px;">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--accent-bg);color:var(--accent);">📋</div>
+      <div class="stat-label">总任务</div>
+      <div class="stat-value">3</div>
+      <div class="stat-change">跨 3 个租户</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#eef2ff;color:#6366f1;">🎬</div>
+      <div class="stat-label">脚本任务</div>
+      <div class="stat-value">2</div>
+      <div class="stat-change">占比 67%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#ecfeff;color:#0891b2;">👥</div>
+      <div class="stat-label">跟随任务</div>
+      <div class="stat-value">1</div>
+      <div class="stat-change">占比 33%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--success-bg);color:var(--success);">✅</div>
+      <div class="stat-label">已下发</div>
+      <div class="stat-value">2</div>
+      <div class="stat-change up">↓ 待下发 1</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--warning-bg);color:var(--warning);">⏳</div>
+      <div class="stat-label">未下发</div>
+      <div class="stat-value">1</div>
+      <div class="stat-change">宽窄巷子配送</div>
+    </div>
+  </div>
+
+  <div class="card" style="background:var(--warning-bg);border-color:#fde68a;margin-bottom:16px;">
+    <div class="card-body flex items-center gap-2" style="color:var(--warning);font-weight:500;">
+      <span style="font-size:18px;">🔒</span>
+      只读视图：不支持编辑、暂停或下发执行任何任务，仅用于全局监控与排查。
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <span class="filter-label">所属租户</span>
+      <select class="filter-select">
+        <option>全部租户</option>
+        <option>杭州文旅集团</option>
+        <option>西安大唐不夜城</option>
+        <option>成都宽窄巷子</option>
+        <option>苏州园林景区</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">目标设备</span>
+      <input class="filter-input" placeholder="输入设备ID">
+    </div>
+    <button class="btn btn-primary btn-sm">查询</button>
+    <button class="btn btn-outline btn-sm">重置</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">任务列表</div></div>
+    <div class="card-body" style="padding:0;">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>任务名称</th>
+              <th>类型</th>
+              <th>所属租户</th>
+              <th>目标设备</th>
+              <th>状态</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>大唐巡游·晚场</td>
+              <td><span class="tag tag-accent">脚本</span></td>
+              <td>西安大唐不夜城</td>
+              <td>RB-2024-0188</td>
+              <td><span class="tag tag-success">已下发</span></td>
+              <td>2026-08-10 18:00</td>
+              <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-task-script')">查看</button></td>
+            </tr>
+            <tr>
+              <td>西湖导览随行</td>
+              <td><span class="tag tag-info">跟随</span></td>
+              <td>杭州文旅集团</td>
+              <td>RB-2024-0001</td>
+              <td><span class="tag tag-success">已下发</span></td>
+              <td>2026-08-10 09:30</td>
+              <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-task-follow')">查看</button></td>
+            </tr>
+            <tr>
+              <td>宽窄巷子配送</td>
+              <td><span class="tag tag-accent">脚本</span></td>
+              <td>成都宽窄巷子</td>
+              <td>RB-2023-0742</td>
+              <td><span class="tag tag-warning">未下发</span></td>
+              <td>2026-08-09 14:20</td>
+              <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-task-script')">查看</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 页面3: 素材库 -->
+<!-- ============================================================ -->
+<div id="page-material" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">素材库</div>
+      <div class="page-subtitle">管理图片、表情包、音视频文件和动作图标</div>
+    </div>
+    <div class="flex gap-2">
+      <button class="btn btn-outline">批量管理</button>
+      <button class="btn btn-primary" onclick="openModal('modal-upload-material')">+ 上传素材</button>
+    </div>
+  </div>
+
+  <!-- 文件夹分类 -->
+  <div class="grid-4 mb-4">
+    <div class="card" style="cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+      <div class="card-body" style="padding:20px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:8px;">🖼️</div>
+        <div style="font-size:15px;font-weight:600;">图片库</div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">36个素材 · 全部可用</div>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+      <div class="card-body" style="padding:20px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:8px;">😀</div>
+        <div style="font-size:15px;font-weight:600;">表情包库</div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">48个素材 · 全部可用</div>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+      <div class="card-body" style="padding:20px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:8px;">🎵</div>
+        <div style="font-size:15px;font-weight:600;">音视频文件库</div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">24个素材 · 1个待审核</div>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+      <div class="card-body" style="padding:20px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:8px;">🎯</div>
+        <div style="font-size:15px;font-weight:600;">动作图标库</div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">用于脚本编辑时自定义动作图标</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 当前文件夹：表情包库 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="flex items-center gap-3">
+        <div class="card-title">📁 表情包库</div>
+        <div class="tabs" style="margin-bottom:0;border:none;">
+          <div class="tab active">默认素材</div>
+        </div>
+      </div>
+      <div class="filter-group">
+        <input class="filter-input" placeholder="搜索素材名称" style="min-width:200px;">
+        <button class="btn btn-primary btn-sm">搜索</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="grid-4">
+        <!-- 素材卡片 -->
+        <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+          <div style="height:120px;background:linear-gradient(135deg,#fce4ec,#f8bbd0);display:flex;align-items:center;justify-content:center;font-size:48px;">😊</div>
+          <div style="padding:12px;">
+            <div style="font-size:13px;font-weight:500;">微笑迎宾</div>
+            <div class="flex items-center justify-between mt-2">
+              <span class="tag tag-success">可用</span>
+              <span class="text-sm text-tertiary">12个表情</span>
+            </div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+          <div style="height:120px;background:linear-gradient(135deg,#e3f2fd,#bbdefb);display:flex;align-items:center;justify-content:center;font-size:48px;">🎉</div>
+          <div style="padding:12px;">
+            <div style="font-size:13px;font-weight:500;">节日庆典</div>
+            <div class="flex items-center justify-between mt-2">
+              <span class="tag tag-success">可用</span>
+              <span class="text-sm text-tertiary">8个表情</span>
+            </div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+          <div style="height:120px;background:linear-gradient(135deg,#f3e5f5,#e1bee7);display:flex;align-items:center;justify-content:center;font-size:48px;">😴</div>
+          <div style="padding:12px;">
+            <div style="font-size:13px;font-weight:500;">待机休息</div>
+            <div class="flex items-center justify-between mt-2">
+              <span class="tag tag-success">可用</span>
+              <span class="text-sm text-tertiary">6个表情</span>
+            </div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+          <div style="height:120px;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);display:flex;align-items:center;justify-content:center;font-size:48px;">👋</div>
+          <div style="padding:12px;">
+            <div style="font-size:13px;font-weight:500;">挥手致意</div>
+            <div class="flex items-center justify-between mt-2">
+              <span class="tag tag-success">可用</span>
+              <span class="text-sm text-tertiary;">10个表情</span>
+            </div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+          <div style="height:120px;background:linear-gradient(135deg,#fff3e0,#ffe0b2);display:flex;align-items:center;justify-content:center;font-size:48px;">🕺</div>
+          <div style="padding:12px;">
+            <div style="font-size:13px;font-weight:500;">舞蹈派对</div>
+            <div class="flex items-center justify-between mt-2">
+              <span class="tag tag-warning">待审核</span>
+              <span class="text-sm text-tertiary">15个表情</span>
+            </div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+          <div style="height:120px;background:linear-gradient(135deg,#e0f7fa,#b2ebf2);display:flex;align-items:center;justify-content:center;font-size:48px;">🤔</div>
+          <div style="padding:12px;">
+            <div style="font-size:13px;font-weight:500;">思考疑问</div>
+            <div class="flex items-center justify-between mt-2">
+              <span class="tag tag-success">可用</span>
+              <span class="text-sm text-tertiary">7个表情</span>
+            </div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+          <div style="height:120px;background:linear-gradient(135deg,#fce4ec,#f8bbd0);display:flex;align-items:center;justify-content:center;font-size:48px;">😍</div>
+          <div style="padding:12px;">
+            <div style="font-size:13px;font-weight:500;">开心喜爱</div>
+            <div class="flex items-center justify-between mt-2">
+              <span class="tag tag-success">可用</span>
+              <span class="text-sm text-tertiary">9个表情</span>
+            </div>
+          </div>
+        </div>
+        <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;cursor:pointer;transition:all .2s;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+          <div style="height:120px;background:linear-gradient(135deg,#fff8e1,#ffecb3);display:flex;align-items:center;justify-content:center;font-size:48px;">🎁</div>
+          <div style="padding:12px;">
+            <div style="font-size:13px;font-weight:500;">礼物惊喜</div>
+            <div class="flex items-center justify-between mt-2">
+              <span class="tag tag-danger">不可用</span>
+              <span class="text-sm text-tertiary">5个表情</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 上传素材弹窗 -->
+  <div class="modal-overlay" id="modal-upload-material">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">上传素材</div>
+        <button class="modal-close" onclick="closeModal('modal-upload-material')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">素材类型 <span class="required">*</span></label>
+          <select class="form-select">
+            <option>请选择</option>
+            <option>语音包</option>
+            <option>表情包</option>
+            <option>音视频文件</option>
+            <option>动作图标</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">素材名称 <span class="required">*</span></label>
+          <input class="form-input" placeholder="请输入素材名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">上传文件 <span class="required">*</span></label>
+          <div style="border:2px dashed var(--border);border-radius:var(--radius-md);padding:32px;text-align:center;cursor:pointer;">
+            <div style="font-size:32px;margin-bottom:8px;">📁</div>
+            <div style="font-size:13px;color:var(--text-secondary);">点击或拖拽文件到此处上传</div>
+            <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">支持 PNG/JPG/MP3/MP4 等格式</div>
+          </div>
+        </div>
+        <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--info);">
+          ℹ 内部运营或租户上传的素材均需进入内容审核流程：先经 AI 初审，命中风险（黄赌毒 / 不正当言论等）自动转人工复审，全部通过后才会转为可用状态。提交后将自动送入「审核管理 - 内容审核」队列，素材在被审核通过前显示「待审核」。素材被删除后，与该素材相关的运行脚本仍可正常使用。
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-upload-material')">取消</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-upload-material');showToast('素材已提交，进入AI审核队列，通过后转为可用')">提交并送审</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 页面: 镗钯平台资源 / 动作库 -->
+<!-- ============================================================ -->
+<div id="page-action-library" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">动作库</div>
+      <div class="page-subtitle">平台自定义创建原子动作组合，供各租户引用使用；支持同步给指定租户或全部租户</div>
+    </div>
+    <div class="flex gap-2">
+      <button class="btn btn-outline" onclick="openPlatformActionHelp()">使用说明</button>
+      <button class="btn btn-primary" onclick="openCreatePlatformAction()">+ 新建动作</button>
+    </div>
+  </div>
+
+  <!-- 概览统计 -->
+  <div class="grid-4 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">动作总数</div>
+        <div style="font-size:26px;font-weight:700;color:var(--text-primary);" id="plat-act-total">12</div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">含草稿 + 已发布</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">已发布</div>
+        <div style="font-size:26px;font-weight:700;color:#10b981;" id="plat-act-published">8</div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">租户可引用</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">草稿</div>
+        <div style="font-size:26px;font-weight:700;color:#f59e0b;" id="plat-act-draft">4</div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">未发布，租户不可见</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:6px;">已同步租户</div>
+        <div style="font-size:26px;font-weight:700;color:var(--accent);" id="plat-act-tenant">7</div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">覆盖全部租户</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 筛选区 -->
+  <div class="filter-bar">
+    <div class="filter-group"><span class="filter-label">动作名称</span><input class="filter-input" placeholder="输入动作名称" id="plat-act-search-name"></div>
+    <div class="filter-group"><span class="filter-label">动作位置</span>
+      <select class="filter-select" id="plat-act-search-pos">
+        <option value="">全部位置</option><option>头部</option><option>躯体</option><option>耳朵</option><option>全身</option>
+      </select>
+    </div>
+    <div class="filter-group"><span class="filter-label">状态</span>
+      <select class="filter-select" id="plat-act-search-status">
+        <option value="">全部状态</option><option>草稿</option><option>已发布</option>
+      </select>
+    </div>
+    <div class="filter-group"><span class="filter-label">同步范围</span>
+      <select class="filter-select" id="plat-act-search-scope">
+        <option value="">全部</option><option>未同步</option><option>部分租户</option><option>全部租户</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="renderPlatformActionList()">查询</button>
+    <button class="btn btn-outline btn-sm" onclick="resetPlatformActionFilter()">重置</button>
+  </div>
+
+  <!-- 动作列表 -->
+  <div class="card">
+    <div class="card-body" style="padding:0;">
+      <div class="table-wrapper">
+        <table>
+          <thead><tr>
+            <th style="width:60px;">图标</th>
+            <th>动作名称</th>
+            <th>位置</th>
+            <th>原子动作数</th>
+            <th>时长</th>
+            <th>状态</th>
+            <th>同步范围</th>
+            <th>更新时间</th>
+            <th style="width:280px;">操作</th>
+          </tr></thead>
+          <tbody id="plat-act-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部说明 -->
+  <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--info);margin-top:16px;">
+    ℹ 平台动作库：管理员创建的原子动作组合可发布给租户使用。发布后状态变为"已发布"，通过"同步"动作可将动作下发给指定租户或全部租户，租户收到后可在自有动作库内引用。
+    草稿状态下租户不可见，编辑中的修改不会影响已发布的版本；点击"发布"后再次修改，需重新发布并同步。
+  </div>
+</div>
+
+<div id="page-agent" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">智能体</div>
+      <div class="page-subtitle">查看全局智能体 / 知识库 / 模型 / 声纹（无创建入口）</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this,'ag-model')">模型管理</div>
+    <div class="tab" onclick="switchTab(this,'ag-agent')">智能体</div>
+    <div class="tab" onclick="switchTab(this,'ag-kb')">知识库</div>
+    <div class="tab" onclick="switchTab(this,'ag-voice')">声纹管理</div>
+  </div>
+
+  <div id="ag-model" class="tab-pane">
+    <div class="card">
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>模型名称</th><th>类型</th><th>提供方</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr><td>TBot-GPT-Pro</td><td>对话大模型</td><td>平台内置</td><td><span class="tag tag-success">可用</span></td></tr>
+              <tr><td>TBot-GPT-Lite</td><td>对话大模型</td><td>平台内置</td><td><span class="tag tag-success">可用</span></td></tr>
+              <tr><td>TBot-Vision</td><td>视觉识别</td><td>平台内置</td><td><span class="tag tag-warning">维护中</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ag-agent" class="tab-pane" style="display:none;">
+    <div class="filter-bar">
+      <div class="filter-group"><span class="filter-label">智能体名称</span><input class="filter-input" placeholder="输入名称"></div>
+      <div class="filter-group"><span class="filter-label">租户</span><select class="filter-select"><option>全部租户</option><option>杭州文旅集团</option><option>西安大唐不夜城</option></select></div>
+      <button class="btn btn-primary btn-sm">查询</button>
+    </div>
+    <div class="card">
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>智能体名称</th><th>所属租户</th><th>关联模型</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>西湖讲解员</td><td>杭州文旅集团</td><td>TBot-GPT-Pro</td><td><span class="tag tag-success">启用</span></td><td><button class="btn btn-ghost btn-sm">查看</button></td></tr>
+              <tr><td>不夜城导购</td><td>西安大唐不夜城</td><td>TBot-GPT-Lite</td><td><span class="tag tag-success">启用</span></td><td><button class="btn btn-ghost btn-sm">查看</button></td></tr>
+              <tr><td>巷子巡检员</td><td>成都宽窄巷子</td><td>TBot-GPT-Pro</td><td><span class="tag tag-default">停用</span></td><td><button class="btn btn-ghost btn-sm">查看</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ag-kb" class="tab-pane" style="display:none;">
+    <div class="filter-bar">
+      <div class="filter-group"><span class="filter-label">知识库名称</span><input class="filter-input" placeholder="输入名称"></div>
+      <div class="filter-group"><span class="filter-label">租户</span><select class="filter-select"><option>全部租户</option><option>苏州园林景区</option></select></div>
+      <button class="btn btn-primary btn-sm">查询</button>
+    </div>
+    <div class="card">
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>知识库名称</th><th>所属租户</th><th>文档数</th><th>更新时间</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>园林百科</td><td>苏州园林景区</td><td>128</td><td>2026-08-08</td><td><button class="btn btn-ghost btn-sm">查看</button></td></tr>
+              <tr><td>景区FAQ</td><td>杭州文旅集团</td><td>76</td><td>2026-08-09</td><td><button class="btn btn-ghost btn-sm">查看</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ag-voice" class="tab-pane" style="display:none;">
+    <div class="card">
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>声纹名称</th><th>所属租户</th><th>性别</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>小钯-女声</td><td>杭州文旅集团</td><td>女</td><td><span class="tag tag-success">可用</span></td><td><button class="btn btn-ghost btn-sm">查看</button></td></tr>
+              <tr><td>大唐-男声</td><td>西安大唐不夜城</td><td>男</td><td><span class="tag tag-success">可用</span></td><td><button class="btn btn-ghost btn-sm">查看</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 页面: 审核管理 / 内容审核 -->
+<!-- ============================================================ -->
+<div id="page-audit" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">内容审核</div>
+      <div class="page-subtitle">对内部和租户平台上传的素材与知识库进行AI审核与人工复审，重点审核黄赌毒及不正当言论等政治审核点</div>
+    </div>
+  </div>
+
+  <!-- 统计卡片 -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--accent-bg);color:var(--accent);">📋</div>
+      <div class="stat-label">今日审核总量</div>
+      <div class="stat-value">38</div>
+      <div class="stat-change up">↑ 较昨日 +12</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--success-bg);color:var(--success);">✅</div>
+      <div class="stat-label">AI审核通过</div>
+      <div class="stat-value">29</div>
+      <div class="stat-change">通过率 76.3%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--warning-bg);color:var(--warning);">⏳</div>
+      <div class="stat-label">待人工审核</div>
+      <div class="stat-value">7</div>
+      <div class="stat-change down">需及时处理</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--danger-bg);color:var(--danger);">🚫</div>
+      <div class="stat-label">已驳回</div>
+      <div class="stat-value">2</div>
+      <div class="stat-change">本期累计</div>
+    </div>
+  </div>
+
+  <!-- Tab切换 -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this,'audit-ai')">AI审核</div>
+    <div class="tab" onclick="switchTab(this,'audit-manual')">人工审核</div>
+  </div>
+
+  <!-- ===== AI审核 Tab ===== -->
+  <div id="audit-ai" class="tab-pane">
+    <div class="card" style="background:var(--info-bg);border-color:#bfdbfe;margin-bottom:16px;">
+      <div class="card-body flex items-center gap-2" style="color:var(--info);font-size:13px;">
+        <span style="font-size:18px;">🤖</span>
+        AI自动审核：所有内部和租户平台上传的素材（图片、表情包、音视频）及知识库文档，系统自动进行内容安全检测。审核通过的素材直接转为可用状态；未通过的自动流转至人工审核。
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">来源平台</span>
+        <select class="filter-select">
+          <option>全部</option>
+          <option>内部管理平台</option>
+          <option>租户平台</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">内容类型</span>
+        <select class="filter-select">
+          <option>全部</option>
+          <option>图片素材</option>
+          <option>表情包</option>
+          <option>音视频文件</option>
+          <option>知识库文档</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">AI审核结果</span>
+        <select class="filter-select">
+          <option>全部</option>
+          <option>通过</option>
+          <option>不通过（转人工）</option>
+          <option>待审核</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <input class="filter-input" placeholder="搜索素材/知识库名称">
+      </div>
+      <button class="btn btn-primary btn-sm">查询</button>
+      <button class="btn btn-outline btn-sm">重置</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">AI审核记录</div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>内容名称</th>
+                <th>来源平台</th>
+                <th>内容类型</th>
+                <th>上传时间</th>
+                <th>AI审核结果</th>
+                <th>命中风险类型</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>微笑迎宾表情包</td>
+                <td><span class="tag tag-default">内部平台</span></td>
+                <td>表情包</td>
+                <td>2026-08-12 09:15</td>
+                <td><span class="tag tag-success">✅ 通过</span></td>
+                <td>—</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-detail')">查看</button></td>
+              </tr>
+              <tr>
+                <td>园林百科知识库</td>
+                <td><span class="tag tag-accent">租户平台</span></td>
+                <td>知识库文档</td>
+                <td>2026-08-12 08:42</td>
+                <td><span class="tag tag-success">✅ 通过</span></td>
+                <td>—</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-detail')">查看</button></td>
+              </tr>
+              <tr>
+                <td>舞蹈派对表情包</td>
+                <td><span class="tag tag-accent">租户平台</span></td>
+                <td>表情包</td>
+                <td>2026-08-12 08:30</td>
+                <td><span class="tag tag-danger">❌ 不通过</span></td>
+                <td><span class="tag tag-danger">涉嫌低俗内容</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-detail')">查看</button></td>
+              </tr>
+              <tr>
+                <td>迎宾语音包-女声</td>
+                <td><span class="tag tag-default">内部平台</span></td>
+                <td>音视频文件</td>
+                <td>2026-08-12 07:55</td>
+                <td><span class="tag tag-success">✅ 通过</span></td>
+                <td>—</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-detail')">查看</button></td>
+              </tr>
+              <tr>
+                <td>景区FAQ文档</td>
+                <td><span class="tag tag-accent">租户平台</span></td>
+                <td>知识库文档</td>
+                <td>2026-08-11 18:20</td>
+                <td><span class="tag tag-danger">❌ 不通过</span></td>
+                <td><span class="tag tag-danger">涉嫌不当言论</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-detail')">查看</button></td>
+              </tr>
+              <tr>
+                <td>节日庆典图片集</td>
+                <td><span class="tag tag-default">内部平台</span></td>
+                <td>图片素材</td>
+                <td>2026-08-11 16:10</td>
+                <td><span class="tag tag-success">✅ 通过</span></td>
+                <td>—</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-detail')">查看</button></td>
+              </tr>
+              <tr>
+                <td>大唐巡游背景音乐</td>
+                <td><span class="tag tag-accent">租户平台</span></td>
+                <td>音视频文件</td>
+                <td>2026-08-11 14:35</td>
+                <td><span class="tag tag-warning">⏳ 待审核</span></td>
+                <td>—</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-detail')">查看</button></td>
+              </tr>
+              <tr>
+                <td>景区导览图片素材</td>
+                <td><span class="tag tag-accent">租户平台</span></td>
+                <td>图片素材</td>
+                <td>2026-08-11 11:08</td>
+                <td><span class="tag tag-success">✅ 通过</span></td>
+                <td>—</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-detail')">查看</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <button class="active">1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 人工审核 Tab ===== -->
+  <div id="audit-manual" class="tab-pane" style="display:none;">
+    <div class="card" style="background:var(--warning-bg);border-color:#fde68a;margin-bottom:16px;">
+      <div class="card-body flex items-center gap-2" style="color:var(--warning);font-size:13px;">
+        <span style="font-size:18px;">👤</span>
+        人工复审：AI审核未通过的内容将进入人工审核队列。审核员需重点核查黄赌毒、不正当言论等政治审核点，决定是否通过或驳回。驳回后素材将标记为不可用，并通知上传方。
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">审核状态</span>
+        <select class="filter-select">
+          <option>全部</option>
+          <option>待人工审核</option>
+          <option>已通过</option>
+          <option>已驳回</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">风险类型</span>
+        <select class="filter-select">
+          <option>全部</option>
+          <option>涉嫌低俗/色情</option>
+          <option>涉嫌赌博</option>
+          <option>涉嫌毒品相关</option>
+          <option>不正当言论</option>
+          <option>政治敏感内容</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">来源平台</span>
+        <select class="filter-select">
+          <option>全部</option>
+          <option>内部管理平台</option>
+          <option>租户平台</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-sm">查询</button>
+      <button class="btn btn-outline btn-sm">重置</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">人工审核队列</div>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>内容名称</th>
+                <th>来源平台</th>
+                <th>内容类型</th>
+                <th>命中风险类型</th>
+                <th>AI审核说明</th>
+                <th>上传时间</th>
+                <th>审核状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>舞蹈派对表情包</td>
+                <td><span class="tag tag-accent">租户平台</span></td>
+                <td>表情包</td>
+                <td><span class="tag tag-danger">涉嫌低俗/色情</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">检测到3张表情包含暴露姿势，置信度92%</td>
+                <td>2026-08-12 08:30</td>
+                <td><span class="tag tag-warning">⏳ 待审核</span></td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-review')">审核</button>
+                </td>
+              </tr>
+              <tr>
+                <td>景区FAQ文档</td>
+                <td><span class="tag tag-accent">租户平台</span></td>
+                <td>知识库文档</td>
+                <td><span class="tag tag-danger">不正当言论</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">检测到2处不当政治表述，置信度87%</td>
+                <td>2026-08-11 18:20</td>
+                <td><span class="tag tag-warning">⏳ 待审核</span></td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-review')">审核</button>
+                </td>
+              </tr>
+              <tr>
+                <td>夜场巡游背景视频</td>
+                <td><span class="tag tag-accent">租户平台</span></td>
+                <td>音视频文件</td>
+                <td><span class="tag tag-danger">涉嫌赌博</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">视频画面含疑似赌博相关道具，置信度78%</td>
+                <td>2026-08-11 15:00</td>
+                <td><span class="tag tag-warning">⏳ 待审核</span></td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-review')">审核</button>
+                </td>
+              </tr>
+              <tr>
+                <td>迎宾图片素材-备选</td>
+                <td><span class="tag tag-default">内部平台</span></td>
+                <td>图片素材</td>
+                <td><span class="tag tag-danger">政治敏感内容</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">图片背景含敏感地标标识，置信度85%</td>
+                <td>2026-08-10 14:22</td>
+                <td><span class="tag tag-danger">已驳回</span></td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-detail')">查看</button>
+                </td>
+              </tr>
+              <tr>
+                <td>巷子文化知识库</td>
+                <td><span class="tag tag-accent">租户平台</span></td>
+                <td>知识库文档</td>
+                <td><span class="tag tag-danger">涉嫌毒品相关</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">文档中出现违禁品相关描述，置信度81%</td>
+                <td>2026-08-10 10:15</td>
+                <td><span class="tag tag-success">已通过</span></td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-detail')">查看</button>
+                </td>
+              </tr>
+              <tr>
+                <td>表演动作图标包</td>
+                <td><span class="tag tag-default">内部平台</span></td>
+                <td>动作图标</td>
+                <td><span class="tag tag-danger">涉嫌低俗/色情</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">部分动作图标疑似不雅姿势，置信度76%</td>
+                <td>2026-08-09 16:40</td>
+                <td><span class="tag tag-warning">⏳ 待审核</span></td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openModal('modal-audit-review')">审核</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <button class="active">1</button>
+          <button>2</button>
+          <button>›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗: 审核详情（AI审核记录查看） -->
+  <div class="modal-overlay" id="modal-audit-detail">
+    <div class="modal-box" style="width:640px;">
+      <div class="modal-header">
+        <div class="modal-title">审核详情</div>
+        <button class="modal-close" onclick="closeModal('modal-audit-detail')">×</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:100px 1fr;gap:10px 16px;font-size:13px;margin-bottom:20px;">
+          <div style="color:var(--text-secondary);">内容名称</div>
+          <div style="font-weight:500;">舞蹈派对表情包</div>
+          <div style="color:var(--text-secondary);">来源平台</div>
+          <div><span class="tag tag-accent">租户平台</span> 西安大唐不夜城</div>
+          <div style="color:var(--text-secondary);">内容类型</div>
+          <div>表情包（15个表情）</div>
+          <div style="color:var(--text-secondary);">上传时间</div>
+          <div>2026-08-12 08:30</div>
+          <div style="color:var(--text-secondary);">AI审核结果</div>
+          <div><span class="tag tag-danger">❌ 不通过</span></div>
+          <div style="color:var(--text-secondary);">命中风险类型</div>
+          <div><span class="tag tag-danger">涉嫌低俗/色情</span></div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:16px;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">AI审核分析</div>
+          <div class="card" style="background:var(--bg-secondary);border:none;">
+            <div class="card-body" style="font-size:12px;color:var(--text-secondary);line-height:1.8;">
+              <div>• 检测到3张表情包中含暴露姿势画面，置信度92%</div>
+              <div>• 命中模型：内容安全-低俗检测 v2.1</div>
+              <div>• 检测维度：图像画面、文字标注</div>
+              <div>• 建议处置：转人工复审，重点核查第4、7、9张表情</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:16px;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">人工审核结果</div>
+          <div style="display:grid;grid-template-columns:100px 1fr;gap:10px 16px;font-size:13px;">
+            <div style="color:var(--text-secondary);">审核状态</div>
+            <div><span class="tag tag-warning">⏳ 待人工审核</span></div>
+            <div style="color:var(--text-secondary);">审核人</div>
+            <div style="color:var(--text-tertiary);">—</div>
+            <div style="color:var(--text-secondary);">审核意见</div>
+            <div style="color:var(--text-tertiary);">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" style="color:var(--accent);border-color:var(--accent);" onclick="openModal('modal-audit-original')">📂 查看原文件</button>
+        <button class="btn btn-outline" onclick="closeModal('modal-audit-detail')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗: 人工审核操作 -->
+  <div class="modal-overlay" id="modal-audit-review">
+    <div class="modal-box" style="width:680px;">
+      <div class="modal-header">
+        <div class="modal-title">人工审核 · 舞蹈派对表情包</div>
+        <button class="modal-close" onclick="closeModal('modal-audit-review')">×</button>
+      </div>
+      <div class="modal-body" style="max-height:600px;overflow-y:auto;">
+        <!-- 基本信息 -->
+        <div style="display:grid;grid-template-columns:100px 1fr 100px 1fr;gap:10px 16px;font-size:13px;margin-bottom:20px;">
+          <div style="color:var(--text-secondary);">内容名称</div>
+          <div style="font-weight:500;">舞蹈派对表情包</div>
+          <div style="color:var(--text-secondary);">内容类型</div>
+          <div>表情包（15个表情）</div>
+          <div style="color:var(--text-secondary);">来源平台</div>
+          <div><span class="tag tag-accent">租户平台</span></div>
+          <div style="color:var(--text-secondary);">上传时间</div>
+          <div>2026-08-12 08:30</div>
+          <div style="color:var(--text-secondary);">所属租户</div>
+          <div>西安大唐不夜城</div>
+          <div style="color:var(--text-secondary);">上传人</div>
+          <div>xa_operator</div>
+        </div>
+
+        <!-- AI审核信息 -->
+        <div class="card" style="background:var(--danger-bg);border-color:#fecaca;margin-bottom:16px;">
+          <div class="card-body">
+            <div style="font-size:13px;font-weight:600;color:var(--danger);margin-bottom:8px;">🤖 AI审核结果：不通过</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">
+              命中风险类型：<span class="tag tag-danger">涉嫌低俗/色情</span><br>
+              检测说明：检测到3张表情包中含暴露姿势画面，置信度92%。命中模型：内容安全-低俗检测 v2.1。<br>
+              建议处置：转人工复审，重点核查第4、7、9张表情。
+            </div>
+          </div>
+        </div>
+
+        <!-- 内容预览 -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:600;margin-bottom:10px;">内容预览（AI标记可疑项已标红）</div>
+          <div class="grid-4">
+            <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);padding:8px;text-align:center;">
+              <div style="height:60px;display:flex;align-items:center;justify-content:center;font-size:32px;">🕺</div>
+              <div style="font-size:11px;margin-top:4px;">表情1</div>
+            </div>
+            <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);padding:8px;text-align:center;">
+              <div style="height:60px;display:flex;align-items:center;justify-content:center;font-size:32px;">💃</div>
+              <div style="font-size:11px;margin-top:4px;">表情2</div>
+            </div>
+            <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);padding:8px;text-align:center;">
+              <div style="height:60px;display:flex;align-items:center;justify-content:center;font-size:32px;">🎉</div>
+              <div style="font-size:11px;margin-top:4px;">表情3</div>
+            </div>
+            <div style="border:2px solid var(--danger);border-radius:var(--radius-md);padding:8px;text-align:center;background:var(--danger-bg);">
+              <div style="height:60px;display:flex;align-items:center;justify-content:center;font-size:32px;">🔞</div>
+              <div style="font-size:11px;margin-top:4px;color:var(--danger);font-weight:600;">表情4 ⚠️</div>
+            </div>
+            <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);padding:8px;text-align:center;">
+              <div style="height:60px;display:flex;align-items:center;justify-content:center;font-size:32px;">🎵</div>
+              <div style="font-size:11px;margin-top:4px;">表情5</div>
+            </div>
+            <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);padding:8px;text-align:center;">
+              <div style="height:60px;display:flex;align-items:center;justify-content:center;font-size:32px;">🎊</div>
+              <div style="font-size:11px;margin-top:4px;">表情6</div>
+            </div>
+            <div style="border:2px solid var(--danger);border-radius:var(--radius-md);padding:8px;text-align:center;background:var(--danger-bg);">
+              <div style="height:60px;display:flex;align-items:center;justify-content:center;font-size:32px;">🔞</div>
+              <div style="font-size:11px;margin-top:4px;color:var(--danger);font-weight:600;">表情7 ⚠️</div>
+            </div>
+            <div style="border:1px solid var(--border-light);border-radius:var(--radius-md);padding:8px;text-align:center;">
+              <div style="height:60px;display:flex;align-items:center;justify-content:center;font-size:32px;">😎</div>
+              <div style="font-size:11px;margin-top:4px;">表情8</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 审核要点提示 -->
+        <div style="background:var(--warning-bg);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--warning);margin-bottom:16px;">
+          ⚠️ 审核要点：请重点核查以下政治审核点：<br>
+          1. 是否涉及黄赌毒内容（色情低俗、赌博、毒品相关）<br>
+          2. 是否含有不正当言论（颠覆国家政权、破坏民族团结等）<br>
+          3. 是否涉及政治敏感人物或事件<br>
+          4. 是否含有暴力、恐怖主义相关内容
+        </div>
+
+        <!-- 审核意见 -->
+        <div class="form-group">
+          <label class="form-label">审核意见 <span class="required">*</span></label>
+          <textarea class="form-input" rows="3" placeholder="请输入审核意见，如：第4、7张表情包含不雅姿势，符合AI检测结果，予以驳回。" style="resize:vertical;"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-audit-review')">取消</button>
+        <button class="btn btn-outline" style="color:var(--danger);border-color:var(--danger);" onclick="closeModal('modal-audit-review');showToast('已驳回，已通知上传方')">驳回</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-audit-review');showToast('审核通过，素材已转为可用状态')">通过</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗: 查看原文件 -->
+  <div class="modal-overlay" id="modal-audit-original">
+    <div class="modal-box" style="width:760px;">
+      <div class="modal-header">
+        <div class="modal-title">📂 原文件查看 - 舞蹈派对表情包</div>
+        <button class="modal-close" onclick="closeModal('modal-audit-original')">×</button>
+      </div>
+      <div class="modal-body">
+        <!-- 文件信息 -->
+        <div class="card" style="background:var(--bg-secondary);border:none;margin-bottom:16px;">
+          <div class="card-body" style="padding:12px 16px;">
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 20px;font-size:12px;">
+              <div style="color:var(--text-secondary);">内容类型</div>
+              <div>表情包（15个表情）</div>
+              <div style="color:var(--text-secondary);">来源平台</div>
+              <div><span class="tag tag-accent">租户平台</span> 西安大唐不夜城</div>
+              <div style="color:var(--text-secondary);">上传人</div>
+              <div>张明远（运营经理）</div>
+              <div style="color:var(--text-secondary);">上传时间</div>
+              <div>2026-08-12 08:30</div>
+              <div style="color:var(--text-secondary);">文件大小</div>
+              <div>共 12.6 MB（表情4: 1.2MB, 表情7: 1.5MB, 表情9: 1.1MB）</div>
+              <div style="color:var(--text-secondary);">当前审核状态</div>
+              <div><span class="tag tag-warning">⏳ 待人工审核</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 全部原始表情 -->
+        <div style="font-size:14px;font-weight:600;margin-bottom:10px;">全部原始内容（15个表情）</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;">
+          <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;" onclick="openModal('modal-audit-preview-single')">
+            <div style="height:90px;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:flex;align-items:center;justify-content:center;font-size:36px;">😊</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;">表情 01</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 850KB</div>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;" onclick="openModal('modal-audit-preview-single')">
+            <div style="height:90px;background:linear-gradient(135deg,#34d399,#10b981);display:flex;align-items:center;justify-content:center;font-size:36px;">😄</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;">表情 02</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 920KB</div>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;" onclick="openModal('modal-audit-preview-single')">
+            <div style="height:90px;background:linear-gradient(135deg,#60a5fa,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:36px;">😎</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;">表情 03</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 780KB</div>
+            </div>
+          </div>
+          <div style="border:2px solid var(--danger);border-radius:6px;overflow:hidden;cursor:pointer;position:relative;" onclick="openModal('modal-audit-preview-single')">
+            <div style="position:absolute;top:4px;right:4px;background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:3px;z-index:2;">⚠ AI标记</div>
+            <div style="height:90px;background:linear-gradient(135deg,#f472b6,#ec4899);display:flex;align-items:center;justify-content:center;font-size:36px;">💃</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;color:var(--danger);">表情 04</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 1.2MB</div>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;" onclick="openModal('modal-audit-preview-single')">
+            <div style="height:90px;background:linear-gradient(135deg,#a78bfa,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:36px;">😘</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;">表情 05</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 890KB</div>
+            </div>
+          </div>
+
+          <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;" onclick="openModal('modal-audit-preview-single')">
+            <div style="height:90px;background:linear-gradient(135deg,#fb923c,#f97316);display:flex;align-items:center;justify-content:center;font-size:36px;">🤩</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;">表情 06</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 760KB</div>
+            </div>
+          </div>
+          <div style="border:2px solid var(--danger);border-radius:6px;overflow:hidden;cursor:pointer;position:relative;" onclick="openModal('modal-audit-preview-single')">
+            <div style="position:absolute;top:4px;right:4px;background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:3px;z-index:2;">⚠ AI标记</div>
+            <div style="height:90px;background:linear-gradient(135deg,#fb7185,#f43f5e);display:flex;align-items:center;justify-content:center;font-size:36px;">👯</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;color:var(--danger);">表情 07</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 1.5MB</div>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;" onclick="openModal('modal-audit-preview-single')">
+            <div style="height:90px;background:linear-gradient(135deg,#22d3ee,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:36px;">🕺</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;">表情 08</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 1.0MB</div>
+            </div>
+          </div>
+          <div style="border:2px solid var(--danger);border-radius:6px;overflow:hidden;cursor:pointer;position:relative;" onclick="openModal('modal-audit-preview-single')">
+            <div style="position:absolute;top:4px;right:4px;background:var(--danger);color:#fff;font-size:10px;padding:1px 6px;border-radius:3px;z-index:2;">⚠ AI标记</div>
+            <div style="height:90px;background:linear-gradient(135deg,#e879f9,#d946ef);display:flex;align-items:center;justify-content:center;font-size:36px;">💋</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;color:var(--danger);">表情 09</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 1.1MB</div>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;" onclick="openModal('modal-audit-preview-single')">
+            <div style="height:90px;background:linear-gradient(135deg,#4ade80,#22c55e);display:flex;align-items:center;justify-content:center;font-size:36px;">🥳</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;">表情 10</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 820KB</div>
+            </div>
+          </div>
+
+          <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;" onclick="openModal('modal-audit-preview-single')">
+            <div style="height:90px;background:linear-gradient(135deg,#fcd34d,#eab308);display:flex;align-items:center;justify-content:center;font-size:36px;">🙌</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;">表情 11</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 880KB</div>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;" onclick="openModal('modal-audit-preview-single')">
+            <div style="height:90px;background:linear-gradient(135deg,#f87171,#ef4444);display:flex;align-items:center;justify-content:center;font-size:36px;">❤️</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;">表情 12</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">240×240 · 750KB</div>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;background:var(--bg-secondary);">
+            <div style="height:90px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text-tertiary);">+1</div>
+            <div style="padding:6px 8px;font-size:11px;">
+              <div style="font-weight:500;color:var(--text-tertiary);">展开更多</div>
+              <div style="color:var(--text-tertiary);font-size:10px;">表情 13-15</div>
+            </div>
+          </div>
+          <div style="border:1px dashed var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;background:var(--bg-secondary);font-size:11px;color:var(--text-tertiary);">已隐藏</div>
+          <div style="border:1px dashed var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;background:var(--bg-secondary);font-size:11px;color:var(--text-tertiary);">已隐藏</div>
+        </div>
+
+        <!-- 上传说明 -->
+        <div class="card" style="background:var(--bg-secondary);border:none;">
+          <div class="card-body" style="padding:12px 16px;">
+            <div style="font-size:12px;font-weight:600;margin-bottom:6px;">📝 上传说明</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">
+              为"大唐不夜城"舞蹈派对活动定制的一组表情包，共15个动作，建议配置在互动环节使用。包含微笑、舞蹈、击掌、爱心等动作，期望通过机器人屏幕展示增强游客互动体验。
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-audit-original')">关闭</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-audit-original');openModal('modal-audit-review')">前往审核</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗: 单个表情大图预览 -->
+  <div class="modal-overlay" id="modal-audit-preview-single">
+    <div class="modal-box" style="width:520px;">
+      <div class="modal-header">
+        <div class="modal-title">🖼️ 表情 04 - 大图预览</div>
+        <button class="modal-close" onclick="closeModal('modal-audit-preview-single')">×</button>
+      </div>
+      <div class="modal-body">
+        <div style="height:240px;background:linear-gradient(135deg,#f472b6,#ec4899);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:96px;margin-bottom:16px;position:relative;">
+          💃
+          <div style="position:absolute;top:10px;right:10px;background:var(--danger);color:#fff;font-size:11px;padding:3px 8px;border-radius:4px;">⚠ AI标记可疑</div>
+        </div>
+        <div class="card" style="background:var(--bg-secondary);border:none;margin-bottom:12px;">
+          <div class="card-body" style="padding:12px 16px;">
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:12px;">
+              <div style="color:var(--text-secondary);">文件名</div>
+              <div>emoji_04_dance.png</div>
+              <div style="color:var(--text-secondary);">尺寸</div>
+              <div>240 × 240 像素</div>
+              <div style="color:var(--text-secondary);">大小</div>
+              <div>1.2 MB</div>
+              <div style="color:var(--text-secondary);">格式</div>
+              <div>PNG（透明背景）</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="background:#fef2f2;border:1px solid #fecaca;">
+          <div class="card-body" style="padding:12px 16px;">
+            <div style="font-size:12px;font-weight:600;color:var(--danger);margin-bottom:6px;">AI 标记详情</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;">
+              <div>• 命中模型：内容安全-低俗检测 v2.1</div>
+              <div>• 置信度：92%</div>
+              <div>• 检测说明：图像画面含暴露姿势动作，舞蹈姿态被识别为不当</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-audit-preview-single')">返回列表</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-audit-preview-single');closeModal('modal-audit-original');openModal('modal-audit-review')">前往审核</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- 页面5: 系统管理 -->
+<!-- ============================================================ -->
+
+<!-- ===== 页面: 账号管理 ===== -->
+<div id="page-account" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">账号管理</div>
+      <div class="page-subtitle">创建和管理内部管理平台账号</div>
+    </div>
+  </div>
+  <div class="flex gap-2" style="margin-bottom:16px;">
+    <button class="btn btn-primary btn-sm" onclick="openModal('modal-account-system')">创建内部账号</button>
+  </div>
+  <div class="card">
+    <div class="card-body" style="padding:0;">
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>用户名</th><th>手机号</th><th>角色</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>op_admin</td><td>138****0066</td><td><span class="tag tag-accent">平台超级管理员</span></td><td><span class="tag tag-success">启用</span></td>
+              <td>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('账号 op_admin 的登录密码：Op@2024#plat')">重置密码</button>
+                <button class="btn btn-ghost btn-sm">详情</button>
+                <button class="btn btn-ghost btn-sm">编辑</button>
+                <button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button>
+              </td>
+            </tr>
+            <tr>
+              <td>op_oper</td><td>135****8821</td><td>运营专员</td><td><span class="tag tag-success">启用</span></td>
+              <td>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('账号 op_oper 的登录密码已重置')">重置密码</button>
+                <button class="btn btn-ghost btn-sm">详情</button>
+                <button class="btn btn-ghost btn-sm">编辑</button>
+                <button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button>
+              </td>
+            </tr>
+            <tr>
+              <td>op_readonly</td><td>136****3309</td><td>运营只读</td><td><span class="tag tag-default">停用</span></td>
+              <td>
+                <button class="btn btn-ghost btn-sm" onclick="showToast('账号 op_readonly 的登录密码已重置')">重置密码</button>
+                <button class="btn btn-ghost btn-sm">详情</button>
+                <button class="btn btn-ghost btn-sm">编辑</button>
+                <button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 页面: 角色权限 ===== -->
+<div id="page-role" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">角色权限</div>
+      <div class="page-subtitle">内部平台角色管理，支持基于平台的数据权限与功能权限配置</div>
+    </div>
+    <div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('modal-role-add')">新增角色</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(this,'role-list')">角色列表</div>
+    <div class="tab" onclick="switchTab(this,'role-data')">数据权限（设备）</div>
+    <div class="tab" onclick="switchTab(this,'role-func')">功能权限（功能点）</div>
+  </div>
+
+  <!-- 角色列表 -->
+  <div id="role-list" class="tab-pane">
+    <div class="card">
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>角色名称</th><th>数据权限范围</th><th>功能权限</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>平台超级管理员</td>
+                <td><span class="tag tag-success">全部设备</span></td>
+                <td>全部功能</td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openModal('modal-role-config')">配置权限</button>
+                  <button class="btn btn-ghost btn-sm">编辑</button>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button>
+                </td>
+              </tr>
+              <tr>
+                <td>租户管理员</td>
+                <td><span class="tag tag-accent">本租户设备</span></td>
+                <td>设备 / 任务 / 智能体 / 素材</td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openModal('modal-role-config')">配置权限</button>
+                  <button class="btn btn-ghost btn-sm">编辑</button>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button>
+                </td>
+              </tr>
+              <tr>
+                <td>运营只读</td>
+                <td><span class="tag tag-default">仅查看</span></td>
+                <td>查看权限</td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openModal('modal-role-config')">配置权限</button>
+                  <button class="btn btn-ghost btn-sm">编辑</button>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据权限（设备） -->
+  <div id="role-data" class="tab-pane" style="display:none;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">数据权限（设备范围）</div></div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">选择角色</label>
+          <select class="form-select"><option>平台超级管理员</option><option>租户管理员</option><option>运营只读</option></select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="radio" name="roleDataPerm" onclick="document.getElementById('role-data-sn').style.display='none'" checked> 全部设备（跨租户全局）</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="radio" name="roleDataPerm" onclick="document.getElementById('role-data-sn').style.display='block'"> 指定设备（按设备 SN 多选）</label>
+        </div>
+        <div id="role-data-sn" style="display:none;margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-secondary);">
+          <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">选择设备 SN（多选）</div>
+          <div style="max-height:150px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);"><input type="checkbox"> RB-2024-0001（小镋-01 / 杭州文旅集团）</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);"><input type="checkbox"> RB-2024-0188（小镋-05 / 西安大唐不夜城）</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);"><input type="checkbox"> RB-2023-0742（小镋-12 / 成都宽窄巷子）</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);"><input type="checkbox"> RB-2024-0225（小镋-18 / 苏州园林景区）</label>
+          </div>
+        </div>
+        <div style="margin-top:14px;">
+          <button class="btn btn-primary btn-sm" onclick="showToast('数据权限已保存')">保存配置</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 功能权限（功能点） -->
+  <div id="role-func" class="tab-pane" style="display:none;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">功能权限（功能点）</div></div>
+      <div class="card-body">
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label">选择角色</label>
+          <select class="form-select"><option>平台超级管理员</option><option>租户管理员</option><option>运营只读</option></select>
+        </div>
+        <div class="grid-3">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">设备管理</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 设备总览查看</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 镗钯机器人管理</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 运行任务查看</label>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">内容运营</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 素材库管理</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 智能体管理</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 模型管理</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 内容审核</label>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">系统管理</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 账号管理</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 角色权限</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 租户管理</label>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-primary btn-sm" onclick="showToast('功能权限已保存')">保存配置</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 页面: 租户管理 ===== -->
+<div id="page-tenant" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">租户管理</div>
+      <div class="page-subtitle">管理租户信息，设备需隶属到对应租户下</div>
+    </div>
+    <div class="flex gap-2">
+      <button class="btn btn-primary" onclick="openModal('modal-tenant-create')">+ 新增租户</button>
+    </div>
+  </div>
+
+  <!-- 统计卡片 -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--accent-bg);color:var(--accent);">🏢</div>
+      <div class="stat-label">租户总数</div>
+      <div class="stat-value">6</div>
+      <div class="stat-change up">↑ 较上月 +1</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--success-bg);color:var(--success);">✅</div>
+      <div class="stat-label">启用中</div>
+      <div class="stat-value">5</div>
+      <div class="stat-change">占比 83%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fef3c7;color:#d97706;">📱</div>
+      <div class="stat-label">关联设备</div>
+      <div class="stat-value">24</div>
+      <div class="stat-change">已全部分配</div>
+    </div>
+  </div>
+
+  <!-- 筛选栏 -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <span class="filter-label">租户名称：</span>
+      <input class="filter-input" placeholder="输入租户名称搜索">
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">状态：</span>
+      <select class="filter-select"><option>全部</option><option>启用</option><option>停用</option></select>
+    </div>
+    <div class="filter-group" style="margin-left:auto;">
+      <button class="btn btn-outline btn-sm">重置</button>
+      <button class="btn btn-primary btn-sm">查询</button>
+    </div>
+  </div>
+
+  <!-- 租户列表 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">租户列表 <span class="tag tag-accent" style="margin-left:8px;">6 个租户</span></div>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:40px;">#</th>
+            <th>租户名称</th>
+            <th style="width:120px;">联系人</th>
+            <th style="width:140px;">联系电话</th>
+            <th style="width:100px;">设备数</th>
+            <th style="width:100px;">状态</th>
+            <th style="width:140px;">创建时间</th>
+            <th style="width:200px;text-align:center;">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align:center;">1</td>
+            <td style="font-weight:500;">🏢 文旅景区A</td>
+            <td>张经理</td>
+            <td style="font-size:12px;">138-0001-1000</td>
+            <td><span class="tag tag-accent">8 台</span></td>
+            <td><span class="tag tag-success"><span class="status-dot online"></span>启用</span></td>
+            <td style="font-size:12px;color:var(--text-secondary);">2026-06-15</td>
+            <td style="text-align:center;">
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tenant-detail')">查看</button>
+              <button class="btn btn-outline btn-sm" onclick="openTenantAccounts('文旅景区A')">租户账号</button>
+              <button class="btn btn-outline btn-sm" onclick="openModal('modal-tenant-edit')">编辑</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);">停用</button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align:center;">2</td>
+            <td style="font-weight:500;">🔬 科技馆展厅</td>
+            <td>李主任</td>
+            <td style="font-size:12px;">139-0002-2000</td>
+            <td><span class="tag tag-accent">5 台</span></td>
+            <td><span class="tag tag-success"><span class="status-dot online"></span>启用</span></td>
+            <td style="font-size:12px;color:var(--text-secondary);">2026-06-20</td>
+            <td style="text-align:center;">
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tenant-detail')">查看</button>
+              <button class="btn btn-outline btn-sm" onclick="openTenantAccounts('科技馆展厅')">租户账号</button>
+              <button class="btn btn-outline btn-sm" onclick="openModal('modal-tenant-edit')">编辑</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);">停用</button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align:center;">3</td>
+            <td style="font-weight:500;">🏬 商业综合体B</td>
+            <td>王总监</td>
+            <td style="font-size:12px;">137-0003-3000</td>
+            <td><span class="tag tag-accent">6 台</span></td>
+            <td><span class="tag tag-success"><span class="status-dot online"></span>启用</span></td>
+            <td style="font-size:12px;color:var(--text-secondary);">2026-07-01</td>
+            <td style="text-align:center;">
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tenant-detail')">查看</button>
+              <button class="btn btn-outline btn-sm" onclick="openTenantAccounts('商业综合体B')">租户账号</button>
+              <button class="btn btn-outline btn-sm" onclick="openModal('modal-tenant-edit')">编辑</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);">停用</button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align:center;">4</td>
+            <td style="font-weight:500;">🎭 文化演艺中心</td>
+            <td>赵馆长</td>
+            <td style="font-size:12px;">136-0004-4000</td>
+            <td><span class="tag tag-accent">3 台</span></td>
+            <td><span class="tag tag-success"><span class="status-dot online"></span>启用</span></td>
+            <td style="font-size:12px;color:var(--text-secondary);">2026-07-10</td>
+            <td style="text-align:center;">
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tenant-detail')">查看</button>
+              <button class="btn btn-outline btn-sm" onclick="openTenantAccounts('文化演艺中心')">租户账号</button>
+              <button class="btn btn-outline btn-sm" onclick="openModal('modal-tenant-edit')">编辑</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);">停用</button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align:center;">5</td>
+            <td style="font-weight:500;">🏨 星级酒店C</td>
+            <td>孙经理</td>
+            <td style="font-size:12px;">135-0005-5000</td>
+            <td><span class="tag tag-accent">2 台</span></td>
+            <td><span class="tag tag-success"><span class="status-dot online"></span>启用</span></td>
+            <td style="font-size:12px;color:var(--text-secondary);">2026-07-22</td>
+            <td style="text-align:center;">
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tenant-detail')">查看</button>
+              <button class="btn btn-outline btn-sm" onclick="openTenantAccounts('星级酒店C')">租户账号</button>
+              <button class="btn btn-outline btn-sm" onclick="openModal('modal-tenant-edit')">编辑</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);">停用</button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align:center;">6</td>
+            <td style="font-weight:500;">🎪 主题乐园D</td>
+            <td>周主管</td>
+            <td style="font-size:12px;">134-0006-6000</td>
+            <td><span class="tag tag-default">0 台</span></td>
+            <td><span class="tag tag-default"><span class="status-dot offline"></span>停用</span></td>
+            <td style="font-size:12px;color:var(--text-secondary);">2026-07-28</td>
+            <td style="text-align:center;">
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tenant-detail')">查看</button>
+              <button class="btn btn-outline btn-sm" onclick="openTenantAccounts('主题乐园D')">租户账号</button>
+              <button class="btn btn-outline btn-sm" onclick="openModal('modal-tenant-edit')">编辑</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--success);">启用</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 弹窗：新增/编辑租户 -->
+  <div class="modal-overlay" id="modal-tenant-create">
+    <div class="modal-box" style="width:560px;">
+      <div class="modal-header">
+        <div class="modal-title">新增租户</div>
+        <button class="modal-close" onclick="closeModal('modal-tenant-create')">×</button>
+      </div>
+      <div class="modal-body" style="max-height:560px;overflow-y:auto;">
+        <div class="form-group">
+          <label class="form-label">租户名称 <span class="required">*</span></label>
+          <input class="form-input" placeholder="请输入租户名称，如：文旅景区A">
+        </div>
+        <div class="form-group">
+          <label class="form-label">联系人 <span class="required">*</span></label>
+          <input class="form-input" placeholder="请输入联系人姓名">
+        </div>
+        <div class="form-group">
+          <label class="form-label">联系电话 <span class="required">*</span></label>
+          <input class="form-input" placeholder="请输入联系电话">
+        </div>
+        <div class="form-group">
+          <label class="form-label">联系邮箱</label>
+          <input class="form-input" type="email" placeholder="请输入邮箱地址">
+        </div>
+        <div class="form-group">
+          <label class="form-label">所在地区</label>
+          <input class="form-input" placeholder="请输入省市区，如：四川省成都市">
+        </div>
+        <div class="form-group">
+          <label class="form-label">详细地址</label>
+          <input class="form-input" placeholder="请输入详细地址">
+        </div>
+        <div class="form-group">
+          <label class="form-label">租户状态</label>
+          <div class="flex gap-3">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="radio" name="tenant-status" checked> 启用
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="radio" name="tenant-status"> 停用
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">备注说明</label>
+          <textarea class="form-input" rows="3" placeholder="可填写租户的业务类型、合作信息等" style="resize:vertical;"></textarea>
+        </div>
+        <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--info);">
+          ℹ 租户创建后，可在设备列表中将设备分配到此租户下。停用租户后，该租户下设备将无法接收新任务。
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-tenant-create')">取消</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-tenant-create')">确认创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗：编辑租户（与新增结构一致，预填数据） -->
+  <div class="modal-overlay" id="modal-tenant-edit">
+    <div class="modal-box" style="width:560px;">
+      <div class="modal-header">
+        <div class="modal-title">编辑租户 — 文旅景区A</div>
+        <button class="modal-close" onclick="closeModal('modal-tenant-edit')">×</button>
+      </div>
+      <div class="modal-body" style="max-height:560px;overflow-y:auto;">
+        <div class="form-group">
+          <label class="form-label">租户名称 <span class="required">*</span></label>
+          <input class="form-input" value="文旅景区A">
+        </div>
+        <div class="form-group">
+          <label class="form-label">联系人 <span class="required">*</span></label>
+          <input class="form-input" value="张经理">
+        </div>
+        <div class="form-group">
+          <label class="form-label">联系电话 <span class="required">*</span></label>
+          <input class="form-input" value="138-0001-1000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">联系邮箱</label>
+          <input class="form-input" type="email" value="zhang@wenlv-scenic.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">所在地区</label>
+          <input class="form-input" value="四川省成都市">
+        </div>
+        <div class="form-group">
+          <label class="form-label">详细地址</label>
+          <input class="form-input" value="XX区XX路XX号文旅景区">
+        </div>
+        <div class="form-group">
+          <label class="form-label">租户状态</label>
+          <div class="flex gap-3">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="radio" name="tenant-status-edit" checked> 启用
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="radio" name="tenant-status-edit"> 停用
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">备注说明</label>
+          <textarea class="form-input" rows="3" style="resize:vertical;">主要使用场景为景区入口迎宾和巡游表演</textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-tenant-edit')">取消</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-tenant-edit')">保存修改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗：租户详情（含关联设备列表） -->
+  <div class="modal-overlay" id="modal-tenant-detail">
+    <div class="modal-box" style="width:680px;">
+      <div class="modal-header">
+        <div class="modal-title">租户详情 — 文旅景区A</div>
+        <button class="modal-close" onclick="closeModal('modal-tenant-detail')">×</button>
+      </div>
+      <div class="modal-body" style="max-height:600px;overflow-y:auto;">
+        <!-- 基本信息 -->
+        <div style="display:grid;grid-template-columns:100px 1fr 100px 1fr;gap:12px 16px;font-size:13px;margin-bottom:24px;">
+          <div style="color:var(--text-secondary);">租户名称</div>
+          <div style="font-weight:500;">文旅景区A</div>
+          <div style="color:var(--text-secondary);">状态</div>
+          <div><span class="tag tag-success"><span class="status-dot online"></span>启用</span></div>
+          <div style="color:var(--text-secondary);">联系人</div>
+          <div>张经理</div>
+          <div style="color:var(--text-secondary);">联系电话</div>
+          <div>138-0001-1000</div>
+          <div style="color:var(--text-secondary);">联系邮箱</div>
+          <div>zhang@wenlv-scenic.com</div>
+          <div style="color:var(--text-secondary);">所在地区</div>
+          <div>四川省成都市</div>
+          <div style="color:var(--text-secondary);">创建时间</div>
+          <div style="font-size:12px;">2026-06-15</div>
+          <div style="color:var(--text-secondary);">详细地址</div>
+          <div colspan="3">XX区XX路XX号文旅景区</div>
+          <div style="color:var(--text-secondary);">备注</div>
+          <div colspan="3" style="color:var(--text-secondary);">主要使用场景为景区入口迎宾和巡游表演</div>
+        </div>
+
+        <!-- 关联设备列表 -->
+        <div style="border-top:1px solid var(--border);padding-top:16px;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px;">关联设备 <span class="tag tag-accent" style="margin-left:8px;">8 台</span></div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>设备名称</th>
+                <th style="width:120px;">型号</th>
+                <th style="width:120px;">编码</th>
+                <th style="width:100px;">状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:500;">🤖 小镋-01</td>
+                <td>镋钯-T2</td>
+                <td style="font-size:12px;">TB-T2-0023</td>
+                <td><span class="tag tag-success">运行中</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:500;">🤖 小镋-02</td>
+                <td>镋钯-T2</td>
+                <td style="font-size:12px;">TB-T2-0024</td>
+                <td><span class="tag tag-success">运行中</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:500;">🤖 小镋-04</td>
+                <td>镋钯-T2</td>
+                <td style="font-size:12px;">TB-T2-0025</td>
+                <td><span class="tag tag-success">运行中</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:500;">🤖 小镋-08</td>
+                <td>镋钯-T2</td>
+                <td style="font-size:12px;">TB-T2-0028</td>
+                <td><span class="tag tag-success">运行中</span></td>
+              </tr>
+              <tr>
+                <td colspan="4" style="text-align:center;color:var(--text-tertiary);font-size:12px;padding:8px;">还有 4 台设备未展示 · 点击"查看全部"展开</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-tenant-detail')">关闭</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-tenant-detail');openModal('modal-tenant-edit');">编辑租户</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 租户账号管理 ===== -->
+<div class="modal-overlay" id="modal-tenant-accounts">
+  <div class="modal-box" style="width:680px;">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-tenant-accounts-title">👤 租户账号管理</div>
+      <button class="modal-close" onclick="closeModal('modal-tenant-accounts')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--info);margin-bottom:14px;">
+        ℹ 租户账号由内部平台统一创建，关联至具体租户，用于租户侧平台登录与日常运营。支持账号的新建 / 编辑 / 停用 / 删除。
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>账号</th><th>所属租户</th><th>角色</th><th>状态</th><th>操作</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:500;">hz_operator</td>
+                  <td>杭州文旅集团</td>
+                  <td>租户管理员</td>
+                  <td><span class="tag tag-success">启用</span></td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" onclick="showToast('账号 hz_operator 密码已重置')">重置密码</button>
+                    <button class="btn btn-ghost btn-sm" onclick="openModal('modal-account-tenant')">编辑</button>
+                    <button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-weight:500;">xa_operator</td>
+                  <td>西安大唐不夜城</td>
+                  <td>租户管理员</td>
+                  <td><span class="tag tag-default">停用</span></td>
+                  <td>
+                    <button class="btn btn-ghost btn-sm" onclick="showToast('账号 xa_operator 密码已重置')">重置密码</button>
+                    <button class="btn btn-ghost btn-sm" onclick="openModal('modal-account-tenant')">编辑</button>
+                    <button class="btn btn-ghost btn-sm" style="color:var(--danger);">删除</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-tenant-accounts')">关闭</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-tenant-accounts');openModal('modal-account-tenant')">+ 新建租户账号</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 添加设备 ===== -->
+<div class="modal-overlay" id="modal-add-device">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">添加设备</div>
+      <button class="modal-close" onclick="closeModal('modal-add-device')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">设备编码 <span class="required">*</span></label>
+        <input class="form-input" placeholder="请输入设备唯一编码或扫描二维码">
+      </div>
+      <div class="form-group">
+        <label class="form-label">设备昵称</label>
+        <input class="form-input" placeholder="给设备起个名字，如：小镋-01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">所属租户 <span class="required">*</span></label>
+        <select class="form-select">
+          <option value="">请选择租户</option>
+          <option>杭州文旅集团</option>
+          <option>西安大唐不夜城</option>
+          <option>成都宽窄巷子</option>
+          <option>苏州园林景区</option>
+        </select>
+      </div>
+      <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--info);">
+        ℹ 设备需处于开机状态才能添加。开机后设备屏幕会显示二维码，可在App端扫码添加。
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-device')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-add-device')">确认添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 设备详情 ===== -->
+<div class="modal-overlay" id="modal-device">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">设备详情 · RB-2024-0188</div>
+      <button class="modal-close" onclick="closeModal('modal-device')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'d-prop')">基础属性</div>
+        <div class="tab" onclick="switchTab(this,'d-fault')">故障记录</div>
+        <div class="tab" onclick="switchTab(this,'d-log')">日志</div>
+        <div class="tab" onclick="switchTab(this,'d-monitor')">监控状态</div>
+      </div>
+      <div id="d-prop" class="tab-pane">
+        <div class="grid-2">
+          <div class="form-group"><label class="form-label">型号</label><div class="text-secondary">TBot-S2 表演型</div></div>
+          <div class="form-group"><label class="form-label">所属租户</label><div class="text-secondary">西安大唐不夜城</div></div>
+          <div class="form-group"><label class="form-label">固件版本</label><div class="text-secondary">v2.3.1</div></div>
+          <div class="form-group"><label class="form-label">在线状态</label><span class="tag tag-danger">故障</span></div>
+        </div>
+      </div>
+      <div id="d-fault" class="tab-pane" style="display:none;">
+        <div class="card" style="border-color:var(--danger-bg);"><div class="card-body">2026-08-09 22:15 · 关节电机过载告警，已派单运维。</div></div>
+      </div>
+      <div id="d-log" class="tab-pane" style="display:none;">
+        <div style="background:#1e1e2d;color:#cbd5e1;padding:16px;border-radius:8px;font-size:12px;font-family:monospace;">[22:15] WARN motor overload<br>[22:16] INFO reboot attempt<br>[22:20] ERROR sensor offline</div>
+      </div>
+      <div id="d-monitor" class="tab-pane" style="display:none;">
+        <div class="progress-bar mb-2"><div class="progress-fill" style="width:62%;"></div></div>
+        <div class="text-sm text-secondary">CPU 62% · 内存 48% · 电量 73% · 网络正常</div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-device')">关闭</button></div>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 任务详情 ===== -->
+<div class="modal-overlay" id="modal-task">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">任务详情 · 大唐巡游·晚场</div>
+      <button class="modal-close" onclick="closeModal('modal-task')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">类型</label><span class="tag tag-accent">脚本</span></div>
+        <div class="form-group"><label class="form-label">状态</label><span class="tag tag-success">运行中</span></div>
+        <div class="form-group"><label class="form-label">所属租户</label><div class="text-secondary">西安大唐不夜城</div></div>
+        <div class="form-group"><label class="form-label">目标设备</label><div class="text-secondary">RB-2024-0188</div></div>
+      </div>
+      <div class="card" style="background:var(--warning-bg);border-color:#fde68a;"><div class="card-body" style="color:var(--warning);font-size:13px;">本弹窗仅供查看，无法暂停、编辑或重新下发该任务。</div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-task')">关闭</button></div>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 脚本任务详情 ===== -->
+<div class="modal-overlay" id="modal-task-script">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">脚本任务详情 · 大唐巡游·晚场</div>
+      <button class="modal-close" onclick="closeModal('modal-task-script')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">任务名称</label><div class="text-secondary">大唐巡游·晚场</div></div>
+        <div class="form-group"><label class="form-label">所属租户</label><div class="text-secondary">西安大唐不夜城</div></div>
+        <div class="form-group"><label class="form-label">脚本名称</label><div class="text-secondary">巡游迎宾脚本 v3.2</div></div>
+        <div class="form-group"><label class="form-label">目标设备</label><div class="text-secondary">RB-2024-0188（小镋-05）</div></div>
+        <div class="form-group" style="grid-column:1 / -1;">
+          <label class="form-label">执行方式</label>
+          <div class="flex gap-3">
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);"><input type="radio" name="script-exec" checked disabled> 单次执行</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);"><input type="radio" name="script-exec" disabled> 重复执行</label>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="background:var(--warning-bg);border-color:#fde68a;margin-top:12px;"><div class="card-body" style="color:var(--warning);font-size:13px;">本弹窗仅供查看，无法暂停、编辑或重新下发该任务。</div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-task-script')">关闭</button></div>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 跟随任务详情 ===== -->
+<div class="modal-overlay" id="modal-task-follow">
+  <div class="modal-box" style="max-width:620px;">
+    <div class="modal-header">
+      <div class="modal-title">跟随任务详情 · 西湖导览随行</div>
+      <button class="modal-close" onclick="closeModal('modal-task-follow')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">任务名称</label><div class="text-secondary">西湖导览随行</div></div>
+      <div class="form-group"><label class="form-label">目标设备</label>
+        <div class="flex gap-2 flex-wrap">
+          <span class="tag tag-default">小镜-01</span><span class="tag tag-default">小镜-02</span><span class="tag tag-default">小镜-04</span><span class="tag tag-default">小镜-07</span>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">首位跟随对象</label>
+        <div class="flex gap-3">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);"><input type="radio" name="follow-leader" checked disabled> 跟随人员（UWB标签）</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);"><input type="radio" name="follow-leader" disabled> 跟随机器人（首位机器人UWB）</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">机器人排队列配置 <span style="font-size:12px;color:var(--text-tertiary);font-weight:400;">（拖拽行可调整顺序，或直接修改序号）</span></label>
+        <div class="card" style="padding:0;">
+          <table class="data-table" style="margin:0;">
+            <thead><tr><th style="width:50px;">序列</th><th>机器人</th><th>角色</th><th>跟随对象</th><th style="width:60px;">操作</th></tr></thead>
+            <tbody>
+              <tr><td><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:600;">1</span></td><td>🤖 R1 小镜-01</td><td style="color:var(--accent);">首位跟随者</td><td>👤 人员UWB</td><td>▲▼</td></tr>
+              <tr><td><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--success);color:#fff;font-size:12px;font-weight:600;">2</span></td><td>🤖 R2 小镜-02</td><td>跟随 R1</td><td>🤖 R1</td><td>▲▼</td></tr>
+              <tr><td><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--warning);color:#fff;font-size:12px;font-weight:600;">3</span></td><td>🤖 R3 小镜-03</td><td>跟随 R2</td><td>🤖 R2</td><td>▲▼</td></tr>
+              <tr><td><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--purple);color:#fff;font-size:12px;font-weight:600;">4</span></td><td>🤖 R4 小镜-04</td><td>跟随 R3</td><td>🤖 R3</td><td>▲▼</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">后续跟随方式</label>
+        <div class="flex gap-3">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);"><input type="radio" name="follow-mode" checked disabled> 自动跟随（默认间距）</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);"><input type="radio" name="follow-mode" disabled> 手动配置间距</label>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">跟随间距（米）</label><input class="form-input" value="1.5" disabled></div>
+        <div class="form-group"><label class="form-label">队列多媒体内容（可选）</label>
+          <div class="flex gap-2">
+            <button class="btn btn-outline btn-sm" disabled>😊 选择表情包</button>
+            <button class="btn btn-outline btn-sm" disabled>🎵 选择音视频</button>
+            <button class="btn btn-outline btn-sm" disabled>🖼️ 选择图片</button>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="background:var(--warning-bg);border-color:#fde68a;margin-top:12px;"><div class="card-body" style="color:var(--warning);font-size:13px;">本弹窗仅供查看，无法暂停、编辑或重新下发该任务。</div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-task-follow')">关闭</button></div>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 创建内部管理平台账号 ===== -->
+<div class="modal-overlay" id="modal-account-system">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">创建内部管理平台账号</div>
+      <button class="modal-close" onclick="closeModal('modal-account-system')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">用户名<span class="required">*</span></label><input class="form-input" placeholder="请输入用户名"></div>
+      <div class="form-group"><label class="form-label">手机号<span class="required">*</span></label><input class="form-input" placeholder="请输入手机号"></div>
+      <div class="form-group"><label class="form-label">角色</label><select class="form-select"><option>平台超级管理员</option><option>运营只读</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-account-system')">取消</button><button class="btn btn-primary" onclick="closeModal('modal-account-system')">确认创建</button></div>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 新建租户账号 ===== -->
+<div class="modal-overlay" id="modal-account-tenant">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">新建租户账号</div>
+      <button class="modal-close" onclick="closeModal('modal-account-tenant')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">用户名<span class="required">*</span></label><input class="form-input" placeholder="请输入用户名"></div>
+      <div class="form-group"><label class="form-label">手机号码<span class="required">*</span></label><input class="form-input" placeholder="请输入手机号"></div>
+      <div class="form-group"><label class="form-label">角色</label><select class="form-select"><option>租户管理员</option></select></div>
+      <div class="form-group"><label class="form-label">所属租户</label><select class="form-select"><option>杭州文旅集团</option><option>西安大唐不夜城</option><option>成都宽窄巷子</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-account-tenant')">取消</button><button class="btn btn-primary" onclick="closeModal('modal-account-tenant')">确认创建</button></div>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 新增角色 ===== -->
+<div class="modal-overlay" id="modal-role-add">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">新增角色</div>
+      <button class="modal-close" onclick="closeModal('modal-role-add')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">角色名称<span class="required">*</span></label><input class="form-input" placeholder="请输入角色名称"></div>
+      <div class="form-group"><label class="form-label">角色描述</label><input class="form-input" placeholder="如：运营只读、设备运维"></div>
+      <div class="form-group"><label class="form-label">数据权限范围</label><select class="form-select"><option>全部设备</option><option>本租户设备</option></select></div>
+      <div class="form-group"><label class="form-label">功能权限预设</label><select class="form-select"><option>全功能</option><option>只读</option><option>自定义（创建后配置）</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-role-add')">取消</button><button class="btn btn-primary" onclick="closeModal('modal-role-add');showToast('角色已创建')">确认创建</button></div>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 配置角色权限 ===== -->
+<div class="modal-overlay" id="modal-role-config">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-header">
+      <div class="modal-title">配置角色权限</div>
+      <button class="modal-close" onclick="closeModal('modal-role-config')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">角色</label><input class="form-input" value="平台超级管理员" disabled></div>
+      <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin:8px 0 6px;">数据权限（设备）</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="radio" name="cfgDataPerm" onclick="document.getElementById('cfg-data-sn').style.display='none'" checked> 全部设备（跨租户全局）</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="radio" name="cfgDataPerm" onclick="document.getElementById('cfg-data-sn').style.display='block'"> 指定设备（按设备 SN 多选）</label>
+      </div>
+      <div id="cfg-data-sn" style="display:none;margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-secondary);">
+        <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">选择设备 SN（多选）</div>
+        <div style="max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);"><input type="checkbox"> RB-2024-0001（小镋-01 / 杭州文旅集团）</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);"><input type="checkbox"> RB-2024-0188（小镋-05 / 西安大唐不夜城）</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);"><input type="checkbox"> RB-2023-0742（小镋-12 / 成都宽窄巷子）</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);"><input type="checkbox"> RB-2024-0225（小镋-18 / 苏州园林景区）</label>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin:14px 0 6px;">功能权限（功能点）</div>
+      <div class="grid-2">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 设备总览</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 镗钯机器人</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 运行任务</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 素材库</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 内容审核</label>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 智能体</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 账号管理</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 角色权限</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 租户管理</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-role-config')">取消</button><button class="btn btn-primary" onclick="closeModal('modal-role-config');showToast('角色权限已保存')">保存</button></div>
+  </div>
+</div>
+
+<style>
+/* ===== 平台动作库 - 自定义动作编辑器样式（复用租户平台规范） ===== */
+.pla-palette-group { padding:4px 0; border-bottom:1px solid var(--border-light); }
+.pla-palette-group:last-child { border-bottom:none; }
+.pla-palette-group-title { padding:6px 12px; font-size:11px; font-weight:600; color:var(--text-secondary); }
+.pla-palette-item { display:flex; align-items:center; gap:6px; padding:7px 12px; font-size:13px; cursor:pointer; transition:all .15s; }
+.pla-palette-item:hover { background:var(--accent-bg); color:var(--accent); }
+.pla-palette-item:active { transform:scale(0.97); }
+.pla-palette-item .pla-icon { font-size:16px; }
+.pla-palette-item.dragging { opacity:0.4; }
+
+.pla-tl-bar { position:absolute; height:24px; top:2px; border-radius:4px; display:flex; align-items:center; padding:0 6px; font-size:10px; color:#fff; white-space:nowrap; overflow:hidden; cursor:pointer; transition:all .15s; font-weight:500; }
+.pla-tl-bar:hover { transform:scaleY(1.1); z-index:5; box-shadow:0 2px 8px rgba(0,0,0,0.25); }
+.pla-tl-bar.selected { outline:2px solid #f59e0b; outline-offset:1px; z-index:6; }
+.pla-tl-bar.bar-head { background:linear-gradient(135deg,#3b82f6,#60a5fa); }
+.pla-tl-bar.bar-torso { background:linear-gradient(135deg,#10b981,#34d399); }
+.pla-tl-bar.bar-ear-l { background:linear-gradient(135deg,#8b5cf6,#a78bfa); }
+.pla-tl-bar.bar-ear-r { background:linear-gradient(135deg,#a855f7,#c084fc); }
+.pla-tl-bar .bar-del { margin-left:4px; opacity:0.7; font-size:12px; }
+.pla-tl-bar .bar-del:hover { opacity:1; }
+
+.action-thumb {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:8px;
+  background:linear-gradient(135deg,#f5f3ff,#ede9fe); font-size:20px;
+}
+.pla-sync-tenant-item {
+  display:flex; align-items:center; gap:8px; padding:6px 8px;
+  border-radius:4px; cursor:pointer; transition:background .15s; font-size:13px;
+}
+.pla-sync-tenant-item:hover { background:var(--bg-page); }
+.pla-sync-tenant-item input { cursor:pointer; }
+</style>
+<style>
+/* 动作库 - 时序图 / 原子动作面板样式（移植自租户平台） */
+/* 仅补充 main.css 未覆盖的少量组件样式（与现有视觉一致） */
+
+    .prop-panel { background:white; border:1px solid var(--border-light); border-radius:var(--radius-md); overflow:hidden; }
+
+    .prop-panel .prop-header { padding:12px 16px; border-bottom:1px solid var(--border-light); font-size:13px; font-weight:600; background:#f9fafb; }
+
+    .prop-row { display:flex; justify-content:space-between; gap:12px; padding:10px 16px; border-bottom:1px solid var(--border-light); font-size:13px; }
+
+    .prop-row:last-child { border-bottom:none; }
+
+    .prop-row .prop-label { color:var(--text-secondary); }
+
+    .prop-row .prop-value { font-weight:500; text-align:right; }
+
+    .camera-ph { height:260px; background:#1a1a28; border-radius:var(--radius-md); position:relative; overflow:hidden;
+
+      background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);
+
+      background-size:24px 24px; }
+
+    .camera-ph .cam-tag { position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.5); color:#fff; font-size:11px; padding:4px 8px; border-radius:4px; display:flex; align-items:center; gap:6px; }
+
+    .camera-ph .cam-live { position:absolute; top:10px; right:10px; background:var(--danger); color:#fff; font-size:11px; padding:4px 8px; border-radius:4px; }
+
+    .camera-ph .cam-center { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:54px; opacity:0.5; }
+
+    .camera-ph .cam-foot { position:absolute; bottom:10px; left:10px; right:10px; display:flex; justify-content:space-between; color:#cfd2da; font-size:11px; }
+
+    .traffic-stat { display:flex; gap:12px; }
+
+    .traffic-item { flex:1; text-align:center; padding:12px; border-radius:var(--radius-sm); background:var(--bg-tag); }
+
+
+
+    /* 设备运动任务 - 即时任务媒体选择器 */
+
+    .media-tabs { display:flex; gap:8px; margin-bottom:16px; border-bottom:1px solid var(--border-light); }
+
+    .media-tab { display:flex; align-items:center; gap:6px; padding:8px 14px; font-size:13px; color:var(--text-secondary); cursor:pointer; border-bottom:2px solid transparent; transition:all .15s; }
+
+    .media-tab:hover { color:var(--text-primary); }
+
+    .media-tab.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:500; background:var(--accent-bg); border-radius:6px 6px 0 0; }
+
+    .media-search-row { display:flex; gap:12px; margin-bottom:16px; }
+
+    .media-search { flex:1; display:flex; align-items:center; gap:8px; padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); background:#fff; }
+
+    .media-search input { border:none; outline:none; flex:1; font-size:13px; color:var(--text-primary); background:transparent; }
+
+    .media-search-row .btn { white-space:nowrap; }
+
+    .selected-media-title { font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:10px; }
+
+    .selected-media-list { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
+
+    .selected-media-item { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--border-light); border-radius:var(--radius-md); background:#fff; }
+
+    .media-icon-box { width:44px; height:44px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+
+    .media-icon-box.music { background:#ede9fe; color:#7c3aed; }
+
+    .media-icon-box.video { background:#dbeafe; color:#2563eb; }
+
+    .media-icon-box.image { background:#d1fae5; color:#059669; }
+
+    .media-icon-box.emoji { background:#fef3c7; color:#d97706; }
+
+    .media-info { flex:1; min-width:0; }
+
+    .media-name { font-size:13px; font-weight:500; color:var(--text-primary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    .media-meta { font-size:12px; color:var(--text-secondary); margin-top:2px; }
+
+    .media-type-tag { font-size:11px; padding:2px 8px; border-radius:10px; background:var(--accent-bg); color:var(--accent); white-space:nowrap; }
+
+    .media-remove { width:24px; height:24px; display:flex; align-items:center; justify-content:center; border:none; background:transparent; color:var(--danger); cursor:pointer; font-size:16px; border-radius:4px; }
+
+    .media-remove:hover { background:var(--danger-bg); }
+
+    .media-library-title { font-size:13px; font-weight:600; color:var(--text-primary); margin:16px 0 10px; }
+
+    .media-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+
+    .media-grid-item { padding:10px; border:1px solid var(--border-light); border-radius:var(--radius-md); text-align:center; cursor:pointer; transition:all .15s; background:#fff; }
+
+    .media-grid-item:hover { border-color:var(--accent); background:var(--accent-bg); }
+
+    .media-grid-item .media-icon-box { margin:0 auto 8px; }
+
+    .media-grid-item .media-name { font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    .instant-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border-light); }
+
+
+
+    /* 脚本编辑器 - 资源库（动作库/素材库） */
+
+    .resource-tab { flex:1; text-align:center; padding:10px; font-size:13px; color:var(--text-secondary); cursor:pointer; border-bottom:2px solid transparent; transition:all .15s; background:#f9fafb; }
+
+    .resource-tab:hover { color:var(--text-primary); background:#f3f4f6; }
+
+    .resource-tab.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:600; background:#fff; }
+
+    .media-fold { border-bottom:1px solid var(--border-light); }
+
+    .media-fold:last-child { border-bottom:none; }
+
+    .media-fold-header { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; font-size:13px; font-weight:500; color:var(--text-primary); cursor:pointer; background:#fff; transition:background .15s; }
+
+    .media-fold-header:hover { background:#f9fafb; }
+
+    .media-fold-body { padding:0 14px 14px; }
+
+    .media-item-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+
+    .media-item { padding:12px 8px; border:1px solid var(--border-light); border-radius:var(--radius-md); text-align:center; cursor:pointer; transition:all .15s; background:#fff; }
+
+    .media-item:hover { border-color:var(--accent); background:var(--accent-bg); }
+
+    .media-emoji { font-size:32px; line-height:1; margin-bottom:6px; }
+
+    .media-thumb { width:44px; height:44px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px; margin:0 auto 8px; background:#f3f4f6; }
+
+    .media-item-name { font-size:12px; color:var(--text-primary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    .media-item-meta { font-size:11px; color:var(--text-secondary); margin-top:2px; }
+
+  
+
+
+
+    /* 脚本编辑器 - 自定义动作原子组合器 */
+
+    .ca-palette-group { padding:4px 0; border-bottom:1px solid var(--border-light); }
+
+    .ca-palette-group:last-child { border-bottom:none; }
+
+    .ca-palette-group-title { padding:6px 12px; font-size:11px; font-weight:600; color:var(--text-secondary); }
+
+    .ca-palette-item { display:flex; align-items:center; gap:6px; padding:7px 12px; font-size:13px; cursor:pointer; transition:all .15s; }
+
+    .ca-palette-item:hover { background:var(--accent-bg); color:var(--accent); }
+
+    .ca-palette-item:active { transform:scale(0.97); }
+
+    .ca-palette-item .ap-icon { font-size:16px; }
+
+    .ca-lane { border-bottom:1px solid var(--border-light); }
+
+    .ca-lane:last-child { border-bottom:none; }
+
+    .ca-lane-header { display:flex; align-items:center; gap:6px; padding:6px 10px; font-size:11px; font-weight:600; color:var(--text-secondary); background:#f9fafb; border-bottom:1px solid var(--border-light); }
+
+    .ca-lane-mutex { font-size:10px; color:#ef4444; background:rgba(239,68,68,0.08); padding:1px 5px; border-radius:3px; font-weight:400; }
+
+    .ca-lane-track { display:flex; gap:6px; padding:8px 10px; align-items:flex-start; min-height:56px; flex-wrap:wrap; }
+
+    .ca-block { border:1px solid var(--border-light); border-radius:var(--radius-sm); background:#fff; padding:5px 7px; min-width:130px; max-width:170px; position:relative; }
+
+    .ca-block.cb-head { border-left:3px solid #3b82f6; }
+
+    .ca-block.cb-torso { border-left:3px solid #10b981; }
+
+    .ca-block.cb-ear-l { border-left:3px solid #8b5cf6; }
+
+    .ca-block.cb-ear-r { border-left:3px solid #a855f7; }
+
+    .cb-top { display:flex; align-items:center; justify-content:space-between; gap:4px; margin-bottom:3px; }
+
+    .cb-name { font-size:12px; font-weight:500; display:flex; align-items:center; gap:3px; }
+
+    .cb-del { font-size:13px; color:var(--danger); cursor:pointer; opacity:0.5; line-height:1; }
+
+    .cb-del:hover { opacity:1; }
+
+    .cb-props { display:flex; flex-direction:column; gap:2px; }
+
+    .cb-prop { display:flex; align-items:center; gap:3px; font-size:10px; color:var(--text-tertiary); }
+
+    .cb-prop label { width:20px; flex-shrink:0; }
+
+    .cb-prop input[type=range] { flex:1; height:10px; -webkit-appearance:none; background:#e5e7eb; border-radius:5px; outline:none; }
+
+    .cb-prop input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:10px; height:10px; border-radius:50%; background:var(--accent); cursor:pointer; }
+
+    .cb-prop .cb-val { width:22px; text-align:right; color:var(--text-secondary); }
+
+    .ca-lane-hint { font-size:11px; color:var(--text-tertiary); padding:4px 8px; border:1px dashed var(--border-light); border-radius:var(--radius-sm); }
+
+    .ca-parallel-bar { display:flex; align-items:center; gap:4px; padding:2px 10px; font-size:9px; color:#3b82f6; background:rgba(59,130,246,0.04); border-bottom:1px solid var(--border-light); }
+
+    /* 自定义动作拖拽到时间轴 */
+
+    .custom-action-item { cursor:grab; }
+
+    .custom-action-item:active { cursor:grabbing; }
+
+    .custom-action-item.dragging { opacity:0.4; }
+
+    .timeline-track-area.drag-over { background:rgba(99,102,241,0.06) !important; box-shadow:inset 0 0 0 2px var(--accent); }
+
+    .timeline-block.custom-action-block { border:1px dashed rgba(255,255,255,0.5) !important; opacity:0.85; }
+
+
+
+
+
+    /* 时序图 - 主交互区 */
+
+    .ca-tl-main { border:1px solid var(--border-light); border-radius:var(--radius-md); overflow:hidden; }
+
+    .ca-tl-preview-header { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; font-size:11px; font-weight:600; color:var(--text-secondary); background:#f9fafb; border-bottom:1px solid var(--border-light); }
+
+    .ca-tl-body { padding:8px 10px; }
+
+    .ca-tl-ruler { display:flex; height:18px; margin-bottom:6px; margin-left:66px; position:relative; }
+
+    .ca-tl-ruler-tick { flex:1; border-left:1px solid var(--border-light); font-size:9px; color:var(--text-tertiary); padding-left:2px; line-height:18px; }
+
+    .ca-tl-ruler-tick:last-child { border-right:1px solid var(--border-light); }
+
+    .ca-tl-lane-row { display:flex; align-items:center; gap:6px; margin-bottom:5px; }
+
+    .ca-tl-lane-label { width:60px; flex-shrink:0; font-size:10px; color:var(--text-secondary); text-align:right; }
+
+    .ca-tl-lane-track { flex:1; height:28px; background:#f3f4f6; border-radius:4px; position:relative; overflow:hidden; transition:all .15s; border:1px solid transparent; }
+
+    .ca-tl-lane-track.drop-active { background:rgba(99,102,241,0.08); border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
+
+    .ca-tl-lane-track.has-blocks { background:#fff; border-color:var(--border-light); }
+
+    .ca-tl-bar { position:absolute; height:24px; top:2px; border-radius:4px; display:flex; align-items:center; padding:0 6px; font-size:10px; color:#fff; white-space:nowrap; overflow:hidden; cursor:pointer; transition:all .15s; font-weight:500; }
+
+    .ca-tl-bar:hover { transform:scaleY(1.1); z-index:5; box-shadow:0 2px 8px rgba(0,0,0,0.25); }
+
+    .ca-tl-bar.selected { outline:2px solid #f59e0b; outline-offset:1px; z-index:6; }
+
+    .ca-tl-bar.bar-head { background:linear-gradient(135deg,#3b82f6,#60a5fa); }
+
+    .ca-tl-bar.bar-torso { background:linear-gradient(135deg,#10b981,#34d399); }
+
+    .ca-tl-bar.bar-ear-l { background:linear-gradient(135deg,#8b5cf6,#a78bfa); }
+
+    .ca-tl-bar.bar-ear-r { background:linear-gradient(135deg,#a855f7,#c084fc); }
+
+    .ca-tl-bar .bar-del { margin-left:4px; opacity:0.7; font-size:12px; }
+
+    .ca-tl-bar .bar-del:hover { opacity:1; }
+
+    .ca-tl-lane-hint { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:10px; color:var(--text-tertiary); pointer-events:none; }
+
+.ca-tl-parallel-hint { font-size:9px; color:#3b82f6; padding:3px 0 3px 66px; background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(59,130,246,0.06) 4px,rgba(59,130,246,0.06) 8px); border-left:2px dashed #93c5fd; margin:3px 0; }
+
+.ca-tl-lane-del { margin-left:3px; color:#ef4444; font-size:11px; cursor:pointer; opacity:0.6; font-weight:bold; }
+
+.ca-tl-lane-del:hover { opacity:1; }
+
+.ca-tl-add-lane { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:8px; padding:8px 12px; font-size:11px; color:#6366f1; background:#f5f3ff; border:1px dashed #c7d2fe; border-radius:var(--radius-sm); cursor:pointer; transition:all .15s; }
+
+.ca-tl-add-lane:hover { background:#ede9fe; border-color:#a5b4fc; color:#4f46e5; }
+
+.ca-tl-add-lane span { font-size:14px; font-weight:bold; }
+
+    .ca-tl-warn { font-size:10px; color:#ef4444; padding:3px 0; }
+
+    /* 块编辑面板 */
+
+    .ca-editor { margin-top:8px; border:1px solid var(--border-light); border-radius:var(--radius-md); padding:10px 12px; background:#f9fafb; }
+
+    .ca-editor-title { font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; }
+
+    .ca-editor-props { display:flex; gap:16px; flex-wrap:wrap; }
+
+    .ca-editor-prop { display:flex; flex-direction:column; gap:3px; min-width:140px; }
+
+    .ca-editor-prop label { font-size:10px; color:var(--text-tertiary); }
+
+    .ca-editor-prop input[type=range] { width:120px; height:12px; -webkit-appearance:none; background:#e5e7eb; border-radius:6px; outline:none; }
+
+    .ca-editor-prop input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:var(--accent); cursor:pointer; }
+
+    .ca-editor-prop .ep-val { font-size:11px; font-weight:600; color:var(--accent); }
+
+    .ca-editor-info { display:flex; gap:12px; font-size:10px; color:var(--text-tertiary); margin-top:6px; }
+
+    .ca-editor-info span { background:#fff; padding:2px 8px; border-radius:3px; border:1px solid var(--border-light); }
+
+    .ca-palette-item.draggable { cursor:grab; }
+
+    .ca-palette-item.draggable:active { cursor:grabbing; }
+
+    .ca-palette-item.dragging { opacity:0.4; }
+</style>
+
+
+<script>
+  function navigateTo(pageId) {
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+    var target = document.getElementById(pageId);
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+    if (event && event.currentTarget) event.currentTarget.classList.add('active');
+    var map = {
+      'page-device-overview':'设备总览',
+      'page-device':'设备列表',
+      'page-task':'运行任务',
+      'page-material':'素材库',
+      'page-action-library':'动作库',
+      'page-agent':'智能体',
+      'page-audit':'内容审核',
+      'page-account':'账号管理',
+      'page-role':'角色权限',
+      'page-tenant':'租户管理'
+    };
+    document.getElementById('bc-current').textContent = map[pageId] || '';
+    if (pageId === 'page-device-overview') {
+      if (typeof leafletMap === 'undefined' || !leafletMap) { initDeviceMap(); }
+      else { setTimeout(function(){ leafletMap.invalidateSize(); }, 100); }
+    }
+  }
+  function switchTab(el, paneId) {
+    var tabs = el.parentNode.querySelectorAll('.tab');
+    tabs.forEach(function(t){ t.classList.remove('active'); });
+    el.classList.add('active');
+    var pane = document.getElementById(paneId);
+    var group = pane.parentNode;
+    group.querySelectorAll('.tab-pane').forEach(function(p){ p.style.display='none'; });
+    pane.style.display = 'block';
+  }
+  function openModal(id){ document.getElementById(id).classList.add('show'); }
+  function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+  function openTenantAccounts(tenantName){
+    var el = document.getElementById('modal-tenant-accounts-title');
+    if (el) el.textContent = '👤 租户账号 · ' + tenantName;
+    openModal('modal-tenant-accounts');
+  }
+  function showToast(msg){
+    var t = document.getElementById('toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'toast';
+      t.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,0.2);transition:opacity .2s;';
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(function(){ t.style.opacity = '0'; }, 1800);
+  }
+  document.querySelectorAll('.modal-overlay').forEach(function(ov){
+    ov.addEventListener('click', function(e){ if(e.target===ov){ ov.classList.remove('show'); } });
+  });
+
+// ===== 设备总览 - Leaflet 地图 =====
+var leafletMap = null;
+var mapMarkers = [];
+var mapDeviceData = [
+  { province: '北京市', city: '北京市', district: '朝阳区', addr: '三里屯太古里', lat: 39.9352, lng: 116.4551, total: 5, online: 4, offline: 1, fault: 0 },
+  { province: '北京市', city: '北京市', district: '海淀区', addr: '中关村壹号', lat: 39.9847, lng: 116.3184, total: 2, online: 2, offline: 0, fault: 0 },
+  { province: '上海市', city: '上海市', district: '浦东新区', addr: '世纪大道', lat: 31.2240, lng: 121.5480, total: 4, online: 3, offline: 1, fault: 0 },
+  { province: '上海市', city: '上海市', district: '徐汇区', addr: '徐家汇商圈', lat: 31.1930, lng: 121.4360, total: 2, online: 2, offline: 0, fault: 0 },
+  { province: '广东省', city: '广州市', district: '天河区', addr: '天河城广场', lat: 23.1310, lng: 113.3610, total: 3, online: 2, offline: 1, fault: 0 },
+  { province: '广东省', city: '深圳市', district: '南山区', addr: '欢乐海岸', lat: 22.5150, lng: 113.9330, total: 2, online: 2, offline: 0, fault: 0 },
+  { province: '广东省', city: '深圳市', district: '福田区', addr: 'COCO Park', lat: 22.5350, lng: 114.0580, total: 2, online: 2, offline: 0, fault: 0 },
+  { province: '四川省', city: '成都市', district: '武侯区', addr: 'IFS国际金融中心', lat: 30.6590, lng: 104.0720, total: 2, online: 0, offline: 0, fault: 2 },
+  { province: '浙江省', city: '杭州市', district: '西湖区', addr: '湖滨银泰in77', lat: 30.2520, lng: 120.1690, total: 1, online: 1, offline: 0, fault: 0 },
+  { province: '湖北省', city: '武汉市', district: '洪山区', addr: '光谷步行街', lat: 30.5060, lng: 114.4070, total: 1, online: 0, offline: 1, fault: 0 }
+];
+
+function initDeviceMap() {
+  if (typeof L === 'undefined') { setTimeout(initDeviceMap, 200); return; }
+  var container = document.getElementById('leaflet-map');
+  if (!container || leafletMap) return;
+
+  leafletMap = L.map('leaflet-map', { zoomControl: true, attributionControl: false }).setView([34.5, 108.0], 4);
+
+  // 高德地图瓦片
+  L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+    subdomains: ['1', '2', '3', '4'],
+    maxZoom: 18,
+    minZoom: 3
+  }).addTo(leafletMap);
+
+  renderMapMarkers('all');
+}
+
+function getMarkerColor(item) {
+  if (item.online === 0) return '#ef4444';
+  if (item.offline > 0 || item.fault > 0) return '#f59e0b';
+  return '#22c55e';
+}
+
+function getMarkerRadius(total) {
+  return Math.max(12, Math.min(30, 10 + total * 3));
+}
+
+function renderMapMarkers(filter) {
+  // 清除旧标记
+  mapMarkers.forEach(function(m) { leafletMap.removeLayer(m); });
+  mapMarkers = [];
+
+  var showCount = 0;
+  mapDeviceData.forEach(function(item) {
+    var visible = false;
+    var displayTotal = item.total;
+    if (filter === 'all') {
+      visible = true;
+    } else if (filter === 'online') {
+      visible = item.online > 0;
+      displayTotal = item.online;
+    } else if (filter === 'offline') {
+      visible = (item.offline + item.fault) > 0;
+      displayTotal = item.offline + item.fault;
+    }
+
+    if (!visible) return;
+
+    var color = getMarkerColor(item);
+    var radius = getMarkerRadius(item.total);
+
+    var marker = L.circleMarker([item.lat, item.lng], {
+      radius: radius,
+      fillColor: color,
+      color: '#ffffff',
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 0.85
+    }).addTo(leafletMap);
+
+    var popupHtml = '<div style="min-width:200px;">' +
+      '<div style="font-size:14px;font-weight:700;margin-bottom:6px;">' + item.province + ' · ' + item.district + '</div>' +
+      '<div style="font-size:12px;color:#666;margin-bottom:8px;">' + item.addr + '</div>' +
+      '<div style="display:flex;gap:14px;font-size:12px;">' +
+        '<div><span style="color:#999;">设备总数</span><br><b style="font-size:16px;">' + item.total + '</b></div>' +
+        '<div><span style="color:#999;">在线</span><br><b style="font-size:16px;color:#22c55e;">' + item.online + '</b></div>' +
+        '<div><span style="color:#999;">离线</span><br><b style="font-size:16px;color:#999;">' + item.offline + '</b></div>' +
+        '<div><span style="color:#999;">故障</span><br><b style="font-size:16px;color:#ef4444;">' + item.fault + '</b></div>' +
+      '</div></div>';
+
+    marker.bindPopup(popupHtml);
+    marker.on('click', function() {
+      showRegionPanel(item);
+    });
+
+    // 标记上显示数字
+    marker.bindTooltip(String(displayTotal), {
+      permanent: true,
+      direction: 'center',
+      className: 'map-marker-label'
+    });
+
+    mapMarkers.push(marker);
+    showCount += displayTotal;
+  });
+
+  var countEl = document.getElementById('map-device-count');
+  if (countEl) countEl.textContent = showCount;
+}
+
+function filterMapDevices(filter) {
+  document.querySelectorAll('.map-filter-btn').forEach(function(btn) {
+    btn.classList.remove('active');
+    if (btn.dataset.filter === filter) btn.classList.add('active');
+  });
+  renderMapMarkers(filter);
+  var panel = document.getElementById('map-region-panel');
+  if (panel) panel.style.display = 'none';
+}
+
+function showRegionPanel(item) {
+  var panel = document.getElementById('map-region-panel');
+  if (!panel) return;
+  panel.style.display = 'block';
+  document.getElementById('region-panel-title').textContent = item.province + ' · ' + item.district;
+
+  var onlinePct = item.total > 0 ? Math.round(item.online / item.total * 100) : 0;
+  var statusText = item.online === 0 ? '<span style="color:#ef4444;font-weight:600;">全部离线</span>' :
+    (item.offline + item.fault > 0 ? '<span style="color:#f59e0b;font-weight:600;">部分离线</span>' :
+    '<span style="color:#22c55e;font-weight:600;">全部在线</span>');
+
+  document.getElementById('region-panel-content').innerHTML =
+    '<div style="font-size:12px;color:#999;margin-bottom:4px;">详细地址</div>' +
+    '<div style="font-size:13px;margin-bottom:12px;">' + item.addr + '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">' +
+      '<div style="background:#f0fdf4;border-radius:6px;padding:8px 10px;text-align:center;">' +
+        '<div style="font-size:22px;font-weight:700;color:#22c55e;">' + item.online + '</div>' +
+        '<div style="font-size:11px;color:#999;">在线设备</div></div>' +
+      '<div style="background:#fef2f2;border-radius:6px;padding:8px 10px;text-align:center;">' +
+        '<div style="font-size:22px;font-weight:700;color:#ef4444;">' + (item.offline + item.fault) + '</div>' +
+        '<div style="font-size:11px;color:#999;">离线设备</div></div>' +
+    '</div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-top:1px solid #f0f0f0;">' +
+      '<span style="color:#999;">设备总数</span><b>' + item.total + ' 台</b></div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;">' +
+      '<span style="color:#999;">在线率</span><b>' + onlinePct + '%</b></div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;">' +
+      '<span style="color:#999;">运行状态</span>' + statusText + '</div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;">' +
+      '<span style="color:#999;">故障设备</span><b style="color:' + (item.fault > 0 ? '#ef4444' : '#999') + ';">' + item.fault + ' 台</b></div>';
+}
+
+
+document.addEventListener('DOMContentLoaded', function(){ if (typeof initDeviceMap === 'function') initDeviceMap(); });
+
+
+// ===== 平台动作库模块 =====
+var PLATFORM_ACTIONS = [
+  {id:'pa-001', name:'欢迎致意', icon:'👋', position:'head', desc:'标准开场问好动作', blocks:{},
+    status:'published', scope:'all', syncedTenants:['all'], atomicCount:4, totalDuration:12.5, updatedAt:'2026-08-12 14:30'},
+  {id:'pa-002', name:'巡场讲解', icon:'🗣️', position:'full', desc:'边走边讲的复合动作', blocks:{},
+    status:'published', scope:'partial', syncedTenants:['hz-001','xa-002'], atomicCount:6, totalDuration:18.0, updatedAt:'2026-08-11 10:15'},
+  {id:'pa-003', name:'摇头拒绝', icon:'🙅', position:'head', desc:'表达否定', blocks:{},
+    status:'published', scope:'all', syncedTenants:['all'], atomicCount:3, totalDuration:8.5, updatedAt:'2026-08-10 16:20'},
+  {id:'pa-004', name:'惊讶反应', icon:'😮', position:'head', desc:'表达惊喜', blocks:{},
+    status:'published', scope:'partial', syncedTenants:['hz-001','cd-003','xa-002'], atomicCount:3, totalDuration:7.0, updatedAt:'2026-08-09 09:45'},
+  {id:'pa-005', name:'鞠躬行礼', icon:'🙇', position:'full', desc:'正式场合鞠躬', blocks:{},
+    status:'published', scope:'all', syncedTenants:['all'], atomicCount:5, totalDuration:15.5, updatedAt:'2026-08-08 11:00'},
+  {id:'pa-006', name:'得意展示', icon:'😄', position:'head', desc:'表达愉悦', blocks:{},
+    status:'published', scope:'all', syncedTenants:['all'], atomicCount:2, totalDuration:5.5, updatedAt:'2026-08-07 15:30'},
+  {id:'pa-007', name:'思考疑问', icon:'🤔', position:'head', desc:'侧头思考', blocks:{},
+    status:'published', scope:'partial', syncedTenants:['cd-003'], atomicCount:4, totalDuration:10.5, updatedAt:'2026-08-06 17:00'},
+  {id:'pa-008', name:'挥手告别', icon:'👋', position:'full', desc:'送别挥手', blocks:{},
+    status:'published', scope:'all', syncedTenants:['all'], atomicCount:3, totalDuration:9.5, updatedAt:'2026-08-05 14:00'},
+  {id:'pa-009', name:'待机摆头', icon:'🔄', position:'head', desc:'空闲时小幅度摆头', blocks:{},
+    status:'draft', scope:'', syncedTenants:[], atomicCount:0, totalDuration:0, updatedAt:'2026-08-14 09:00'},
+  {id:'pa-010', name:'起身站立', icon:'🧍', position:'torso', desc:'从蹲姿站立', blocks:{},
+    status:'draft', scope:'', syncedTenants:[], atomicCount:0, totalDuration:0, updatedAt:'2026-08-14 08:30'},
+  {id:'pa-011', name:'耳朵转向', icon:'👂', position:'ear', desc:'转向声源方向', blocks:{},
+    status:'draft', scope:'', syncedTenants:[], atomicCount:0, totalDuration:0, updatedAt:'2026-08-13 17:00'},
+  {id:'pa-012', name:'舞蹈动作v2', icon:'🕺', position:'full', desc:'新版舞蹈编排', blocks:{},
+    status:'draft', scope:'', syncedTenants:[], atomicCount:0, totalDuration:0, updatedAt:'2026-08-13 16:00'}
+];
+
+var PLATFORM_TENANTS = [
+  {id:'hz-001', name:'杭州文旅集团', tag:'华东'},
+  {id:'xa-002', name:'西安大唐不夜城', tag:'西北'},
+  {id:'cd-003', name:'成都宽窄巷子', tag:'西南'},
+  {id:'sz-004', name:'苏州园林景区', tag:'华东'},
+  {id:'gz-005', name:'广州长隆度假区', tag:'华南'},
+  {id:'bj-006', name:'北京颐和园', tag:'华北'},
+  {id:'sh-007', name:'上海博物馆', tag:'华东'}
+];
+
+// 编辑器状态
+var plaSelectedIcon = '🤖';
+var plaCombinerData = {};
+var plaExtraLanes = {};
+var plaSelectedBlock = null;
+var plaEditingId = null;
+var plaSyncTargetId = null;
+
+// ===== 原子动作数据（与租户平台同步） =====
+var PLA_ATOMIC_ACTIONS = {
+  head: [
+    {id:'nod', name:'点头1次', icon:'👍'},
+    {id:'shake', name:'摇头1次', icon:'👎'},
+    {id:'swing', name:'摆头1次', icon:'↔️'},
+    {id:'lower-hold', name:'低头后保持', icon:'⬇️'},
+    {id:'left-turn', name:'左转头保持', icon:'↪️'},
+    {id:'right-turn', name:'右转头保持', icon:'↩️'}
+  ],
+  torso: [
+    {id:'stand', name:'站立', icon:'🧍'},
+    {id:'squat-hold', name:'下蹲后保持', icon:'⬇️'},
+    {id:'stand-hold', name:'站起后保持', icon:'⬆️'},
+    {id:'squat-stand', name:'蹲起1次', icon:'🔄'}
+  ],
+  'ear-left': [
+    {id:'left-antenna', name:'左耳天线角度', icon:'👂'}
+  ],
+  'ear-right': [
+    {id:'right-antenna', name:'右耳天线角度', icon:'👂'}
+  ]
+};
+
+var PLA_POSITION_LANES = {
+  head: [
+    {key:'head-1', label:'头部 1', cls:'bar-head'},
+    {key:'head-2', label:'头部 2', cls:'bar-head'},
+    {key:'head-3', label:'头部 3', cls:'bar-head'}
+  ],
+  torso: [
+    {key:'torso-1', label:'躯体 1', cls:'bar-torso'},
+    {key:'torso-2', label:'躯体 2', cls:'bar-torso'}
+  ],
+  ear: [
+    {key:'ear-left', label:'左耳 1', cls:'bar-ear-l'},
+    {key:'ear-right', label:'右耳 1', cls:'bar-ear-r'}
+  ],
+  full: [
+    {key:'head-1', label:'头部 1', cls:'bar-head'},
+    {key:'head-2', label:'头部 2', cls:'bar-head'},
+    {key:'head-3', label:'头部 3', cls:'bar-head'},
+    {key:'torso-1', label:'躯体 1', cls:'bar-torso'},
+    {key:'torso-2', label:'躯体 2', cls:'bar-torso'},
+    {key:'ear-left', label:'左耳 1', cls:'bar-ear-l'},
+    {key:'ear-right', label:'右耳 1', cls:'bar-ear-r'}
+  ]
+};
+
+// ===== 列表渲染 =====
+function renderPlatformActionList() {
+  var nameQ = (document.getElementById('plat-act-search-name').value || '').trim().toLowerCase();
+  var posQ = document.getElementById('plat-act-search-pos').value;
+  var statusQ = document.getElementById('plat-act-search-status').value;
+  var scopeQ = document.getElementById('plat-act-search-scope').value;
+
+  var filtered = PLATFORM_ACTIONS.filter(function(a){
+    if (nameQ && a.name.toLowerCase().indexOf(nameQ) === -1) return false;
+    if (posQ && a.position !== posQ) return false;
+    if (statusQ && (statusQ === '草稿' ? a.status !== 'draft' : a.status !== 'published')) return false;
+    if (scopeQ) {
+      if (scopeQ === '未同步' && a.scope !== '') return false;
+      if (scopeQ === '部分租户' && a.scope !== 'partial') return false;
+      if (scopeQ === '全部租户' && a.scope !== 'all') return false;
+    }
+    return true;
+  });
+
+  var html = '';
+  if (filtered.length === 0) {
+    html = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-tertiary);">暂无匹配动作</td></tr>';
+  } else {
+    filtered.forEach(function(a){
+      var statusTag = a.status === 'published'
+        ? '<span class="tag tag-success">已发布</span>'
+        : '<span class="tag tag-warning">草稿</span>';
+      var scopeTag = a.scope === 'all'
+        ? '<span class="tag tag-info">全部租户</span>'
+        : a.scope === 'partial'
+          ? '<span class="tag tag-info">部分租户（' + a.syncedTenants.length + '）</span>'
+          : '<span class="tag tag-default">未同步</span>';
+      var posText = a.position === 'head' ? '头部' : a.position === 'torso' ? '躯体' : a.position === 'ear' ? '耳朵' : '全身';
+      var opBtns = '';
+      opBtns += '<button class="btn btn-ghost btn-sm" onclick="previewPlatformAction(\'' + a.id + '\')">预览</button>';
+      if (a.status === 'draft') {
+        opBtns += '<button class="btn btn-ghost btn-sm" onclick="openEditPlatformAction(\'' + a.id + '\')">编辑</button>';
+        opBtns += '<button class="btn btn-ghost btn-sm" onclick="publishPlatformAction(\'' + a.id + '\')" style="color:#10b981;">发布</button>';
+      } else {
+        opBtns += '<button class="btn btn-ghost btn-sm" onclick="openEditPlatformAction(\'' + a.id + '\')">编辑</button>';
+        opBtns += '<button class="btn btn-ghost btn-sm" onclick="syncPlatformAction(\'' + a.id + '\')" style="color:var(--accent);">同步</button>';
+        opBtns += '<button class="btn btn-ghost btn-sm" onclick="unpublishPlatformAction(\'' + a.id + '\')" style="color:#f59e0b;">下线</button>';
+      }
+      opBtns += '<button class="btn btn-ghost btn-sm" onclick="deletePlatformAction(\'' + a.id + '\')" style="color:var(--danger);">删除</button>';
+
+      html += '<tr>'
+        + '<td><div class="action-thumb">' + a.icon + '</div></td>'
+        + '<td><div style="font-weight:600;">' + a.name + '</div>'
+        +   '<div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">' + (a.desc || '-') + '</div></td>'
+        + '<td><span class="tag" style="background:var(--bg-tag);">' + posText + '</span></td>'
+        + '<td>' + a.atomicCount + ' 个原子</td>'
+        + '<td>' + (a.totalDuration > 0 ? plaFmtTime(a.totalDuration) : '-') + '</td>'
+        + '<td>' + statusTag + '</td>'
+        + '<td>' + scopeTag + '</td>'
+        + '<td style="font-size:12px;color:var(--text-secondary);">' + a.updatedAt + '</td>'
+        + '<td><div style="display:flex;flex-wrap:wrap;gap:4px;">' + opBtns + '</div></td>'
+        + '</tr>';
+    });
+  }
+  document.getElementById('plat-act-tbody').innerHTML = html;
+  updatePlatformActionStats();
+}
+
+function updatePlatformActionStats() {
+  var total = PLATFORM_ACTIONS.length;
+  var published = PLATFORM_ACTIONS.filter(function(a){ return a.status === 'published'; }).length;
+  var draft = PLATFORM_ACTIONS.filter(function(a){ return a.status === 'draft'; }).length;
+  var syncedTenants = {};
+  PLATFORM_ACTIONS.forEach(function(a){
+    if (a.scope === 'all') {
+      syncedTenants['__all__'] = true;
+    } else if (a.scope === 'partial') {
+      a.syncedTenants.forEach(function(t){ syncedTenants[t] = true; });
+    }
+  });
+  document.getElementById('plat-act-total').textContent = total;
+  document.getElementById('plat-act-published').textContent = published;
+  document.getElementById('plat-act-draft').textContent = draft;
+  document.getElementById('plat-act-tenant').textContent = syncedTenants['__all__'] ? PLATFORM_TENANTS.length : Object.keys(syncedTenants).length;
+}
+
+function resetPlatformActionFilter() {
+  document.getElementById('plat-act-search-name').value = '';
+  document.getElementById('plat-act-search-pos').value = '';
+  document.getElementById('plat-act-search-status').value = '';
+  document.getElementById('plat-act-search-scope').value = '';
+  renderPlatformActionList();
+}
+
+// ===== 使用说明 =====
+function openPlatformActionHelp() {
+  openModal('modal-platform-action-help');
+}
+
+// ===== 创建/编辑/保存/发布 =====
+function openCreatePlatformAction() {
+  plaEditingId = null;
+  document.getElementById('pla-modal-title').textContent = '➕ 新建平台动作';
+  document.getElementById('pla-name').value = '';
+  document.getElementById('pla-position').value = 'head';
+  document.getElementById('pla-desc').value = '';
+  plaSelectedIcon = '🤖';
+  document.querySelectorAll('#pla-icon-picker .icon-pick-item').forEach(function(it){ it.classList.remove('selected'); });
+  document.querySelector('#pla-icon-picker .icon-pick-item').classList.add('selected');
+  plaCombinerData = {};
+  plaExtraLanes = {};
+  plaSelectedBlock = null;
+  renderPlaPalette();
+  renderPlaTimeline();
+  hidePlaBlockEditor();
+  openModal('modal-platform-action');
+}
+
+function openEditPlatformAction(id) {
+  var a = PLATFORM_ACTIONS.find(function(x){ return x.id === id; });
+  if (!a) return;
+  plaEditingId = id;
+  document.getElementById('pla-modal-title').textContent = '✏️ 编辑平台动作';
+  document.getElementById('pla-name').value = a.name;
+  document.getElementById('pla-position').value = a.position;
+  document.getElementById('pla-desc').value = a.desc || '';
+  plaSelectedIcon = a.icon;
+  document.querySelectorAll('#pla-icon-picker .icon-pick-item').forEach(function(it){
+    it.classList.toggle('selected', it.getAttribute('data-icon') === a.icon);
+  });
+  // 加载数据
+  plaCombinerData = a.blocks || {};
+  plaExtraLanes = {};
+  plaSelectedBlock = null;
+  renderPlaPalette();
+  renderPlaTimeline();
+  hidePlaBlockEditor();
+  openModal('modal-platform-action');
+}
+
+function closePlatformActionEditor() {
+  closeModal('modal-platform-action');
+}
+
+function selectPlaIcon(el) {
+  document.querySelectorAll('#pla-icon-picker .icon-pick-item').forEach(function(i){ i.classList.remove('selected'); });
+  el.classList.add('selected');
+  plaSelectedIcon = el.getAttribute('data-icon');
+}
+
+function onPlaPositionChange() {
+  plaCombinerData = {};
+  plaExtraLanes = {};
+  plaSelectedBlock = null;
+  renderPlaPalette();
+  renderPlaTimeline();
+  hidePlaBlockEditor();
+}
+
+// ===== 调色板渲染 =====
+function renderPlaPalette() {
+  var pos = document.getElementById('pla-position').value;
+  var groups = [];
+  if (pos === 'head' || pos === 'full') groups.push({title:'头部原子动作', key:'head'});
+  if (pos === 'torso' || pos === 'full') groups.push({title:'躯体原子动作', key:'torso'});
+  if (pos === 'ear' || pos === 'full') {
+    groups.push({title:'左耳原子动作', key:'ear-left'});
+    groups.push({title:'右耳原子动作', key:'ear-right'});
+  }
+  var html = '';
+  groups.forEach(function(g){
+    html += '<div class="pla-palette-group">';
+    html += '<div class="pla-palette-group-title">' + g.title + '</div>';
+    var actions = PLA_ATOMIC_ACTIONS[g.key] || [];
+    actions.forEach(function(a){
+      html += '<div class="pla-palette-item draggable" draggable="true" ondragstart="dragPlaAtomicAction(event,\'' + g.key + '\',\'' + a.id + '\',\'' + a.name + '\',\'' + a.icon + '\')">';
+      html += '<span class="pla-icon">' + a.icon + '</span><span>' + a.name + '</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  var pal = document.getElementById('pla-atomic-palette');
+  if (pal) pal.innerHTML = html;
+}
+
+// ===== 时序图渲染与轨道管理 =====
+function plaCalcDuration(amp, spd) {
+  return Math.round((0.5 + (amp / 100) * 2.5 + ((100 - spd) / 100) * 2.0) * 10) / 10;
+}
+
+function plaGetTotalTime() {
+  var maxEnd = 0;
+  Object.keys(plaCombinerData).forEach(function(k){
+    var blocks = plaCombinerData[k] || [];
+    blocks.forEach(function(b){
+      var end = b.startTime + b.duration;
+      if (end > maxEnd) maxEnd = end;
+    });
+  });
+  var total = Math.ceil(maxEnd);
+  if (total < 5) total = 5;
+  return total;
+}
+
+function plaGetTotalTimeForBlocks(blocksData) {
+  var maxEnd = 0;
+  Object.keys(blocksData).forEach(function(k){
+    var blocks = blocksData[k] || [];
+    blocks.forEach(function(b){
+      var end = b.startTime + b.duration;
+      if (end > maxEnd) maxEnd = end;
+    });
+  });
+  var total = Math.ceil(maxEnd);
+  if (total < 5) total = 5;
+  return total;
+}
+
+function plaFmtTime(sec) {
+  if (sec === 0) return '0s';
+  return (Math.round(sec * 10) / 10) + 's';
+}
+
+function plaGetBarCls(laneKey) {
+  if (laneKey.indexOf('torso') === 0) return 'bar-torso';
+  if (laneKey.indexOf('ear-left') === 0) return 'bar-ear-l';
+  if (laneKey.indexOf('ear-right') === 0) return 'bar-ear-r';
+  return 'bar-head';
+}
+
+function plaGetCurrentLanes(pos) {
+  var defaults = PLA_POSITION_LANES[pos] || [];
+  var extras = plaExtraLanes[pos] || [];
+  return defaults.concat(extras);
+}
+
+function plaAddLane(pos) {
+  if (!plaExtraLanes[pos]) plaExtraLanes[pos] = [];
+  var defaults = PLA_POSITION_LANES[pos] || [];
+  var posLabel = pos;
+  var posCls = 'bar-head';
+  if (defaults.length > 0) {
+    posLabel = (defaults[0].label || pos).replace(/[^\u4e00-\u9fa5a-zA-Z]/g,'').replace(/\s*\d+$/,'').trim();
+    posCls = defaults[0].cls || 'bar-head';
+  }
+  var idx = defaults.length + plaExtraLanes[pos].length + 1;
+  var prefix = pos + '-x';
+  var n = 1;
+  while (plaCombinerData[prefix + n]) n++;
+  var newKey = prefix + n;
+  plaExtraLanes[pos].push({key:newKey, label: posLabel + ' ' + idx, cls: posCls});
+  renderPlaTimeline();
+}
+
+function plaRemoveLane(pos, laneKey) {
+  var defaults = PLA_POSITION_LANES[pos] || [];
+  for (var i = 0; i < defaults.length; i++) {
+    if (defaults[i].key === laneKey) return;
+  }
+  if (plaExtraLanes[pos]) {
+    plaExtraLanes[pos] = plaExtraLanes[pos].filter(function(l){ return l.key !== laneKey; });
+    if (plaExtraLanes[pos].length === 0) delete plaExtraLanes[pos];
+  }
+  if (plaCombinerData[laneKey]) delete plaCombinerData[laneKey];
+  if (plaSelectedBlock && plaSelectedBlock.lane === laneKey) {
+    plaSelectedBlock = null;
+    hidePlaBlockEditor();
+  }
+  renderPlaTimeline();
+}
+
+function renderPlaTimeline() {
+  var body = document.getElementById('pla-tl-body');
+  if (!body) return;
+  var pos = document.getElementById('pla-position').value;
+  var lanes = plaGetCurrentLanes(pos);
+  var totalTime = plaGetTotalTime();
+  var html = '';
+
+  html += '<div class="ca-tl-ruler">';
+  for (var i = 0; i <= 5; i++) {
+    var t = (totalTime / 5) * i;
+    html += '<div class="ca-tl-ruler-tick">' + plaFmtTime(t) + '</div>';
+  }
+  html += '</div>';
+
+  lanes.forEach(function(lane, i){
+    if (i > 0) html += '<div class="ca-tl-parallel-hint">🔗 可并线（不互斥）</div>';
+    var blocks = plaCombinerData[lane.key] || [];
+    var barCls = plaGetBarCls(lane.key);
+    var laneLabel = lane.label.replace(/[^\u4e00-\u9fa5a-zA-Z\d\s]/g,'');
+    var isExtra = false;
+    if (plaExtraLanes[pos]) {
+      for (var e = 0; e < plaExtraLanes[pos].length; e++) {
+        if (plaExtraLanes[pos][e].key === lane.key) { isExtra = true; break; }
+      }
+    }
+    html += '<div class="ca-tl-lane-row">';
+    html += '<div class="ca-tl-lane-label">' + laneLabel + (isExtra ? '<span class="ca-tl-lane-del" onclick="plaRemoveLane(\'' + pos + '\',\'' + lane.key + '\')" title="删除轨道">×</span>' : '') + '</div>';
+    html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '" data-lane="' + lane.key + '" data-total="' + totalTime + '" ondragover="onDragOverPlaTl(event)" ondragleave="onDragLeavePlaTl(event)" ondrop="onDropToPlaTl(event,\'' + lane.key + '\')">';
+    if (blocks.length === 0) {
+      html += '<div class="ca-tl-lane-hint">拖拽原子动作到此</div>';
+    } else {
+      blocks.forEach(function(b, idx){
+        var left = Math.max(0, Math.min(95, (b.startTime / totalTime) * 100));
+        var width = Math.max(3, Math.min(100 - left, (b.duration / totalTime) * 100));
+        var selCls = (plaSelectedBlock && plaSelectedBlock.lane === lane.key && plaSelectedBlock.idx === idx) ? ' selected' : '';
+        var delHtml = '<span class="bar-del" onclick="event.stopPropagation();plaRemoveBlock(\'' + lane.key + '\',' + idx + ')">×</span>';
+        html += '<div class="pla-tl-bar ' + barCls + selCls + '" style="left:' + left + '%;width:' + width + '%;" onclick="selectPlaBlock(\'' + lane.key + '\',' + idx + ')" title="' + b.name + ' (' + plaFmtTime(b.startTime) + '→' + plaFmtTime(b.startTime + b.duration) + ')">' + b.icon + ' ' + b.name.substring(0,4) + delHtml + '</div>';
+      });
+    }
+    html += '</div></div>';
+  });
+
+  html += '<div class="ca-tl-add-lane" onclick="plaAddLane(\'' + pos + '\')"><span>+</span> 添加新轨道（可并线）</div>';
+  body.innerHTML = html;
+}
+
+// ===== 拖拽与块操作 =====
+function dragPlaAtomicAction(e, laneKey, actionId, actionName, icon) {
+  e.dataTransfer.setData('text/plain', JSON.stringify({laneKey:laneKey, actionId:actionId, actionName:actionName, icon:icon}));
+  e.target.classList.add('dragging');
+}
+function onDragOverPlaTl(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('drop-active');
+}
+function onDragLeavePlaTl(e) {
+  e.currentTarget.classList.remove('drop-active');
+}
+function onDropToPlaTl(e, laneKey) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drop-active');
+  document.querySelectorAll('.pla-palette-item.dragging').forEach(function(el){ el.classList.remove('dragging'); });
+  try { var data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch(err) { return; }
+  var rect = e.currentTarget.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  var totalTime = plaGetTotalTime();
+  var startSec = Math.round((x / rect.width) * totalTime * 10) / 10;
+  startSec = Math.max(0, Math.min(totalTime - 0.5, startSec));
+  plaAddBlock(laneKey, data.actionId, data.actionName, data.icon, startSec);
+}
+
+function plaAddBlock(laneKey, actionId, actionName, icon, startSec) {
+  if (!plaCombinerData[laneKey]) plaCombinerData[laneKey] = [];
+  var blocks = plaCombinerData[laneKey];
+  var amplitude = 80;
+  var speed = 60;
+  var duration = plaCalcDuration(amplitude, speed);
+  var totalTime = plaGetTotalTime();
+  var startTime;
+  if (blocks.length === 0) {
+    startTime = startSec;
+  } else {
+    var last = blocks[blocks.length - 1];
+    startTime = Math.max(startSec, last.startTime + last.duration);
+  }
+  startTime = Math.min(startTime, totalTime - 0.5);
+  startTime = Math.round(startTime * 10) / 10;
+  blocks.push({id:actionId, name:actionName, icon:icon, amplitude:amplitude, speed:speed, startTime:startTime, duration:duration});
+  renderPlaTimeline();
+}
+
+function plaRemoveBlock(laneKey, idx) {
+  if (plaCombinerData[laneKey]) {
+    plaCombinerData[laneKey].splice(idx, 1);
+    plaRecalcTimings(laneKey);
+    if (plaSelectedBlock && plaSelectedBlock.lane === laneKey && plaSelectedBlock.idx === idx) {
+      plaSelectedBlock = null;
+      hidePlaBlockEditor();
+    } else if (plaSelectedBlock && plaSelectedBlock.lane === laneKey && plaSelectedBlock.idx > idx) {
+      plaSelectedBlock.idx--;
+    }
+    renderPlaTimeline();
+    if (plaSelectedBlock) showPlaBlockEditor();
+  }
+}
+
+function plaRecalcTimings(laneKey) {
+  var blocks = plaCombinerData[laneKey] || [];
+  var totalTime = plaGetTotalTime();
+  for (var i = 1; i < blocks.length; i++) {
+    var prev = blocks[i - 1];
+    var minStart = prev.startTime + prev.duration;
+    if (blocks[i].startTime < minStart) {
+      blocks[i].startTime = Math.min(minStart, totalTime - 0.5);
+    }
+  }
+}
+
+function selectPlaBlock(laneKey, idx) {
+  plaSelectedBlock = {lane:laneKey, idx:idx};
+  renderPlaTimeline();
+  showPlaBlockEditor();
+}
+
+function showPlaBlockEditor() {
+  if (!plaSelectedBlock) return;
+  var blocks = plaCombinerData[plaSelectedBlock.lane] || [];
+  var b = blocks[plaSelectedBlock.idx];
+  if (!b) { hidePlaBlockEditor(); return; }
+  var editor = document.getElementById('pla-block-editor');
+  if (!editor) return;
+  editor.style.display = '';
+  editor.className = 'ca-editor';
+  var endSec = Math.round((b.startTime + b.duration) * 10) / 10;
+  editor.innerHTML = ''
+    + '<div class="ca-editor-title">'
+    +   '<span>' + b.icon + ' ' + b.name + '</span>'
+    +   '<span style="font-size:11px;font-weight:400;color:var(--text-tertiary);">📌 ' + plaSelectedBlock.lane + ' #' + (plaSelectedBlock.idx + 1) + '</span>'
+    + '</div>'
+    + '<div class="ca-editor-props">'
+    +   '<div class="ca-editor-prop"><label>幅度</label><input type="range" min="0" max="100" value="' + b.amplitude + '" oninput="updatePlaBlockProp(\'' + plaSelectedBlock.lane + '\',' + plaSelectedBlock.idx + ',\'amplitude\',this.value)"><span class="ep-val">' + b.amplitude + '</span></div>'
+    +   '<div class="ca-editor-prop"><label>速度</label><input type="range" min="0" max="100" value="' + b.speed + '" oninput="updatePlaBlockProp(\'' + plaSelectedBlock.lane + '\',' + plaSelectedBlock.idx + ',\'speed\',this.value)"><span class="ep-val">' + b.speed + '</span></div>'
+    + '</div>'
+    + '<div class="ca-editor-info">'
+    +   '<span>⏱ 时长: ' + plaFmtTime(b.duration) + '（自动计算）</span>'
+    +   '<span>🕐 起始: ' + plaFmtTime(b.startTime) + '</span>'
+    +   '<span>✅ 结束: ' + plaFmtTime(endSec) + '</span>'
+    +   '<span style="color:#ef4444;cursor:pointer;" onclick="plaRemoveBlock(\'' + plaSelectedBlock.lane + '\',' + plaSelectedBlock.idx + ')">🗑 删除</span>'
+    + '</div>';
+}
+
+function hidePlaBlockEditor() {
+  var editor = document.getElementById('pla-block-editor');
+  if (editor) { editor.style.display = 'none'; editor.innerHTML = ''; }
+}
+
+function updatePlaBlockProp(laneKey, idx, prop, val) {
+  if (!plaCombinerData[laneKey] || !plaCombinerData[laneKey][idx]) return;
+  plaCombinerData[laneKey][idx][prop] = parseInt(val);
+  var b = plaCombinerData[laneKey][idx];
+  b.duration = plaCalcDuration(b.amplitude, b.speed);
+  plaRecalcTimings(laneKey);
+  renderPlaTimeline();
+  showPlaBlockEditor();
+}
+
+// ===== 保存与发布 =====
+function collectPlatformActionForm() {
+  var name = document.getElementById('pla-name').value.trim();
+  if (!name) { alert('请输入动作名称'); return null; }
+  var positionVal = document.getElementById('pla-position').value;
+  var desc = document.getElementById('pla-desc').value.trim();
+  var totalBlocks = 0;
+  var totalDuration = 0;
+  Object.keys(plaCombinerData).forEach(function(k){
+    var blocks = plaCombinerData[k] || [];
+    totalBlocks += blocks.length;
+    blocks.forEach(function(b){ totalDuration = Math.max(totalDuration, b.startTime + b.duration); });
+  });
+  if (totalBlocks === 0) { alert('请至少添加一个原子动作'); return null; }
+  return {
+    name: name,
+    icon: plaSelectedIcon,
+    position: positionVal,
+    desc: desc,
+    blocks: JSON.parse(JSON.stringify(plaCombinerData)),
+    atomicCount: totalBlocks,
+    totalDuration: totalDuration
+  };
+}
+
+function saveAsPlatformDraft() {
+  var data = collectPlatformActionForm();
+  if (!data) return;
+  if (plaEditingId) {
+    var a = PLATFORM_ACTIONS.find(function(x){ return x.id === plaEditingId; });
+    if (a) {
+      a.name = data.name; a.icon = data.icon; a.position = data.position;
+      a.desc = data.desc; a.blocks = data.blocks;
+      a.atomicCount = data.atomicCount; a.totalDuration = data.totalDuration;
+      a.updatedAt = formatNow();
+      // 编辑后回到草稿态（如果原为已发布）
+      if (a.status === 'published') {
+        if (!confirm('当前动作已发布，编辑后租户端的旧版本将保留直到重新同步。是否继续保存为草稿？')) return;
+        a.status = 'draft';
+        a.scope = '';
+        a.syncedTenants = [];
+      }
+    }
+  } else {
+    var newId = 'pa-' + String(PLATFORM_ACTIONS.length + 1).padStart(3, '0');
+    PLATFORM_ACTIONS.unshift({
+      id: newId, name: data.name, icon: data.icon, position: data.position,
+      desc: data.desc, blocks: data.blocks,
+      status: 'draft', scope: '', syncedTenants: [],
+      atomicCount: data.atomicCount, totalDuration: data.totalDuration,
+      updatedAt: formatNow()
+    });
+  }
+  closePlatformActionEditor();
+  renderPlatformActionList();
+  showToast('草稿已保存');
+}
+
+function saveAndPublishPlatformAction() {
+  var data = collectPlatformActionForm();
+  if (!data) return;
+  if (plaEditingId) {
+    var a = PLATFORM_ACTIONS.find(function(x){ return x.id === plaEditingId; });
+    if (a) {
+      a.name = data.name; a.icon = data.icon; a.position = data.position;
+      a.desc = data.desc; a.blocks = data.blocks;
+      a.atomicCount = data.atomicCount; a.totalDuration = data.totalDuration;
+      a.status = 'published';
+      a.updatedAt = formatNow();
+      if (a.scope === '') {
+        // 首次发布，弹出同步选择
+        closePlatformActionEditor();
+        renderPlatformActionList();
+        showToast('动作已发布，是否立即同步给租户？');
+        setTimeout(function(){ syncPlatformAction(a.id); }, 600);
+        return;
+      }
+    }
+  } else {
+    var newId = 'pa-' + String(PLATFORM_ACTIONS.length + 1).padStart(3, '0');
+    var newAction = {
+      id: newId, name: data.name, icon: data.icon, position: data.position,
+      desc: data.desc, blocks: data.blocks,
+      status: 'published', scope: '', syncedTenants: [],
+      atomicCount: data.atomicCount, totalDuration: data.totalDuration,
+      updatedAt: formatNow()
+    };
+    PLATFORM_ACTIONS.unshift(newAction);
+    closePlatformActionEditor();
+    renderPlatformActionList();
+    showToast('动作已发布，是否立即同步给租户？');
+    setTimeout(function(){ syncPlatformAction(newAction.id); }, 600);
+    return;
+  }
+  closePlatformActionEditor();
+  renderPlatformActionList();
+  showToast('动作已发布');
+}
+
+function publishPlatformAction(id) {
+  var a = PLATFORM_ACTIONS.find(function(x){ return x.id === id; });
+  if (!a) return;
+  a.status = 'published';
+  a.updatedAt = formatNow();
+  renderPlatformActionList();
+  showToast('动作已发布');
+  setTimeout(function(){ syncPlatformAction(id); }, 500);
+}
+
+function unpublishPlatformAction(id) {
+  var a = PLATFORM_ACTIONS.find(function(x){ return x.id === id; });
+  if (!a) return;
+  if (!confirm('下线后该动作对所有租户不可见，确定要下线吗？')) return;
+  a.status = 'draft';
+  a.scope = '';
+  a.syncedTenants = [];
+  a.updatedAt = formatNow();
+  renderPlatformActionList();
+  showToast('动作已下线');
+}
+
+function deletePlatformAction(id) {
+  var a = PLATFORM_ACTIONS.find(function(x){ return x.id === id; });
+  if (!a) return;
+  var msg = a.status === 'published'
+    ? '该动作已发布，删除后已同步的租户将失去该动作引用。确定删除吗？'
+    : '确定删除该草稿动作吗？';
+  if (!confirm(msg)) return;
+  PLATFORM_ACTIONS = PLATFORM_ACTIONS.filter(function(x){ return x.id !== id; });
+  renderPlatformActionList();
+  showToast('动作已删除');
+}
+
+// ===== 预览 =====
+function previewPlatformAction(id) {
+  var a = PLATFORM_ACTIONS.find(function(x){ return x.id === id; });
+  if (!a) return;
+  document.getElementById('pla-preview-icon').textContent = a.icon;
+  document.getElementById('pla-preview-name').textContent = a.name;
+  var posText = a.position === 'head' ? '头部' : a.position === 'torso' ? '躯体' : a.position === 'ear' ? '耳朵' : '全身';
+  document.getElementById('pla-preview-meta').textContent = posText + ' · ' + a.atomicCount + '个原子动作 · 总时长 ' + plaFmtTime(a.totalDuration);
+  document.getElementById('pla-preview-desc').textContent = a.desc || '（无描述）';
+
+  // 渲染只读时序图
+  var pos = a.position;
+  var lanes = plaGetCurrentLanes.call(null, pos) || PLA_POSITION_LANES[pos] || [];
+  var totalTime = plaGetTotalTimeForBlocks(a.blocks || {});
+  var html = '<div class="ca-tl-ruler">';
+  for (var i = 0; i <= 5; i++) {
+    var t = (totalTime / 5) * i;
+    html += '<div class="ca-tl-ruler-tick">' + plaFmtTime(t) + '</div>';
+  }
+  html += '</div>';
+  lanes.forEach(function(lane, i){
+    if (i > 0) html += '<div class="ca-tl-parallel-hint">🔗 可并线（不互斥）</div>';
+    var blocks = (a.blocks && a.blocks[lane.key]) || [];
+    var barCls = plaGetBarCls(lane.key);
+    var laneLabel = lane.label.replace(/[^\u4e00-\u9fa5a-zA-Z\d\s]/g,'');
+    html += '<div class="ca-tl-lane-row">';
+    html += '<div class="ca-tl-lane-label">' + laneLabel + '</div>';
+    html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '">';
+    blocks.forEach(function(b){
+      var left = Math.max(0, Math.min(95, (b.startTime / totalTime) * 100));
+      var width = Math.max(3, Math.min(100 - left, (b.duration / totalTime) * 100));
+      html += '<div class="pla-tl-bar ' + barCls + '" style="left:' + left + '%;width:' + width + '%;cursor:default;" title="' + b.name + ' (' + plaFmtTime(b.startTime) + '→' + plaFmtTime(b.startTime + b.duration) + ')">' + b.icon + ' ' + b.name.substring(0,4) + '</div>';
+    });
+    if (blocks.length === 0) html += '<div class="ca-tl-lane-hint">无原子动作</div>';
+    html += '</div></div>';
+  });
+  document.getElementById('pla-preview-tl-body').innerHTML = html;
+  openModal('modal-platform-action-preview');
+}
+
+// ===== 同步流程 =====
+function syncPlatformAction(id) {
+  var a = PLATFORM_ACTIONS.find(function(x){ return x.id === id; });
+  if (!a) return;
+  if (a.status !== 'published') { alert('仅已发布的动作可同步'); return; }
+  plaSyncTargetId = id;
+  var posText = a.position === 'head' ? '头部' : a.position === 'torso' ? '躯体' : a.position === 'ear' ? '耳朵' : '全身';
+  document.getElementById('pla-sync-action-info').innerHTML =
+    '<div style="display:flex;align-items:center;gap:10px;">'
+    + '<span style="font-size:24px;">' + a.icon + '</span>'
+    + '<div>'
+    +   '<div style="font-weight:600;">' + a.name + '</div>'
+    +   '<div style="font-size:11px;color:var(--text-tertiary);">' + posText + ' · ' + a.atomicCount + '个原子动作</div>'
+    + '</div></div>';
+
+  // 默认同步范围
+  var radios = document.querySelectorAll('input[name="pla-sync-scope"]');
+  radios.forEach(function(r){
+    r.checked = (r.value === (a.scope === 'all' ? 'all' : 'partial'));
+  });
+  onPlaSyncScopeChange();
+
+  // 渲染租户列表
+  var opts = '';
+  PLATFORM_TENANTS.forEach(function(t){
+    var checked = a.syncedTenants.indexOf(t.id) >= 0 || a.syncedTenants.indexOf('all') >= 0;
+    opts += '<label class="pla-sync-tenant-item"><input type="checkbox" value="' + t.id + '"' + (checked ? ' checked' : '') + '>'
+      + '<span>' + t.name + '</span>'
+      + '<span style="font-size:10px;color:var(--text-tertiary);margin-left:auto;">' + t.tag + '</span>'
+      + '</label>';
+  });
+  document.getElementById('pla-sync-tenant-options').innerHTML = opts;
+
+  document.getElementById('pla-sync-remark').value = '';
+  document.getElementById('pla-sync-mode').value = 'push';
+  openModal('modal-platform-action-sync');
+}
+
+function onPlaSyncScopeChange() {
+  var val = document.querySelector('input[name="pla-sync-scope"]:checked').value;
+  document.getElementById('pla-sync-tenant-list').style.display = val === 'partial' ? 'block' : 'none';
+}
+
+function selectAllPlaTenants(checked) {
+  document.querySelectorAll('#pla-sync-tenant-options input[type="checkbox"]').forEach(function(cb){ cb.checked = checked; });
+}
+
+function selectPlaTenantsByTag() {
+  document.querySelectorAll('#pla-sync-tenant-options input[type="checkbox"]').forEach(function(cb){ cb.checked = !cb.checked; });
+}
+
+function confirmSyncPlatformAction() {
+  var a = PLATFORM_ACTIONS.find(function(x){ return x.id === plaSyncTargetId; });
+  if (!a) return;
+  var scope = document.querySelector('input[name="pla-sync-scope"]:checked').value;
+  var mode = document.getElementById('pla-sync-mode').value;
+  if (scope === 'all') {
+    a.scope = 'all';
+    a.syncedTenants = ['all'];
+  } else {
+    var ids = [];
+    document.querySelectorAll('#pla-sync-tenant-options input[type="checkbox"]:checked').forEach(function(cb){ ids.push(cb.value); });
+    if (ids.length === 0) { alert('请至少选择一个租户，或切换到"全部租户"'); return; }
+    a.scope = 'partial';
+    a.syncedTenants = ids;
+  }
+  a.updatedAt = formatNow();
+  closeModal('modal-platform-action-sync');
+  renderPlatformActionList();
+  var modeText = mode === 'push' ? '已推送' : '已通知';
+  showToast(modeText + '：' + a.name + ' → ' + (scope === 'all' ? '全部租户' : a.syncedTenants.length + '个租户'));
+}
+
+function formatNow() {
+  var d = new Date();
+  var pad = function(n){ return n < 10 ? '0' + n : '' + n; };
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+// 页面进入时初始化
+document.addEventListener('DOMContentLoaded', function(){ renderPlatformActionList(); });
+// 若DOMContentLoaded已触发
+if (document.readyState === 'interactive' || document.readyState === 'complete') {
+  setTimeout(function(){ renderPlatformActionList(); }, 0);
+}
+
+</script>
+<!-- 创作者署名卡片 (yumei) -->
+<style>
+  .yumei-credit {
+    position: fixed; right: 18px; bottom: 18px; z-index: 9999;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px 10px 10px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #2c2c46 100%);
+    color: #fff; border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(26, 26, 46, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none; backdrop-filter: blur(10px);
+  }
+  .yumei-credit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(26, 26, 46, 0.45); }
+  .yumei-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #f59e0b, #ef4444, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+  }
+  .yumei-info { display: flex; flex-direction: column; line-height: 1.3; }
+  .yumei-name { font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }
+  .yumei-meta { font-size: 10px; opacity: 0.7; margin-top: 1px; }
+  .yumei-tag {
+    display: inline-block; padding: 1px 6px; border-radius: 4px;
+    background: linear-gradient(135deg, #f59e0b, #ef4444); font-size: 9px;
+    font-weight: 600; margin-left: 4px; vertical-align: middle;
+  }
+  @keyframes yumei-glow {
+    0%, 100% { box-shadow: 0 8px 24px rgba(26, 26, 46, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06), 0 0 0 0 rgba(245, 158, 11, 0.4); }
+    50% { box-shadow: 0 8px 24px rgba(26, 26, 46, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06), 0 0 0 8px rgba(245, 158, 11, 0); }
+  }
+  .yumei-credit { animation: yumei-glow 3s ease-in-out infinite; }
+</style>
+
+<div class="yumei-credit" onclick="alert('Yumei Studio · 产品原型设计
+专注于B端复杂业务系统原型设计
+
+© 2026 Yumei. All Rights Reserved.')">
+  <div class="yumei-avatar">Y</div>
+  <div class="yumei-info">
+    <div class="yumei-name">yumei<span class="yumei-tag">创作者</span></div>
+    <div class="yumei-meta">Yumei Studio · 原型设计</div>
+  </div>
+</div>
+
+
+
+<!-- ============================================================ -->
+<!-- 动作库相关模态框（创建/编辑/预览/同步） -->
+<!-- ============================================================ -->
+
+<!-- 1. 创建/编辑平台动作模态框 -->
+<div class="modal-overlay" id="modal-platform-action">
+  <div class="modal-box" style="width:720px;max-width:95vw;">
+    <div class="modal-header">
+      <div class="modal-title" id="pla-modal-title">➕ 新建平台动作</div>
+      <button class="modal-close" onclick="closePlatformActionEditor()">×</button>
+    </div>
+    <div class="modal-body" style="padding:20px 24px;max-height:75vh;overflow-y:auto;">
+      <!-- 基本信息 -->
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">动作名称 <span class="required">*</span></label>
+          <input class="form-input" type="text" id="pla-name" placeholder="如：欢迎致意组合" maxlength="20">
+        </div>
+        <div class="form-group">
+          <label class="form-label">动作位置 <span class="required">*</span></label>
+          <select class="form-select" id="pla-position" onchange="onPlaPositionChange()">
+            <option value="head">头部</option>
+            <option value="torso">躯体</option>
+            <option value="ear">耳朵</option>
+            <option value="full">全身</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 动作图标选择 -->
+      <div class="form-group">
+        <label class="form-label">动作图标 <span class="required">*</span></label>
+        <div class="icon-picker-grid" id="pla-icon-picker">
+          <div class="icon-pick-item selected" data-icon="🤖" onclick="selectPlaIcon(this)">🤖</div>
+          <div class="icon-pick-item" data-icon="😄" onclick="selectPlaIcon(this)">😄</div>
+          <div class="icon-pick-item" data-icon="🙂" onclick="selectPlaIcon(this)">🙂</div>
+          <div class="icon-pick-item" data-icon="😮" onclick="selectPlaIcon(this)">😮</div>
+          <div class="icon-pick-item" data-icon="🙇" onclick="selectPlaIcon(this)">🙇</div>
+          <div class="icon-pick-item" data-icon="🙆" onclick="selectPlaIcon(this)">🙆</div>
+          <div class="icon-pick-item" data-icon="🙅" onclick="selectPlaIcon(this)">🙅</div>
+          <div class="icon-pick-item" data-icon="🙌" onclick="selectPlaIcon(this)">🙌</div>
+          <div class="icon-pick-item" data-icon="👋" onclick="selectPlaIcon(this)">👋</div>
+          <div class="icon-pick-item" data-icon="👍" onclick="selectPlaIcon(this)">👍</div>
+          <div class="icon-pick-item" data-icon="👎" onclick="selectPlaIcon(this)">👎</div>
+          <div class="icon-pick-item" data-icon="✋" onclick="selectPlaIcon(this)">✋</div>
+          <div class="icon-pick-item" data-icon="🤚" onclick="selectPlaIcon(this)">🤚</div>
+          <div class="icon-pick-item" data-icon="🔄" onclick="selectPlaIcon(this)">🔄</div>
+          <div class="icon-pick-item" data-icon="⬇️" onclick="selectPlaIcon(this)">⬇️</div>
+          <div class="icon-pick-item" data-icon="⬆️" onclick="selectPlaIcon(this)">⬆️</div>
+          <div class="icon-pick-item" data-icon="↔️" onclick="selectPlaIcon(this)">↔️</div>
+          <div class="icon-pick-item" data-icon="↪️" onclick="selectPlaIcon(this)">↪️</div>
+          <div class="icon-pick-item" data-icon="↩️" onclick="selectPlaIcon(this)">↩️</div>
+          <div class="icon-pick-item" data-icon="🎵" onclick="selectPlaIcon(this)">🎵</div>
+          <div class="icon-pick-item" data-icon="🎪" onclick="selectPlaIcon(this)">🎪</div>
+          <div class="icon-pick-item" data-icon="✨" onclick="selectPlaIcon(this)">✨</div>
+          <div class="icon-pick-item" data-icon="💫" onclick="selectPlaIcon(this)">💫</div>
+          <div class="icon-pick-item" data-icon="⭐" onclick="selectPlaIcon(this)">⭐</div>
+        </div>
+      </div>
+
+      <!-- 描述 -->
+      <div class="form-group">
+        <label class="form-label">动作描述</label>
+        <input class="form-input" type="text" id="pla-desc" placeholder="如：用于开场问好场景" maxlength="60">
+      </div>
+
+      <!-- 原子动作组合区 -->
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">原子动作组合 <span style="font-size:11px;color:var(--text-tertiary);font-weight:400;">（从左侧拖拽原子动作到时序图的不同轨道，每个位置默认多条轨道，不互斥的动作可同时执行；点击块可调整幅度和速度，时长由幅度和速度自动计算）</span></label>
+        <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;flex-wrap:wrap;">
+          <span style="color:#3b82f6;">🔗 并线：不同轨道上的原子动作可同时执行</span>
+          <span style="color:#ef4444;">🚫 互斥：同一轨道内的原子动作按顺序执行</span>
+          <span style="color:var(--text-tertiary);">📊 点击时序块可调整幅度和速度</span>
+          <span style="color:#8b5cf6;">⏱ 时长 = f(幅度, 速度)，自动计算（单位：秒）</span>
+        </div>
+
+        <div style="display:flex;gap:0;border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;">
+          <div style="width:200px;flex-shrink:0;border-right:1px solid var(--border-light);background:#f9fafb;">
+            <div style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--text-secondary);background:#fff;border-bottom:1px solid var(--border-light);">原子动作库（拖拽）</div>
+            <div id="pla-atomic-palette" style="max-height:340px;overflow-y:auto;"></div>
+          </div>
+
+          <div style="flex:1;min-width:0;">
+            <div class="ca-tl-main" id="pla-tl-preview">
+              <div class="ca-tl-preview-header">
+                <span>⏱ 时序图（拖拽原子动作到此组合）</span>
+                <span style="font-weight:400;color:var(--text-tertiary);font-size:10px;">点击块编辑属性 · 时长自动计算</span>
+              </div>
+              <div class="ca-tl-body" id="pla-tl-body"></div>
+            </div>
+            <div id="pla-block-editor" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closePlatformActionEditor()">取消</button>
+      <button class="btn btn-outline" onclick="saveAsPlatformDraft()">保存草稿</button>
+      <button class="btn btn-primary" onclick="saveAndPublishPlatformAction()">保存并发布</button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. 预览平台动作模态框 -->
+<div class="modal-overlay" id="modal-platform-action-preview">
+  <div class="modal-box" style="width:680px;">
+    <div class="modal-header">
+      <div class="modal-title" id="pla-preview-title">👁 动作预览</div>
+      <button class="modal-close" onclick="closeModal('modal-platform-action-preview')">×</button>
+    </div>
+    <div class="modal-body" style="padding:20px 24px;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border-light);">
+        <div id="pla-preview-icon" style="font-size:48px;width:80px;height:80px;background:linear-gradient(135deg,#f5f3ff,#ede9fe);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">🤖</div>
+        <div style="flex:1;">
+          <div id="pla-preview-name" style="font-size:18px;font-weight:600;margin-bottom:4px;">动作名称</div>
+          <div id="pla-preview-meta" style="font-size:12px;color:var(--text-secondary);">头部 · 3个原子动作 · 总时长 8.5s</div>
+          <div id="pla-preview-desc" style="font-size:12px;color:var(--text-tertiary);margin-top:6px;">动作描述</div>
+        </div>
+      </div>
+      <div id="pla-preview-timeline" class="ca-tl-main">
+        <div class="ca-tl-preview-header">
+          <span>⏱ 时序图</span>
+          <span style="font-weight:400;color:var(--text-tertiary);font-size:10px;">只读模式</span>
+        </div>
+        <div class="ca-tl-body" id="pla-preview-tl-body"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-platform-action-preview')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 3. 同步给租户模态框 -->
+<div class="modal-overlay" id="modal-platform-action-sync">
+  <div class="modal-box" style="width:560px;">
+    <div class="modal-header">
+      <div class="modal-title">📤 同步动作到租户</div>
+      <button class="modal-close" onclick="closeModal('modal-platform-action-sync')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--info);margin-bottom:16px;">
+        ℹ 将已发布的动作同步给租户，租户在自有"动作库"中可引用该动作。同步不修改原动作，再次同步不会覆盖租户基于此动作的本地编辑。
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">同步动作</label>
+        <div id="pla-sync-action-info" style="padding:10px 12px;background:var(--bg-page);border-radius:var(--radius-sm);font-size:13px;">--</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">同步范围 <span class="required">*</span></label>
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+            <input type="radio" name="pla-sync-scope" value="all" checked onchange="onPlaSyncScopeChange()"> 全部租户
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+            <input type="radio" name="pla-sync-scope" value="partial" onchange="onPlaSyncScopeChange()"> 指定租户
+          </label>
+        </div>
+        <div id="pla-sync-tenant-list" style="display:none;border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:8px;max-height:220px;overflow-y:auto;">
+          <div style="margin-bottom:6px;display:flex;gap:6px;">
+            <button class="btn btn-ghost btn-sm" onclick="selectAllPlaTenants(true)">全选</button>
+            <button class="btn btn-ghost btn-sm" onclick="selectAllPlaTenants(false)">全不选</button>
+            <button class="btn btn-ghost btn-sm" onclick="selectPlaTenantsByTag()">反选</button>
+          </div>
+          <div id="pla-sync-tenant-options"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">同步方式</label>
+        <select class="form-select" id="pla-sync-mode">
+          <option value="push">推送（租户自动接收）</option>
+          <option value="notice">通知（租户手动确认）</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">备注（可选）</label>
+        <textarea class="form-input" id="pla-sync-remark" rows="2" placeholder="说明本次同步原因或变更点" maxlength="100"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-platform-action-sync')">取消</button>
+      <button class="btn btn-primary" onclick="confirmSyncPlatformAction()">确认同步</button>
+    </div>
+  </div>
+</div>
+
+<!-- 4. 使用说明弹窗 -->
+<div class="modal-overlay" id="modal-platform-action-help">
+  <div class="modal-box" style="width:640px;">
+    <div class="modal-header">
+      <div class="modal-title">📘 平台动作库使用说明</div>
+      <button class="modal-close" onclick="closeModal('modal-platform-action-help')">×</button>
+    </div>
+    <div class="modal-body" style="padding:20px 24px;font-size:13px;line-height:1.8;">
+      <h4 style="margin:0 0 10px;font-size:14px;color:var(--text-primary);">什么是平台动作库？</h4>
+      <p style="margin:0 0 14px;color:var(--text-secondary);">平台运营方创建的标准化原子动作组合，可下发给各租户在脚本编辑器中引用，统一动作规范与品质。</p>
+
+      <h4 style="margin:0 0 10px;font-size:14px;color:var(--text-primary);">核心流程</h4>
+      <ol style="margin:0 0 14px;padding-left:20px;color:var(--text-secondary);">
+        <li><strong>创建</strong>：选择位置（头部/躯体/耳朵/全身），挑选动作图标，从原子动作库拖拽组合</li>
+        <li><strong>编排</strong>：同一轨道内的原子动作按顺序执行（互斥），不同轨道可同时执行（并线）</li>
+        <li><strong>调参</strong>：点击时序块调整幅度和速度，时长自动计算</li>
+        <li><strong>保存</strong>：可保存为草稿（租户不可见）或直接发布</li>
+        <li><strong>同步</strong>：已发布的动作可同步给指定租户或全部租户</li>
+      </ol>
+
+      <h4 style="margin:0 0 10px;font-size:14px;color:var(--text-primary);">状态说明</h4>
+      <ul style="margin:0 0 14px;padding-left:20px;color:var(--text-secondary);">
+        <li><span class="tag tag-warning">草稿</span>：编辑中，租户不可见</li>
+        <li><span class="tag tag-success">已发布</span>：版本生效，可同步给租户</li>
+        <li><span class="tag tag-info">同步范围</span>：未同步 / 部分租户 / 全部租户</li>
+      </ul>
+
+      <h4 style="margin:0 0 10px;font-size:14px;color:var(--text-primary);">同步规则</h4>
+      <p style="margin:0;color:var(--text-secondary);">同步不会覆盖租户基于此动作的本地修改。再次同步同一动作时，租户会收到版本更新通知。</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('modal-platform-action-help')">我知道了</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

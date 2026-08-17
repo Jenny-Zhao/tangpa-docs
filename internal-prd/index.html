@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>镗钯RaaS管理平台（内部）- PRD产品需求文档</title>
+<style>
+:root{--primary:#2563eb;--primary-light:#dbeafe;--success:#16a34a;--success-light:#dcfce7;--warning:#d97706;--warning-light:#fef3c7;--danger:#dc2626;--danger-light:#fee2e2;--text:#1e293b;--text-secondary:#64748b;--text-tertiary:#94a3b8;--border:#e2e8f0;--bg:#f8fafc;--bg-card:#fff;--radius:8px;--radius-sm:6px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:14px}
+.container{max-width:1100px;margin:0 auto;padding:40px 24px}
+.cover{text-align:center;padding:60px 40px 48px;background:linear-gradient(135deg,#1e293b,#334155);color:#fff;border-radius:12px;margin-bottom:40px}
+.cover h1{font-size:30px;font-weight:700;margin-bottom:10px;letter-spacing:1px}
+.cover .sub{font-size:15px;opacity:.8;margin-bottom:24px}
+.cover .meta{display:inline-flex;gap:32px;background:rgba(255,255,255,.1);border-radius:var(--radius);padding:14px 28px;font-size:13px}
+.cover .meta span{text-align:center}
+.cover .meta strong{display:block;font-size:16px;font-weight:600;margin-bottom:2px}
+h2{font-size:21px;font-weight:700;color:var(--text);margin:40px 0 16px;padding-bottom:10px;border-bottom:2px solid var(--primary);display:flex;align-items:center;gap:8px}
+h2 .priority{font-size:12px;padding:2px 10px;border-radius:12px;font-weight:500}
+h2 .p0{background:var(--danger-light);color:var(--danger)}
+h2 .p1{background:var(--warning-light);color:var(--warning)}
+h2 .p2{background:var(--primary-light);color:var(--primary)}
+h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+h4{font-size:14px;font-weight:600;margin:16px 0 8px;color:var(--text-secondary)}
+p{margin-bottom:10px}
+ul,ol{margin:6px 0 14px 20px}
+li{margin-bottom:4px}
+.section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.info-box{background:var(--primary-light);border-left:3px solid var(--primary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 16px;margin:12px 0;font-size:13px;color:#1e40af}
+.info-box.warning{background:var(--warning-light);border-color:var(--warning);color:#92400e}
+.info-box.danger{background:var(--danger-light);border-color:var(--danger);color:#991b1b}
+.info-box.success{background:var(--success-light);border-color:var(--success);color:#166534}
+.flow-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin:12px 0}
+.flow-box .step{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.flow-box .step:last-child{margin-bottom:0}
+.flow-box .step-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.flow-box .step-content{font-size:13px;flex:1}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:var(--bg);font-weight:600;text-align:left;padding:10px 12px;border-bottom:2px solid var(--border);color:var(--text-secondary);font-size:12px;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover td{background:var(--bg)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500}
+.tag-p0{background:var(--danger-light);color:var(--danger)}
+.tag-p1{background:var(--warning-light);color:var(--warning)}
+.tag-p2{background:var(--primary-light);color:var(--primary)}
+.rule-box{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius-sm);padding:14px 18px;margin:10px 0;font-size:13px}
+.rule-box .rule-title{font-weight:600;color:#92400e;margin-bottom:6px}
+.toc{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 28px;margin-bottom:32px}
+.toc h3{margin:0 0 12px;font-size:16px}
+.toc ol{margin:0;padding-left:20px}
+.toc li{margin-bottom:5px;font-size:13px}
+.toc li a{text-decoration:none;color:var(--primary)}
+.toc li a:hover{text-decoration:underline}
+.field-table td:first-child{font-weight:600;width:140px;white-space:nowrap}
+@media(max-width:768px){.container{padding:20px 12px}.cover{padding:40px 20px}.section{padding:16px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ====== 封面 ====== -->
+<div class="cover">
+<h1>镗钯RaaS管理平台（内部）</h1>
+<div class="sub">PRD 产品需求文档 · Product Requirements Document</div>
+<div class="meta">
+<span><strong>版本</strong>v2.0</span>
+<span><strong>日期</strong>2026-08-14</span>
+<span><strong>编写人</strong>赵玉梅</span>
+<span><strong>状态</strong>已更新</span>
+</div>
+</div>
+
+<!-- ====== 目录 ====== -->
+<div class="toc">
+<h3>目录</h3>
+<ol>
+<li><a href="#s1">产品概述</a></li>
+<li><a href="#s2">模块清单与优先级</a></li>
+<li><a href="#s3">设备总览</a></li>
+<li><a href="#s4">设备列表</a></li>
+<li><a href="#s5">运行任务（只读监控）</a></li>
+<li><a href="#s6">素材库</a></li>
+<li><a href="#s7">动作库</a></li>
+<li><a href="#s8">智能体管理</a></li>
+<li><a href="#s9">内容审核</a></li>
+<li><a href="#s10">账号管理</a></li>
+<li><a href="#s11">角色权限</a></li>
+<li><a href="#s12">租户管理</a></li>
+<li><a href="#s13">业务规则与权限体系</a></li>
+</ol>
+</div>
+
+<!-- ====== 1. 产品概述 ====== -->
+<div class="section" id="s1">
+<h2>1. 产品概述</h2>
+<p><strong>定位：</strong>镗钯RaaS管理平台（内部）是面向平台运营团队的全局管理后台，负责跨租户设备监控、平台资源管理、内容审核、动作库发布与同步、以及租户生命周期管理。</p>
+<p><strong>与租户平台的关系：</strong>内部平台是"平台方"视角，拥有全局只读监控权 + 平台资源管理权 + 审核权 + 系统管理权；租户平台是"租户方"视角，负责自有设备/任务/脚本的日常运营。两者通过"审核流程"和"动作库同步"形成业务闭环。</p>
+
+<div class="info-box">
+<strong>核心业务闭环：</strong><br>
+① 租户上传素材/知识库 → ② 内部平台AI审核 → ③ 命中风险转人工复审 → ④ 审核通过转为可用 / 驳回通知上传方<br>
+⑤ 内部平台创建原子动作组合 → ⑥ 发布并同步给租户 → ⑦ 租户在脚本编辑器中引用
+</div>
+
+<h3>导航结构</h3>
+<table>
+<tr><th>分组</th><th>菜单项</th><th>说明</th></tr>
+<tr><td>镗钯机器人</td><td>设备总览、设备列表</td><td>全局设备状态监控与设备台账</td></tr>
+<tr><td>镗钯租户资产</td><td>运行任务、智能体</td><td>跨租户只读查看任务执行与智能体配置</td></tr>
+<tr><td>镗钯平台资源</td><td>素材库、动作库</td><td>平台级素材管理与动作创建/发布/同步</td></tr>
+<tr><td>审核管理</td><td>内容审核</td><td>AI审核 + 人工复审双轨机制</td></tr>
+<tr><td>系统管理</td><td>账号管理、角色权限、租户管理</td><td>内部账号、RBAC权限、租户CRUD</td></tr>
+</table>
+</div>
+
+<!-- ====== 2. 模块清单与优先级 ====== -->
+<div class="section" id="s2">
+<h2>2. 模块清单与优先级</h2>
+<table>
+<tr><th>序号</th><th>模块</th><th>功能概述</th><th>优先级</th><th>开发阶段</th></tr>
+<tr><td>1</td><td>设备总览</td><td>统计卡片 + Leaflet地图分布 + 区域钻取</td><td><span class="tag tag-p0">P0</span></td><td>MVP</td></tr>
+<tr><td>2</td><td>设备列表</td><td>跨租户设备台账、添加设备、查看详情</td><td><span class="tag tag-p0">P0</span></td><td>MVP</td></tr>
+<tr><td>3</td><td>运行任务</td><td>只读跨租户任务监控、数据总览统计</td><td><span class="tag tag-p1">P1</span></td><td>第二阶段</td></tr>
+<tr><td>4</td><td>素材库</td><td>4分类素材管理、上传送审流程</td><td><span class="tag tag-p1">P1</span></td><td>第二阶段</td></tr>
+<tr><td>5</td><td>动作库</td><td>原子动作组合器、发布/同步给租户</td><td><span class="tag tag-p1">P1</span></td><td>第二阶段</td></tr>
+<tr><td>6</td><td>智能体管理</td><td>模型/智能体/知识库/声纹只读查看</td><td><span class="tag tag-p2">P2</span></td><td>第三阶段</td></tr>
+<tr><td>7</td><td>内容审核</td><td>AI审核 + 人工复审双轨、5类风险检测</td><td><span class="tag tag-p0">P0</span></td><td>MVP</td></tr>
+<tr><td>8</td><td>账号管理</td><td>内部账号CRUD、重置密码</td><td><span class="tag tag-p0">P0</span></td><td>MVP</td></tr>
+<tr><td>9</td><td>角色权限</td><td>RBAC双维度：数据权限(设备) + 功能权限(功能点)</td><td><span class="tag tag-p0">P0</span></td><td>MVP</td></tr>
+<tr><td>10</td><td>租户管理</td><td>租户CRUD、租户账号管理、关联设备查看</td><td><span class="tag tag-p0">P0</span></td><td>MVP</td></tr>
+</table>
+
+<div class="info-box">
+<strong>优先级定义：</strong><br>
+<span class="tag tag-p0">P0</span> 指核心模块，本期必须具备且达到性能指标<br>
+<span class="tag tag-p1">P1</span> 指重要模块，需具备功能，但不强要求性能<br>
+<span class="tag tag-p2">P2</span> 指增强模块，该功能在规划内，不做强要求
+</div>
+</div>
+
+<!-- ====== 3. 设备总览 ====== -->
+<div class="section" id="s3">
+<h2>3. 设备总览 <span class="priority p0">P0</span></h2>
+
+<h3>3.1 功能说明</h3>
+<p>全局掌握所有设备的运行状态与地理分布，支持地图缩放查看省/市/区/街道级别的设备分布，点击标记查看区域详情。</p>
+
+<h3>3.2 统计卡片</h3>
+<table>
+<tr><th>指标</th><th>说明</th><th>示例值</th></tr>
+<tr><td>设备总数</td><td>平台所有设备总量，含较上月增量</td><td>24（↑ +3）</td></tr>
+<tr><td>运行中</td><td>当前在线设备数及在线率</td><td>18（在线率 75%）</td></tr>
+<tr><td>故障/告警</td><td>处于故障状态的设备数</td><td>2（需处理）</td></tr>
+</table>
+
+<h3>3.3 地图分布</h3>
+<ul>
+<li><strong>地图引擎：</strong>Leaflet 1.9.4 真实地图，支持滚轮缩放</li>
+<li><strong>过滤：</strong>全部 / 在线 / 离线 三态过滤</li>
+<li><strong>标记颜色：</strong>绿色=全部在线、橙色=部分离线、红色=全部离线</li>
+<li><strong>区域面板：</strong>点击地图标记弹出右侧区域统计面板，展示该区域设备明细</li>
+<li><strong>底部提示：</strong>支持滚轮缩放查看省/市/区/街道级别的设备分布</li>
+</ul>
+
+<h3>3.4 操作逻辑</h3>
+<div class="flow-box">
+<div class="step"><div class="step-num">1</div><div class="step-content">页面加载时初始化Leaflet地图，渲染所有设备标记</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-content">点击过滤按钮（全部/在线/离线），重新渲染符合条件的标记</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-content">点击地图标记，弹出区域统计面板，显示区域名称和设备列表</div></div>
+<div class="step"><div class="step-num">4</div><div class="step-content">点击"查看设备列表 →"跳转到设备列表页</div></div>
+</div>
+</div>
+
+<!-- ====== 4. 设备列表 ====== -->
+<div class="section" id="s4">
+<h2>4. 设备列表 <span class="priority p0">P0</span></h2>
+
+<h3>4.1 功能说明</h3>
+<p>跨所有租户统一管理设备台账，支持添加设备、查看设备详情、搜索与状态筛选。每台设备必须隶属到某个租户下。</p>
+
+<h3>4.2 统计卡片</h3>
+<table>
+<tr><th>指标</th><th>说明</th></tr>
+<tr><td>设备总数</td><td>全平台设备总量（如 1,284台），含本周新增</td></tr>
+<tr><td>在线</td><td>当前在线数及在线率</td></tr>
+<tr><td>故障</td><td>故障设备数，需运维介入</td></tr>
+<tr><td>离线</td><td>离线设备数及占比</td></tr>
+</table>
+
+<h3>4.3 设备表格字段</h3>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>设备ID</td><td>系统唯一标识，如 RB-2024-0001</td></tr>
+<tr><td>设备名称</td><td>可读名称，如 小镋-01</td></tr>
+<tr><td>型号</td><td>设备型号，如 TBot-X1 导览型、TBot-S2 表演型、TBot-P3 配送型</td></tr>
+<tr><td>所属租户</td><td>设备隶属的租户名称</td></tr>
+<tr><td>状态</td><td>在线 / 离线 / 故障</td></tr>
+<tr><td>最后在线</td><td>最后在线时间戳</td></tr>
+<tr><td>操作</td><td>查看详情</td></tr>
+</table>
+
+<h3>4.4 添加设备弹窗</h3>
+<table class="field-table">
+<tr><td>设备编码 *</td><td>输入设备唯一编码或扫描二维码</td></tr>
+<tr><td>设备昵称</td><td>可选，给设备起名（如：小镋-01）</td></tr>
+<tr><td>所属租户 *</td><td>下拉选择已创建的租户</td></tr>
+</table>
+<div class="info-box">
+<strong>添加逻辑：</strong>设备需处于开机状态才能添加。开机后设备屏幕会显示二维码，可在App端扫码添加。添加时必须指定所属租户。
+</div>
+
+<h3>4.5 筛选与搜索</h3>
+<ul>
+<li>按设备ID搜索</li>
+<li>按状态筛选：全部 / 在线 / 离线 / 故障</li>
+<li>分页展示，支持翻页</li>
+</ul>
+</div>
+
+<!-- ====== 5. 运行任务 ====== -->
+<div class="section" id="s5">
+<h2>5. 运行任务（只读监控） <span class="priority p1">P1</span></h2>
+
+<h3>5.1 功能说明</h3>
+<p>跨租户查看在执行的脚本/跟随任务，仅用于全局监控与排查，<strong>不支持编辑、暂停或下发执行任何任务</strong>。</p>
+
+<div class="info-box warning">
+<strong>只读约束：</strong>内部平台运行任务页为只读视图，不支持编辑、暂停或下发执行任何任务，仅用于全局监控与排查。
+</div>
+
+<h3>5.2 数据总览统计</h3>
+<table>
+<tr><th>指标</th><th>说明</th></tr>
+<tr><td>总任务</td><td>当前任务总数及跨租户数</td></tr>
+<tr><td>脚本任务</td><td>脚本类型任务数及占比</td></tr>
+<tr><td>跟随任务</td><td>跟随类型任务数及占比</td></tr>
+<tr><td>已下发</td><td>已下发至设备的任务数</td></tr>
+<tr><td>未下发</td><td>待下发的任务数及备注</td></tr>
+</table>
+
+<h3>5.3 任务列表字段</h3>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>任务名称</td><td>如"大唐巡游·晚场"</td></tr>
+<tr><td>类型</td><td>脚本 / 跟随</td></tr>
+<tr><td>所属租户</td><td>任务创建方租户名称</td></tr>
+<tr><td>目标设备</td><td>设备ID</td></tr>
+<tr><td>状态</td><td>已下发 / 未下发</td></tr>
+<tr><td>创建时间</td><td>任务创建时间</td></tr>
+<tr><td>操作</td><td>查看（只读详情弹窗）</td></tr>
+</table>
+
+<h3>5.4 筛选逻辑</h3>
+<ul>
+<li>按所属租户筛选（全部租户 / 指定租户）</li>
+<li>按目标设备ID搜索</li>
+<li>查询 / 重置</li>
+</ul>
+
+<h3>5.5 任务详情弹窗</h3>
+<p>点击"查看"弹出只读详情弹窗，展示任务配置信息（脚本内容或跟随配置），不可编辑。脚本类型任务弹出脚本任务详情，跟随类型任务弹出跟随任务详情。</p>
+</div>
+
+<!-- ====== 6. 素材库 ====== -->
+<div class="section" id="s6">
+<h2>6. 素材库 <span class="priority p1">P1</span></h2>
+
+<h3>6.1 功能说明</h3>
+<p>管理图片、表情包、音视频文件和动作图标四类素材。内部平台上传的素材与租户上传的素材统一进入内容审核流程。</p>
+
+<h3>6.2 素材分类</h3>
+<table>
+<tr><th>分类</th><th>说明</th></tr>
+<tr><td>图片库</td><td>设备屏幕展示用图片素材</td></tr>
+<tr><td>表情包库</td><td>机器人互动表情包，含多组表情</td></tr>
+<tr><td>音视频文件库</td><td>语音包、背景音乐、视频文件</td></tr>
+<tr><td>动作图标库</td><td>用于脚本编辑时自定义动作图标</td></tr>
+</table>
+
+<h3>6.3 素材状态</h3>
+<table>
+<tr><th>状态</th><th>说明</th></tr>
+<tr><td>可用</td><td>审核通过，可在脚本中引用</td></tr>
+<tr><td>待审核</td><td>上传后进入审核队列，尚未出结果</td></tr>
+<tr><td>不可用</td><td>审核被驳回，不可引用</td></tr>
+</table>
+
+<h3>6.4 上传素材弹窗</h3>
+<table class="field-table">
+<tr><td>素材类型 *</td><td>下拉选择：语音包 / 表情包 / 音视频文件 / 动作图标</td></tr>
+<tr><td>素材名称 *</td><td>输入素材名称</td></tr>
+<tr><td>上传文件 *</td><td>点击或拖拽上传，支持 PNG/JPG/MP3/MP4 等格式</td></tr>
+</table>
+
+<div class="info-box">
+<strong>审核流程逻辑：</strong><br>
+① 内部运营或租户上传素材 → ② 自动进入AI审核队列 → ③ AI检测命中风险（黄赌毒/不正当言论等）则转人工复审 → ④ 全部通过后转为"可用"状态 → ⑤ 素材在审核通过前显示"待审核"<br>
+⑥ 素材被删除后，与该素材相关的运行脚本仍可正常使用（不影响已引用的脚本）
+</div>
+
+<h3>6.5 素材卡片展示</h3>
+<p>网格布局展示素材卡片，每张卡片包含：渐变背景预览图、素材名称、状态标签、素材数量。支持搜索素材名称。</p>
+</div>
+
+<!-- ====== 7. 动作库 ====== -->
+<div class="section" id="s7">
+<h2>7. 动作库 <span class="priority p1">P1</span></h2>
+
+<h3>7.1 功能说明</h3>
+<p>平台管理员在内部平台创建原子动作组合（自定义动作），发布后同步给指定租户或全部租户使用。租户收到后可在自有动作库内引用。</p>
+
+<h3>7.2 概览统计</h3>
+<table>
+<tr><th>指标</th><th>说明</th></tr>
+<tr><td>动作总数</td><td>含草稿 + 已发布</td></tr>
+<tr><td>已发布</td><td>已发布状态的动作数，租户可引用</td></tr>
+<tr><td>草稿</td><td>未发布状态，租户不可见</td></tr>
+<tr><td>已同步租户</td><td>已同步动作的租户数</td></tr>
+</table>
+
+<h3>7.3 动作列表字段</h3>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>图标</td><td>动作图标</td></tr>
+<tr><td>动作名称</td><td>自定义动作名称</td></tr>
+<tr><td>位置</td><td>头部 / 躯体 / 耳朵 / 全身</td></tr>
+<tr><td>原子动作数</td><td>组合中包含的原子动作数量</td></tr>
+<tr><td>时长</td><td>动作总时长（秒），由公式计算</td></tr>
+<tr><td>状态</td><td>草稿 / 已发布</td></tr>
+<tr><td>同步范围</td><td>未同步 / 部分租户 / 全部租户</td></tr>
+<tr><td>操作</td><td>编辑 / 发布 / 同步 / 删除</td></tr>
+</table>
+
+<h3>7.4 筛选</h3>
+<ul>
+<li>按动作名称搜索</li>
+<li>按动作位置筛选（全部 / 头部 / 躯体 / 耳朵 / 全身）</li>
+<li>按状态筛选（全部 / 草稿 / 已发布）</li>
+<li>按同步范围筛选（全部 / 未同步 / 部分租户 / 全部租户）</li>
+</ul>
+
+<h3>7.5 动作创建/编辑器（原子动作组合器）</h3>
+<p>与租户平台「15. 自定义动作编辑器」共用同一套编辑器，需求说明完全一致，内容如下：</p>
+
+<h4>7.5.1 动作基本信息</h4>
+<table class="field-table">
+<thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>动作名称</td><td>文本</td><td>自定义动作名称</td></tr>
+<tr><td>位置分类</td><td>下拉</td><td>头部 / 躯体 / 耳朵 / 全身</td></tr>
+<tr><td>动作图标</td><td>图标选择器</td><td>支持选择素材库里的动作图标</td></tr>
+<tr><td>描述</td><td>文本</td><td>动作用途说明</td></tr>
+</tbody>
+</table>
+
+<h4>7.5.2 原子动作库</h4>
+<table>
+<thead><tr><th>位置</th><th>原子动作</th><th>数量</th></tr></thead>
+<tbody>
+<tr><td>头部</td><td>点头、摇头、摆头、低头、抬头、左转头、右转头</td><td>7个</td></tr>
+<tr><td>躯体</td><td>站立、下蹲、站起、蹲起</td><td>4个</td></tr>
+<tr><td>耳朵</td><td>左耳天线角度、右耳天线角度</td><td>2个</td></tr>
+</tbody>
+</table>
+
+<h4>7.5.3 多轨道时序图</h4>
+<table>
+<thead><tr><th>轨道</th><th>默认数量</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>头部轨道</td><td>1条</td><td>头部动作编排</td></tr>
+<tr><td>躯体轨道</td><td>1条</td><td>躯体动作编排</td></tr>
+<tr><td>耳朵轨道</td><td>1条</td><td>支持左耳和右耳天线控制</td></tr>
+<tr><td>全身轨道</td><td>3条</td><td>全身复合动作编排</td></tr>
+</tbody>
+</table>
+
+<div class="rule-box">
+<div class="rule-title">🟧 轨道规则</div>
+<ol>
+<li>默认轨道不可删除，额外添加的轨道可删除</li>
+<li>不同轨道的原子动作可并线同时执行</li>
+<li>每个原子动作可设置幅度（0-100）和速度（0-100），颗粒度1%可调</li>
+<li>时序图横轴为时间轴（秒），总时长取所有轨道中最大的起始+时长</li>
+<li>不同部位的轨道可支持用户自定义添加</li>
+<li>不同原子动作间有互斥关系，具体互斥逻辑待梳理后再同步</li>
+</ol>
+</div>
+
+<h4>7.5.4 操作流程</h4>
+<div class="flow-box">
+<div class="step"><div class="step-num">1</div><div class="step-content">点击"自定义动作" → 打开编辑器弹窗</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-content">填写动作名称、选择位置、选择图标、填写描述</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-content">从原子动作库拖拽原子动作到时序轨道</div></div>
+<div class="step"><div class="step-num">4</div><div class="step-content">点击原子动作块，设置幅度和速度（时长自动计算）</div></div>
+<div class="step"><div class="step-num">5</div><div class="step-content">时序图实时显示时间轴和块位置</div></div>
+<div class="step"><div class="step-num">6</div><div class="step-content">保存 → 自定义动作出现在动作库列表</div></div>
+<div class="step"><div class="step-num">7</div><div class="step-content">支持编辑已有自定义动作</div></div>
+<div class="step"><div class="step-num">8</div><div class="step-content">支持删除自定义动作</div></div>
+</div>
+
+<h3>7.6 发布与同步逻辑</h3>
+<div class="flow-box">
+<div class="step"><div class="step-num">1</div><div class="step-content"><strong>创建：</strong>新建动作，进入"草稿"状态，租户不可见</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-content"><strong>编辑：</strong>在草稿状态下编辑原子动作组合，修改不影响已发布版本</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-content"><strong>发布：</strong>点击"发布"后状态变为"已发布"，可被同步给租户</div></div>
+<div class="step"><div class="step-num">4</div><div class="step-content"><strong>再编辑：</strong>已发布的动作再次修改后，需重新发布并同步</div></div>
+<div class="step"><div class="step-num">5</div><div class="step-content"><strong>同步：</strong>点击"同步"选择目标租户（指定租户或全部租户），动作下发到租户平台</div></div>
+<div class="step"><div class="step-num">6</div><div class="step-content"><strong>租户引用：</strong>租户在自有动作库中查看已同步的平台动作，可在脚本编辑器中引用</div></div>
+</div>
+
+<div class="info-box">
+<strong>草稿与已发布的隔离：</strong>草稿状态下租户不可见，编辑中的修改不会影响已发布的版本。点击"发布"后再次修改，需重新发布并同步。
+</div>
+
+<h3>7.7 底部说明</h3>
+<div class="info-box success">
+平台动作库：管理员创建的原子动作组合可发布给租户使用。发布后状态变为"已发布"，通过"同步"动作可将动作下发给指定租户或全部租户，租户收到后可在自有动作库内引用。
+</div>
+</div>
+
+<!-- ====== 8. 智能体管理 ====== -->
+<div class="section" id="s8">
+<h2>8. 智能体管理 <span class="priority p2">P2</span></h2>
+
+<h3>8.1 功能说明</h3>
+<p>查看全局智能体、知识库、模型和声纹信息。内部平台为<strong>只读视角</strong>，无创建入口，仅用于跨租户监控。</p>
+
+<h3>8.2 Tab页结构</h3>
+
+<h4>8.2.1 模型管理</h4>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>模型名称</td><td>如 TBot-GPT-Pro、TBot-GPT-Lite、TBot-Vision</td></tr>
+<tr><td>类型</td><td>对话大模型 / 视觉识别</td></tr>
+<tr><td>提供方</td><td>平台内置</td></tr>
+<tr><td>状态</td><td>可用 / 维护中</td></tr>
+</table>
+
+<h4>8.2.2 智能体</h4>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>智能体名称</td><td>如"西湖讲解员"、"不夜城导购"</td></tr>
+<tr><td>所属租户</td><td>租户名称</td></tr>
+<tr><td>关联模型</td><td>关联的大模型</td></tr>
+<tr><td>状态</td><td>启用 / 停用</td></tr>
+<tr><td>操作</td><td>查看（只读）</td></tr>
+</table>
+
+<h4>8.2.3 知识库</h4>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>知识库名称</td><td>如"园林百科"、"景区FAQ"</td></tr>
+<tr><td>所属租户</td><td>租户名称</td></tr>
+<tr><td>文档数</td><td>知识库内文档数量</td></tr>
+<tr><td>更新时间</td><td>最近更新时间</td></tr>
+<tr><td>操作</td><td>查看（只读）</td></tr>
+</table>
+
+<h4>8.2.4 声纹管理</h4>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>声纹名称</td><td>如"小钯-女声"、"大唐-男声"</td></tr>
+<tr><td>所属租户</td><td>租户名称</td></tr>
+<tr><td>性别</td><td>男 / 女</td></tr>
+<tr><td>状态</td><td>可用</td></tr>
+<tr><td>操作</td><td>查看（只读）</td></tr>
+</table>
+
+<div class="info-box">
+<strong>筛选逻辑：</strong>智能体、知识库支持按名称搜索和按租户筛选。模型管理和声纹管理仅展示列表。
+</div>
+</div>
+
+<!-- ====== 9. 内容审核 ====== -->
+<div class="section" id="s9">
+<h2>9. 内容审核 <span class="priority p0">P0</span></h2>
+
+<h3>9.1 功能说明</h3>
+<p>对内部和租户平台上传的素材与知识库进行AI审核与人工复审，重点审核黄赌毒及不正当言论等政治审核点。审核流程为AI初审 + 人工复审双轨机制。</p>
+
+<h3>9.2 统计卡片</h3>
+<table>
+<tr><th>指标</th><th>说明</th></tr>
+<tr><td>今日审核总量</td><td>今日AI审核的素材/文档总数，含较昨日增量</td></tr>
+<tr><td>AI审核通过</td><td>AI自动通过的数及通过率</td></tr>
+<tr><td>待人工审核</td><td>AI未通过、转入人工审核队列的数量</td></tr>
+<tr><td>已驳回</td><td>人工审核驳回的数量</td></tr>
+</table>
+
+<h3>9.3 AI审核Tab</h3>
+<div class="info-box">
+<strong>AI自动审核：</strong>所有内部和租户平台上传的素材（图片、表情包、音视频）及知识库文档，系统自动进行内容安全检测。审核通过的素材直接转为可用状态；未通过的自动流转至人工审核。
+</div>
+
+<h4>AI审核记录字段</h4>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>内容名称</td><td>素材或知识库名称</td></tr>
+<tr><td>来源平台</td><td>内部平台 / 租户平台</td></tr>
+<tr><td>内容类型</td><td>图片素材 / 表情包 / 音视频文件 / 知识库文档</td></tr>
+<tr><td>上传时间</td><td>内容上传时间</td></tr>
+<tr><td>AI审核结果</td><td>通过 / 不通过（转人工） / 待审核</td></tr>
+<tr><td>命中风险类型</td><td>AI检测到的风险类型，无风险显示"—"</td></tr>
+<tr><td>操作</td><td>查看审核详情</td></tr>
+</table>
+
+<h4>AI审核筛选</h4>
+<ul>
+<li>按来源平台筛选（全部 / 内部管理平台 / 租户平台）</li>
+<li>按内容类型筛选（全部 / 图片素材 / 表情包 / 音视频文件 / 知识库文档）</li>
+<li>按AI审核结果筛选（全部 / 通过 / 不通过（转人工） / 待审核）</li>
+<li>按名称搜索</li>
+</ul>
+
+<h3>9.4 人工审核Tab</h3>
+<div class="info-box warning">
+<strong>人工复审：</strong>AI审核未通过的内容将进入人工审核队列。审核员需重点核查黄赌毒、不正当言论等政治审核点，决定是否通过或驳回。驳回后素材将标记为不可用，并通知上传方。
+</div>
+
+<h4>人工审核队列字段</h4>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>内容名称</td><td>素材或知识库名称</td></tr>
+<tr><td>来源平台</td><td>内部平台 / 租户平台</td></tr>
+<tr><td>内容类型</td><td>图片素材 / 表情包 / 音视频文件 / 知识库文档 / 动作图标</td></tr>
+<tr><td>命中风险类型</td><td>5类风险之一（见下方）</td></tr>
+<tr><td>AI审核说明</td><td>AI检测的具体说明和置信度</td></tr>
+<tr><td>审核状态</td><td>待人工审核 / 已通过 / 已驳回</td></tr>
+<tr><td>操作</td><td>审核（待审核时）/ 查看（已处理时）</td></tr>
+</table>
+
+<h4>人工审核筛选</h4>
+<ul>
+<li>按审核状态筛选（全部 / 待人工审核 / 已通过 / 已驳回）</li>
+<li>按风险类型筛选（全部 / 涉嫌低俗色情 / 涉嫌赌博 / 涉嫌毒品相关 / 不正当言论 / 政治敏感内容）</li>
+<li>按来源平台筛选（全部 / 内部管理平台 / 租户平台）</li>
+</ul>
+
+<h3>9.5 五类风险检测</h3>
+<table>
+<tr><th>风险类型</th><th>说明</th><th>示例</th></tr>
+<tr><td>涉嫌低俗/色情</td><td>暴露姿势、不雅画面等</td><td>"检测到3张表情包含暴露姿势，置信度92%"</td></tr>
+<tr><td>涉嫌赌博</td><td>赌博相关道具、内容等</td><td>"视频画面含疑似赌博相关道具，置信度78%"</td></tr>
+<tr><td>涉嫌毒品相关</td><td>违禁品相关描述或画面</td><td>"文档中出现违禁品相关描述，置信度81%"</td></tr>
+<tr><td>不正当言论</td><td>颠覆国家政权、破坏民族团结等</td><td>"检测到2处不当政治表述，置信度87%"</td></tr>
+<tr><td>政治敏感内容</td><td>敏感地标标识、政治敏感人物等</td><td>"图片背景含敏感地标标识，置信度85%"</td></tr>
+</table>
+
+<h3>9.6 审核详情弹窗</h3>
+<p>展示完整审核信息，分为三部分：</p>
+<ul>
+<li><strong>基本信息：</strong>内容名称、来源平台（含租户名）、内容类型（含素材数量）、上传时间、AI审核结果、命中风险类型</li>
+<li><strong>AI审核分析：</strong>检测详情（如"检测到3张表情包中含暴露姿势画面，置信度92%"）、命中模型（如"内容安全-低俗检测 v2.1"）、检测维度（图像画面、文字标注）、建议处置</li>
+<li><strong>人工审核结果：</strong>审核状态、审核人、审核意见（待审核时为空）</li>
+</ul>
+<p>弹窗底部操作：查看原文件、关闭</p>
+
+<h3>9.7 人工审核操作弹窗</h3>
+<p>审核员执行审核操作的主界面，包含以下区域：</p>
+
+<h4>9.7.1 基本信息</h4>
+<p>展示：内容名称、内容类型、来源平台、上传时间、所属租户、上传人</p>
+
+<h4>9.7.2 AI审核结果展示</h4>
+<p>红色背景卡片展示AI检测结果：命中风险类型、检测说明（含置信度）、命中模型、建议处置</p>
+
+<h4>9.7.3 内容预览（AI标记可疑项已标红）</h4>
+<p>网格展示所有素材内容，AI标记的可疑项用红色边框+红色背景高亮，并标注"⚠️"标识</p>
+
+<h4>9.7.4 政治审核要点提示</h4>
+<div class="rule-box">
+<div class="rule-title">审核要点：请重点核查以下政治审核点：</div>
+1. 是否涉及黄赌毒内容（色情低俗、赌博、毒品相关）<br>
+2. 是否含有不正当言论（颠覆国家政权、破坏民族团结等）<br>
+3. 是否涉及政治敏感人物或事件<br>
+4. 是否含有暴力、恐怖主义相关内容
+</div>
+
+<h4>9.7.5 审核操作</h4>
+<table class="field-table">
+<tr><td>审核意见 *</td><td>必填，文本框输入审核意见（如"第4、7张表情包含不雅姿势，符合AI检测结果，予以驳回。"）</td></tr>
+</table>
+<p>底部操作按钮：</p>
+<ul>
+<li><strong>驳回</strong>（红色按钮）：驳回后素材标记为"不可用"，通知上传方</li>
+<li><strong>通过</strong>（主按钮）：通过后素材转为"可用"状态</li>
+</ul>
+
+<h3>9.8 查看原文件弹窗</h3>
+<p>展示完整原始内容，包含：</p>
+<ul>
+<li><strong>文件信息：</strong>内容类型、来源平台、上传人、上传时间、文件大小明细、当前审核状态</li>
+<li><strong>全部原始内容：</strong>网格展示所有原始文件（如15个表情），AI标记项用红色边框+"⚠ AI标记"角标</li>
+<li><strong>上传说明：</strong>上传者填写的用途说明</li>
+<li>底部操作：关闭 / 前往审核（跳转审核操作弹窗）</li>
+</ul>
+
+<h3>9.9 审核完整流程</h3>
+<div class="flow-box">
+<div class="step"><div class="step-num">1</div><div class="step-content"><strong>上传：</strong>内部运营或租户在素材库上传素材/知识库文档</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-content"><strong>AI初审：</strong>系统自动进行内容安全检测，命中风险模型则标记"不通过"</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-content"><strong>通过处理：</strong>AI审核通过 → 素材直接转为"可用"状态，可在脚本中引用</div></div>
+<div class="step"><div class="step-num">4</div><div class="step-content"><strong>转人工：</strong>AI审核不通过 → 自动流转至人工审核队列，状态变为"待人工审核"</div></div>
+<div class="step"><div class="step-num">5</div><div class="step-content"><strong>人工复审：</strong>审核员查看AI检测结果、内容预览（含AI标记）、政治审核要点，填写审核意见</div></div>
+<div class="step"><div class="step-num">6</div><div class="step-content"><strong>通过/驳回：</strong>通过 → 素材转为"可用"；驳回 → 素材标记"不可用"，通知上传方</div></div>
+</div>
+</div>
+
+<!-- ====== 10. 账号管理 ====== -->
+<div class="section" id="s10">
+<h2>10. 账号管理 <span class="priority p0">P0</span></h2>
+
+<h3>10.1 功能说明</h3>
+<p>创建和管理内部管理平台账号。内部账号用于登录内部平台，与租户账号区分管理。</p>
+
+<h3>10.2 账号列表</h3>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>用户名</td><td>登录用户名，如 op_admin、op_oper</td></tr>
+<tr><td>手机号</td><td>绑定手机号（脱敏显示，如 138****0066）</td></tr>
+<tr><td>角色</td><td>平台超级管理员 / 运营专员 / 运营只读</td></tr>
+<tr><td>状态</td><td>启用 / 停用</td></tr>
+<tr><td>操作</td><td>重置密码、详情、编辑、删除</td></tr>
+</table>
+
+<h3>10.3 操作逻辑</h3>
+<ul>
+<li><strong>创建内部账号：</strong>点击"创建内部账号"按钮，填写用户名、手机号、角色等信息</li>
+<li><strong>重置密码：</strong>点击"重置密码"后弹出Toast提示新密码（如"账号 op_admin 的登录密码：Op@2024#plat"）</li>
+<li><strong>编辑：</strong>修改账号信息</li>
+<li><strong>删除：</strong>删除账号（红色按钮）</li>
+</ul>
+
+<h3>10.4 租户账号管理（在租户管理页操作栏入口）</h3>
+<div class="info-box">
+<strong>租户账号说明：</strong>租户账号由内部平台统一创建，关联至具体租户，用于租户侧平台登录与日常运营。支持账号的新建 / 编辑 / 停用 / 删除。
+</div>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>账号</td><td>租户平台登录用户名，如 hz_operator</td></tr>
+<tr><td>所属租户</td><td>关联的租户名称</td></tr>
+<tr><td>角色</td><td>租户管理员</td></tr>
+<tr><td>状态</td><td>启用 / 停用</td></tr>
+<tr><td>操作</td><td>重置密码、编辑、删除</td></tr>
+</table>
+</div>
+
+<!-- ====== 11. 角色权限 ====== -->
+<div class="section" id="s11">
+<h2>11. 角色权限 <span class="priority p0">P0</span></h2>
+
+<h3>11.1 功能说明</h3>
+<p>内部平台角色管理，支持基于平台的<strong>数据权限</strong>（设备范围）与<strong>功能权限</strong>（功能点）双维度配置。</p>
+
+<h3>11.2 Tab页结构</h3>
+
+<h4>11.2.1 角色列表</h4>
+<table>
+<tr><th>角色名称</th><th>数据权限范围</th><th>功能权限</th><th>操作</th></tr>
+<tr><td>平台超级管理员</td><td>全部设备</td><td>全部功能</td><td>配置权限 / 编辑 / 删除</td></tr>
+<tr><td>租户管理员</td><td>本租户设备</td><td>设备 / 任务 / 智能体 / 素材</td><td>配置权限 / 编辑 / 删除</td></tr>
+<tr><td>运营只读</td><td>仅查看</td><td>查看权限</td><td>配置权限 / 编辑 / 删除</td></tr>
+</table>
+
+<h4>11.2.2 数据权限（设备范围）</h4>
+<p>选择角色后配置该角色的数据权限范围：</p>
+<ul>
+<li><strong>全部设备（跨租户全局）：</strong>可查看所有租户的所有设备（默认）</li>
+<li><strong>指定设备（按设备 SN 多选）：</strong>仅可查看选定的设备，支持按设备SN多选</li>
+</ul>
+<p>设备多选列表展示：设备SN、设备名称、所属租户</p>
+
+<h4>11.2.3 功能权限（功能点）</h4>
+<p>选择角色后配置该角色的功能权限，按三大模块分组：</p>
+<table>
+<tr><th>模块</th><th>功能点</th></tr>
+<tr><td>设备管理</td><td>设备总览查看、镗钯机器人管理、运行任务查看</td></tr>
+<tr><td>内容运营</td><td>素材库管理、智能体管理、模型管理、内容审核</td></tr>
+<tr><td>系统管理</td><td>账号管理、角色权限、租户管理</td></tr>
+</table>
+
+<h3>11.3 权限配置逻辑</h3>
+<div class="flow-box">
+<div class="step"><div class="step-num">1</div><div class="step-content">在角色列表Tab中点击"配置权限"</div></div>
+<div class="step"><div class="step-num">2</div><div class="step-content">切换到"数据权限"Tab，选择数据范围（全部设备 / 指定设备SN多选）</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-content">切换到"功能权限"Tab，勾选/取消功能点</div></div>
+<div class="step"><div class="step-num">4</div><div class="step-content">点击"保存配置"完成权限设置</div></div>
+</div>
+
+<div class="info-box">
+<strong>双维度权限模型：</strong>数据权限控制"能看到哪些设备"，功能权限控制"能操作哪些功能"。两者取交集后生效。例如：运营只读角色 + 指定3台设备 → 只能查看这3台设备的基础信息，不能执行任何操作。
+</div>
+</div>
+
+<!-- ====== 12. 租户管理 ====== -->
+<div class="section" id="s12">
+<h2>12. 租户管理 <span class="priority p0">P0</span></h2>
+
+<h3>12.1 功能说明</h3>
+<p>管理租户信息，设备需隶属到对应租户下。支持租户的创建、编辑、查看、停用/启用，以及租户账号管理。</p>
+
+<h3>12.2 统计卡片</h3>
+<table>
+<tr><th>指标</th><th>说明</th></tr>
+<tr><td>租户总数</td><td>平台租户总量及较上月增量</td></tr>
+<tr><td>启用中</td><td>当前启用状态的租户数及占比</td></tr>
+<tr><td>关联设备</td><td>已分配到租户的设备总数</td></tr>
+</table>
+
+<h3>12.3 租户列表字段</h3>
+<table>
+<tr><th>字段</th><th>说明</th></tr>
+<tr><td>#</td><td>序号</td></tr>
+<tr><td>租户名称</td><td>如"文旅景区A"、"科技馆展厅"</td></tr>
+<tr><td>联系人</td><td>租户联系人姓名</td></tr>
+<tr><td>联系电话</td><td>联系电话</td></tr>
+<tr><td>设备数</td><td>该租户下关联的设备数量</td></tr>
+<tr><td>状态</td><td>启用 / 停用</td></tr>
+<tr><td>创建时间</td><td>租户创建日期</td></tr>
+<tr><td>操作</td><td>查看 / 租户账号 / 编辑 / 停用（或启用）</td></tr>
+</table>
+
+<h3>12.4 新增/编辑租户弹窗</h3>
+<table class="field-table">
+<tr><td>租户名称 *</td><td>输入租户名称，如"文旅景区A"</td></tr>
+<tr><td>联系人 *</td><td>输入联系人姓名</td></tr>
+<tr><td>联系电话 *</td><td>输入联系电话</td></tr>
+<tr><td>联系邮箱</td><td>输入邮箱地址（选填）</td></tr>
+<tr><td>所在地区</td><td>输入省市区，如"四川省成都市"</td></tr>
+<tr><td>详细地址</td><td>输入详细地址</td></tr>
+<tr><td>租户状态</td><td>单选：启用 / 停用（默认启用）</td></tr>
+<tr><td>备注说明</td><td>填写租户的业务类型、合作信息等</td></tr>
+</table>
+
+<div class="info-box">
+<strong>租户与设备关系：</strong>租户创建后，可在设备列表中将设备分配到此租户下。停用租户后，该租户下设备将无法接收新任务。
+</div>
+
+<h3>12.5 租户详情弹窗</h3>
+<p>展示租户完整信息，分为两部分：</p>
+<ul>
+<li><strong>基本信息：</strong>租户名称、状态、联系人、联系电话、联系邮箱、所在地区、创建时间、详细地址、备注</li>
+<li><strong>关联设备列表：</strong>展示该租户下的设备（设备名称、型号、编码、状态），支持"查看全部"展开</li>
+</ul>
+<p>底部操作：关闭 / 编辑租户</p>
+
+<h3>12.6 租户账号管理弹窗</h3>
+<p>从租户列表操作栏"租户账号"按钮打开，管理该租户下的登录账号：</p>
+<ul>
+<li>展示该租户下所有账号列表（账号、所属租户、角色、状态、操作）</li>
+<li>操作：重置密码、编辑、删除</li>
+<li>底部："+ 新建租户账号"按钮</li>
+</ul>
+
+<h3>12.7 筛选逻辑</h3>
+<ul>
+<li>按租户名称搜索</li>
+<li>按状态筛选（全部 / 启用 / 停用）</li>
+<li>重置 / 查询</li>
+</ul>
+
+<h3>12.8 停用/启用逻辑</h3>
+<ul>
+<li><strong>停用：</strong>启用状态的租户操作栏显示"停用"（红色），点击后租户变为停用状态，其下设备无法接收新任务</li>
+<li><strong>启用：</strong>停用状态的租户操作栏显示"启用"（绿色），点击后恢复启用状态</li>
+</ul>
+</div>
+
+<!-- ====== 13. 业务规则与权限体系 ====== -->
+<div class="section" id="s13">
+<h2>13. 业务规则与权限体系</h2>
+
+<h3>13.1 内部平台 vs 租户平台权限对比</h3>
+<table>
+<tr><th>维度</th><th>内部管理平台</th><th>租户管理平台</th></tr>
+<tr><td>设备管理</td><td>跨租户全局只读 + 添加设备</td><td>仅本租户设备 + 编辑/控制</td></tr>
+<tr><td>运行任务</td><td><strong>只读监控</strong>，不可编辑/下发</td><td>创建/编辑/下发/执行任务</td></tr>
+<tr><td>素材库</td><td>上传素材（需审核）</td><td>上传素材（需审核）+ 引用</td></tr>
+<tr><td>动作库</td><td>创建/发布/同步动作给租户</td><td>查看/引用已同步的平台动作</td></tr>
+<tr><td>智能体</td><td><strong>只读查看</strong>跨租户智能体</td><td>创建/编辑智能体、知识库、声纹</td></tr>
+<tr><td>内容审核</td><td>AI审核 + 人工复审（执行方）</td><td>上传方（被审核方）</td></tr>
+<tr><td>账号管理</td><td>内部账号 + 租户账号统一管理</td><td>仅本租户账号（由内部创建）</td></tr>
+<tr><td>角色权限</td><td>数据权限(设备) + 功能权限(功能点)</td><td>数据权限(本租户设备) + 功能权限</td></tr>
+<tr><td>租户管理</td><td>租户CRUD + 停用/启用</td><td>无此功能</td></tr>
+</table>
+
+<h3>13.2 审核流程规则</h3>
+<div class="rule-box">
+<div class="rule-title">规则1：AI初审自动执行</div>
+所有内部和租户平台上传的素材（图片、表情包、音视频）及知识库文档，上传后自动进入AI审核队列，无需人工触发。
+</div>
+<div class="rule-box">
+<div class="rule-title">规则2：AI通过直接可用</div>
+AI审核通过的内容直接转为"可用"状态，可在脚本/知识库中引用，无需人工干预。
+</div>
+<div class="rule-box">
+<div class="rule-title">规则3：AI不通过转人工</div>
+AI检测命中风险模型的内容，自动流转至人工审核队列，状态变为"待人工审核"。
+</div>
+<div class="rule-box">
+<div class="rule-title">规则4：人工审核结果</div>
+人工审核通过 → 素材转为"可用"状态；人工审核驳回 → 素材标记为"不可用"，通知上传方。
+</div>
+<div class="rule-box">
+<div class="rule-title">规则5：素材删除不影响已有脚本</div>
+素材被删除后，与该素材相关的运行脚本仍可正常使用。
+</div>
+
+<h3>13.3 动作库发布与同步规则</h3>
+<div class="rule-box">
+<div class="rule-title">规则1：草稿隔离</div>
+草稿状态下租户不可见，编辑中的修改不会影响已发布的版本。
+</div>
+<div class="rule-box">
+<div class="rule-title">规则2：发布后可同步</div>
+动作状态为"已发布"后，才能执行同步操作，将动作下发给指定租户或全部租户。
+</div>
+<div class="rule-box">
+<div class="rule-title">规则3：再编辑需重新发布</div>
+已发布的动作再次修改后，需重新发布并同步，租户侧才能获取最新版本。
+</div>
+<div class="rule-box">
+<div class="rule-title">规则4：同步范围</div>
+同步可选"指定租户"或"全部租户"，同步范围字段显示"未同步 / 部分租户 / 全部租户"三态。
+</div>
+
+<h3>13.4 租户生命周期规则</h3>
+<div class="rule-box">
+<div class="rule-title">规则1：设备必须隶属租户</div>
+添加设备时必须选择所属租户，设备不能脱离租户独立存在。
+</div>
+<div class="rule-box">
+<div class="rule-title">规则2：停用租户阻断任务</div>
+停用租户后，该租户下设备将无法接收新任务。
+</div>
+<div class="rule-box">
+<div class="rule-title">规则3：租户账号内部创建</div>
+租户账号由内部平台统一创建，关联至具体租户，用于租户侧平台登录与日常运营。
+</div>
+
+<h3>13.5 运行任务只读规则</h3>
+<div class="rule-box">
+<div class="rule-title">规则1：只读约束</div>
+内部平台运行任务页不支持编辑、暂停或下发执行任何任务，仅用于全局监控与排查。
+</div>
+<div class="rule-box">
+<div class="rule-title">规则2：跨租户筛选</div>
+支持按所属租户筛选任务，查看各租户的任务执行情况。
+</div>
+
+<h3>13.6 RBAC权限模型</h3>
+<table>
+<tr><th>维度</th><th>控制对象</th><th>配置方式</th></tr>
+<tr><td>数据权限</td><td>设备范围</td><td>全部设备（跨租户全局）/ 指定设备（按SN多选）</td></tr>
+<tr><td>功能权限</td><td>功能点</td><td>按模块分组勾选（设备管理 / 内容运营 / 系统管理）</td></tr>
+</table>
+<p><strong>生效逻辑：</strong>数据权限与功能权限取交集后生效。数据权限控制"能看到哪些设备"，功能权限控制"能操作哪些功能"。</p>
+
+<h3>13.7 内置角色说明</h3>
+<table>
+<tr><th>角色</th><th>数据权限</th><th>功能权限</th><th>适用场景</th></tr>
+<tr><td>平台超级管理员</td><td>全部设备（跨租户）</td><td>全部功能</td><td>平台运营负责人</td></tr>
+<tr><td>租户管理员</td><td>本租户设备</td><td>设备/任务/智能体/素材</td><td>租户侧运营人员</td></tr>
+<tr><td>运营只读</td><td>仅查看</td><td>查看权限</td><td>审计/观察人员</td></tr>
+</table>
+</div>
+
+<div style="text-align:center;padding:32px 0;color:var(--text-tertiary);font-size:13px;">
+— 文档结束 · 镗钯RaaS管理平台（内部）PRD v2.0 · 编写人：赵玉梅 · 2026-08-14 —
+</div>
+
+</div>
+</body>
+</html>

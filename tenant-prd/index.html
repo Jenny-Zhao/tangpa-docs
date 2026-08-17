@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>镗钯RaaS管理平台（租户）- PRD产品需求文档</title>
+<style>
+:root{--primary:#6366f1;--accent:#6366f1;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--text-primary:#1f2937;--text-secondary:#6b7280;--text-tertiary:#9ca3af;--bg-page:#f9fafb;--bg-tag:#f3f4f6;--border:#e5e7eb;--border-light:#f3f4f6;--radius-sm:6px;--radius-md:8px;--radius-lg:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC",sans-serif;background:var(--bg-page);color:var(--text-primary);line-height:1.7;font-size:14px;}
+.container{max-width:1100px;margin:0 auto;padding:32px 24px;}
+h2{font-size:20px;font-weight:600;margin:40px 0 16px;padding-bottom:8px;border-bottom:2px solid var(--accent);color:var(--text-primary);display:flex;align-items:center;gap:8px;}
+h2 .priority{font-size:11px;padding:2px 8px;border-radius:11px;font-weight:500;background:#fef2f2;color:#dc2626;}
+h2 .priority.p1{background:#fef3c7;color:#d97706;}
+h2 .priority.p2{background:#dbeafe;color:#2563eb;}
+h3{font-size:16px;font-weight:600;margin:24px 0 12px;color:var(--text-primary);}
+h4{font-size:14px;font-weight:600;margin:16px 0 8px;color:var(--text-primary);}
+p{margin-bottom:8px;color:var(--text-secondary);}
+.toc{background:white;border:1px solid var(--border);border-radius:var(--radius-md);padding:24px;margin-bottom:32px;}
+.toc h2{border:none;margin:0 0 12px;font-size:16px;}
+.toc ol{padding-left:20px;}
+.toc li{margin-bottom:4px;}
+.toc a{color:var(--accent);text-decoration:none;}
+.toc a:hover{text-decoration:underline;}
+.section{background:white;border:1px solid var(--border);border-radius:var(--radius-md);padding:24px 28px;margin-bottom:20px;}
+.section-desc{background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:16px;color:var(--text-secondary);font-size:13px;}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;}
+th{background:var(--bg-tag);padding:10px 12px;text-align:left;font-weight:600;color:var(--text-secondary);border-bottom:2px solid var(--border);}
+td{padding:10px 12px;border-bottom:1px solid var(--border-light);color:var(--text-primary);}
+tr:hover td{background:#f9fafb;}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;}
+.tag-p0{background:#fef2f2;color:#dc2626;}
+.tag-p1{background:#fef3c7;color:#d97706;}
+.tag-p2{background:#dbeafe;color:#2563eb;}
+.tag-success{background:rgba(16,185,129,0.1);color:#059669;}
+.tag-warning{background:rgba(245,158,11,0.1);color:#d97706;}
+.tag-danger{background:rgba(239,68,68,0.1);color:#dc2626;}
+.tag-gray{background:#f3f4f6;color:#6b7280;}
+.tag-purple{background:#ede9fe;color:#7c3aed;}
+.tag-blue{background:#dbeafe;color:#2563eb;}
+.tag-orange{background:#ffedd5;color:#ea580c;}
+.rule-box{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius-md);padding:16px 20px;margin:12px 0;}
+.rule-box-title{font-size:14px;font-weight:600;color:#d97706;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.rule-box ol,.rule-box ul{padding-left:20px;font-size:13px;line-height:1.9;}
+.flow-box{background:rgba(99,102,241,0.04);border:1px solid rgba(99,102,241,0.15);border-radius:var(--radius-md);padding:16px 20px;margin:12px 0;}
+.flow-box-title{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.flow-box ol,.flow-box ul{padding-left:20px;font-size:13px;line-height:1.9;}
+.field-table td:first-child{font-weight:600;color:var(--text-secondary);width:140px;white-space:nowrap;}
+.meta{color:var(--text-tertiary);font-size:12px;margin-top:4px;}
+.note{background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:#2563eb;margin:12px 0;}
+.note-warning{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:#d97706;margin:12px 0;}
+
+/* 顶部蓝色标题块样式 */
+.page-header{background:white;border:1px solid var(--border);border-radius:var(--radius-md);padding:32px 28px 24px;margin-bottom:24px;border-left:6px solid var(--accent);}
+.page-header h1{font-size:26px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.page-header .subtitle{font-size:14px;color:var(--accent);font-weight:500;margin-bottom:20px;}
+.meta-card{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 0;}
+.meta-card .meta-cell{text-align:center;border-right:1px solid var(--border);}
+.meta-card .meta-cell:last-child{border-right:none;}
+.meta-card .meta-label{font-size:12px;color:var(--text-tertiary);margin-bottom:4px;font-weight:500;}
+.meta-card .meta-value{font-size:14px;color:var(--text-primary);font-weight:600;}
+
+.priority-legend{display:flex;gap:12px;margin-bottom:16px;font-size:12px;}
+.priority-legend span{display:flex;align-items:center;gap:4px;}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+.priority-legend .p0{background:#dc2626;}
+.priority-legend .p1{background:#d97706;}
+.priority-legend .p2{background:#2563eb;}
+
+.perf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0;}
+.perf-card{background:#eef2ff;border:1px solid #c7d2fe;border-radius:var(--radius-md);padding:16px;text-align:center;}
+.perf-card .label{font-size:12px;color:#4338ca;font-weight:500;margin-bottom:6px;}
+.perf-card .value{font-size:22px;color:#312e81;font-weight:700;}
+.perf-card .desc{font-size:11px;color:#6366f1;margin-top:4px;}
+
+/* 任务关系图样式 */
+.relation-diagram{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--radius-md);padding:20px;margin:16px 0;}
+.relation-diagram img{max-width:100%;border-radius:6px;display:block;}
+.relation-caption{font-size:12px;color:#047857;margin-top:8px;text-align:center;}
+
+/* 预览仿真弹窗截图样式 */
+.preview-screenshot{background:#1f2937;border-radius:var(--radius-md);padding:16px;margin:12px 0;text-align:center;}
+.preview-screenshot img{max-width:100%;border-radius:6px;border:1px solid #374151;}
+.preview-caption{font-size:12px;color:#9ca3af;margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="page-header">
+  <h1>📘 镗钯RaaS管理平台（租户）</h1>
+  <div class="subtitle">PRD 产品需求文档 · Product Requirements Document</div>
+  <div class="meta-card">
+    <div class="meta-cell">
+      <div class="meta-label">版本</div>
+      <div class="meta-value">v1.0</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">日期</div>
+      <div class="meta-value">2026-08-14</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">编写人</div>
+      <div class="meta-value">赵玉梅</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">状态</div>
+      <div class="meta-value">已更新</div>
+    </div>
+  </div>
+</div>
+
+<div class="priority-legend">
+<span><span class="dot p0"></span> P0 指核心模块，本期必须具备且达到性能指标</span>
+<span><span class="dot p1"></span> P1 指重要模块，需具备功能，但不强要求性能</span>
+<span><span class="dot p2"></span> P2 指增强模块，该功能在规划内，不做强要求</span>
+</div>
+
+<div class="toc">
+<h2>目录</h2>
+<ol>
+<li><a href="#s1">产品总览</a></li>
+<li><a href="#s2">模块清单与优先级</a></li>
+<li><a href="#s3">设备列表页</a></li>
+<li><a href="#s4">运行任务页</a></li>
+<li><a href="#s5">脚本库</a></li>
+<li><a href="#s6">脚本编辑器（基础版）</a></li>
+<li><a href="#s7">脚本编辑器-Pro版</a></li>
+<li><a href="#s8">素材库</a></li>
+<li><a href="#s9">智能体列表</a></li>
+<li><a href="#s10">知识库</a></li>
+<li><a href="#s11">声纹克隆</a></li>
+<li><a href="#s12">账户管理</a></li>
+<li><a href="#s13">角色权限</a></li>
+<li><a href="#s14">业务规则与状态机</a></li>
+<li><a href="#s15">自定义动作编辑器</a></li>
+</ol>
+</div>
+
+<!-- 1. 产品总览 -->
+<h2 id="s1">1. 产品总览</h2>
+<div class="section">
+<h3>1.1 产品定位</h3>
+<p>镗钯租户管理平台是镗钯机器人RaaS（Robot as a Service）平台的租户端Web管理系统。面向文旅景区、科技馆展厅、商业综合体等B端租户用户，提供设备管理、任务编排与下发、脚本编辑、素材管理、智能体配置、知识库管理等全链路运营能力。</p>
+<p><strong>核心价值：</strong>租户无需管理机器人运层技术，通过可视化界面即可完成机器人运动剧本编排、任务下发执行、内容运营管理，实现"零代码"机器人运营。</p>
+<p><strong>机型支持：</strong></p>
+<ul>
+<li>镗钯基础版</li>
+<li>镗钯激光雷达版</li>
+</ul>
+</div>
+
+<!-- 2. 模块清单 -->
+<h2 id="s2">2. 模块清单与优先级</h2>
+<table>
+<thead><tr><th>序号</th><th>模块</th><th>页面数</th><th>核心功能</th><th>优先级</th><th>备注</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>设备管理</td><td>1</td><td>设备列表、状态监控、远程监控、智能体关联</td><td><span class="tag tag-p0">P0</span></td><td>MVP必备</td></tr>
+<tr><td>2</td><td>运行任务</td><td>1</td><td>创建/编辑/下发/执行任务，脚本任务、跟随任务</td><td><span class="tag tag-p0">P0</span></td><td>含状态机校验逻辑</td></tr>
+<tr><td>3</td><td>脚本库</td><td>1</td><td>脚本列表、发布、版本管理、删除</td><td><span class="tag tag-p0">P0</span></td><td>—</td></tr>
+<tr><td>4</td><td>脚本编辑器（基础版）</td><td>1</td><td>时间轴编辑器（头部/躯体/耳朵/素材）</td><td><span class="tag tag-p0">P0</span></td><td>含全身动作分组</td></tr>
+<tr><td>5</td><td>脚本编辑器-Pro版</td><td>1</td><td>Pro版时间轴编辑器（增加移动/全身/激光雷达）</td><td><span class="tag tag-p2">P2</span></td><td>三期规划</td></tr>
+<tr><td>6</td><td>素材库</td><td>1</td><td>图片/表情包/音频视频/动作图标管理</td><td><span class="tag tag-p0">P0</span></td><td>含AI审核流程</td></tr>
+<tr><td>7</td><td>智能体管理</td><td>1</td><td>智能体创建/编辑/删除、AI模型配置</td><td><span class="tag tag-p1">P1</span></td><td>—</td></tr>
+<tr><td>8</td><td>知识库</td><td>1</td><td>文档上传、向量化、问答生成</td><td><span class="tag tag-p1">P1</span></td><td>含审核流程</td></tr>
+<tr><td>9</td><td>声纹克隆</td><td>1</td><td>上传/录制声音创建克隆声纹</td><td><span class="tag tag-p2">P2</span></td><td>三期规划</td></tr>
+<tr><td>10</td><td>账户管理</td><td>1</td><td>账户资料、子账户、密码安全</td><td><span class="tag tag-p0">P0</span></td><td>主账户+数据隔离</td></tr>
+<tr><td>11</td><td>角色权限</td><td>1</td><td>角色CRUD、数据权限、功能权限</td><td><span class="tag tag-p0">P0</span></td><td>RBAC双维度</td></tr>
+</tbody>
+</table>
+
+<!-- 3. 设备列表页 -->
+<h2 id="s3">3. 设备列表页 <span class="priority">P0</span></h2>
+<div class="section">
+<div class="section-desc">以卡片网格形式展示租户下所有机器人设备，实时反映设备运行状态、当前模式、电量、关联智能体等信息，支持多维筛选与设备操作。</div>
+
+<h3>3.1 筛选器</h3>
+<table>
+<thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>设备名称</td><td>文本输入</td><td>模糊搜索设备名称</td></tr>
+<tr><td>设备型号</td><td>下拉选择</td><td>全部 / 镗钯基础版 / 镗钯激光雷达版</td></tr>
+<tr><td>所属租户</td><td>下拉选择</td><td>全部 / 文旅景区A / 科技馆展厅 / 商业综合体B</td></tr>
+<tr><td>状态</td><td>下拉选择</td><td>全部 / 运行中 / 关机·离线 / 故障</td></tr>
+</tbody>
+</table>
+
+<h3>3.2 设备卡片字段</h3>
+<table>
+<thead><tr><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>设备头像</td><td>机器人emoji图标</td></tr>
+<tr><td>设备名称</td><td>如"小铁-01"</td></tr>
+<tr><td>设备编码</td><td>根据当前烧录的SN格式显示</td></tr>
+<tr><td>运行状态</td><td>运行中（绿） / 关机·离线（灰） / 故障（红），带状态圆点（具体色值以UI设计为准）</td></tr>
+<tr><td>所属租户</td><td>租户名称</td></tr>
+<tr><td>当前模式</td><td>彩色标签：■ 遥操模式 / ■ 任务模式-脚本任务 / ■ 任务模式-跟随任务 / ■ 任务模式-广告互动</td></tr>
+<tr><td>关联智能体</td><td>关联的智能体名称，未关联时显示"未关联"</td></tr>
+<tr><td>电量</td><td>进度条 + 百分比数值，绿色（&gt;50%）/ 黄色（20-50%）/ 红色（&lt;20%）</td></tr>
+</tbody>
+</table>
+
+<h3>3.3 设备操作按钮</h3>
+<table>
+<thead><tr><th>操作</th><th>按钮说明</th><th>校验逻辑</th></tr></thead>
+<tbody>
+<tr><td>远程监控</td><td>打开远程监控弹窗，查看机器人实时画面</td><td>设备需为运行中状态</td></tr>
+<tr><td>智能体</td><td>打开智能体关联弹窗，为设备绑定/解绑智能体</td><td>—</td></tr>
+<tr><td>运动任务</td><td>打开设备运动任务弹窗，查看该设备当前任务队列</td><td>—</td></tr>
+<tr><td>编辑</td><td>打开设备详情弹窗，修改设备名称等属性</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h3>3.4 设备模式说明</h3>
+<table>
+<thead><tr><th>模式</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>遥操模式</td><td>人工远程操控机器人，可被云端任务指令打断</td></tr>
+<tr><td>任务模式-脚本任务</td><td>执行脚本任务，独占模式，不可接收新任务</td></tr>
+<tr><td>任务模式-跟随任务</td><td>执行跟随任务，可叠加触发广告互动任务</td></tr>
+<tr><td>任务模式-广告互动</td><td>执行广告互动任务，可被任意新任务打断切换</td></tr>
+<tr><td>故障</td><td>设备故障，不可接收任何任务</td></tr>
+<tr><td>关机/离线</td><td>设备离线，不可接收任务</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 4. 运行任务页 -->
+<h2 id="s4">4. 运行任务页 <span class="priority">P0</span></h2>
+<div class="section">
+<div class="section-desc">创建和管理机器人执行任务，支持脚本任务和跟随任务两种类型。核心逻辑是任务下发时需通过设备状态机校验，校验通过才能将执行指令推送至机器人本体。</div>
+
+<h3>4.1 任务列表</h3>
+<table>
+<thead><tr><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>#</td><td>序号（彩色圆形序号）</td></tr>
+<tr><td>任务名称</td><td>如"迎宾舞蹈-单机版 v2.1"</td></tr>
+<tr><td>任务类型</td><td>■ 脚本任务 / 👀 跟随任务</td></tr>
+<tr><td>目标设备</td><td>设备名称列表，逗号分隔</td></tr>
+<tr><td>状态</td><td>已下发（绿）/ 待下发（黄）</td></tr>
+<tr><td>创建时间</td><td>YYYY-MM-DD HH:mm</td></tr>
+<tr><td>操作</td><td>查看 / 编辑 / 执行任务（已下发）/ 下发设备（待下发）</td></tr>
+</tbody>
+</table>
+
+<h3>4.2 任务下发校验逻辑（核心）</h3>
+<div class="flow-box">
+<div class="flow-box-title">🟧 任务下发校验规则（validateAndDispatch）</div>
+<p>当用户点击"下发设备"按钮时，系统执行以下校验：</p>
+<ol>
+<li><strong>设备状态校验：</strong>遍历所有目标设备，检查是否有设备处于"故障"或"离线"状态
+<ul>
+<li>存在故障/离线设备 → 下发失败，Toast提示"下发失败：目标设备XXX处于故障/离线状态，无法接收任务"</li>
+<li>全部设备正常 → 下发成功，Toast提示"下发成功：任务「XXX」已推送至N台设备执行"</li>
+</ul>
+</li>
+<li><strong>下发成功：</strong>任务状态从"待下发"变为"已下发"，操作按钮从"下发设备"变为"执行任务"</li>
+</ol>
+</div>
+
+<h3>4.3 执行任务校验逻辑（核心）</h3>
+<div class="flow-box">
+<div class="flow-box-title">🟧 执行任务校验规则（validateExecuteScript）</div>
+<p>当用户点击"执行任务"按钮时，系统依据机器人当前模式与任务优先级规则进行校验：</p>
+<ol>
+<li><strong>查找首个有效设备：</strong>在目标设备列表中找到第一个处于remote/script/follow/advert模式的设备</li>
+<li><strong>无有效设备（全部故障/离线）</strong> → 校验不通过，展示"目标设备均处于故障/离线状态，无法下发执行指令"</li>
+<li><strong>有效设备存在，根据其当前模式匹配规则：</strong>
+<ul>
+<li>遥操模式（<strong>规则2</strong>）：✅ 允许下发，机器人接收云端执行指令后，自动切换为任务状态，执行队列第一个任务（被新下发的任务排在最前）</li>
+<li>脚本任务模式（<strong>规则3</strong>）：❌ 拒绝下发，机器人处于独占模式，不支持接收新任务执行指令，提示"等待当前的脚本任务结束后再下发"</li>
+<li>跟随任务模式（<strong>规则4</strong>）：
+<ul>
+<li>下发广告互动任务 → ✅ 允许下发，跟随任务与广告互动任务叠加执行</li>
+<li>下发脚本任务/跟随任务 → ❌ 拒绝下发，仅支持接收广告互动任务</li>
+</ul>
+</li>
+<li>广告互动任务模式（<strong>规则5</strong>）：✅ 允许下发，机器人支持接收任意任务指令，接收后立即切换执行新任务</li>
+</ul>
+</li>
+<li><strong>校验结果展示：</strong>弹出校验结果弹窗，显示任务名称、任务类型、目标设备、机器人当前模式、违规规则、校验结论（通过/拒绝）及详情原因</li>
+</ol>
+</div>
+
+<h3>4.4 创建运动任务弹窗</h3>
+<h4>任务类型选择</h4>
+<table>
+<thead><tr><th>类型</th><th>说明</th><th>图标</th></tr></thead>
+<tbody>
+<tr><td>脚本执行任务</td><td>选择脚本库中的脚本，下发至设备执行</td><td>📦</td></tr>
+<tr><td>跟随任务</td><td>配置UWB跟随编队，列队运动</td><td>👀</td></tr>
+</tbody>
+</table>
+
+<h4>脚本任务表单字段</h4>
+<table class="field-table">
+<tbody>
+<tr><td>任务名称</td><td>文本输入 | 必填 | 如"迎宾舞蹈任务"</td></tr>
+<tr><td>目标设备</td><td>标签选择器 | 必填 | 支持多选设备，显示为标签+chip，可单独删除</td></tr>
+<tr><td>选择脚本</td><td>下拉选择 | 必填 | 脚本库中已发布脚本，群控脚本标记data-group和data-roles</td></tr>
+<tr><td>子脚本关联映射</td><td>表格 | 必填（群控脚本）| 将群控脚本的子脚本与目标设备绑定，每个子脚本对应一个虚拟角色</td></tr>
+<tr><td>执行方式</td><td>单选 | 否 | 单次执行 / 重复执行</td></tr>
+<tr><td>重复配置</td><td>单选+数值 | 否 | 按次数（N次）/ 按时间（N分钟）</td></tr>
+</tbody>
+</table>
+
+<h4>跟随任务表单字段</h4>
+<table class="field-table">
+<tbody>
+<tr><td>任务名称 *</td><td>文本输入 | 必填 | 请输入任务名称，如"迎宾舞蹈任务"</td></tr>
+<tr><td>目标设备 *</td><td>标签选择器 | 必填 | 支持多选设备（如 小铿-01、小铿-02、小铿-04、小铿-07...），显示为标签+chip 可单独删除，并支持"添加设备"</td></tr>
+<tr><td>首位跟随对象 *</td><td>单选 | 必填 | ◉ 跟随人员（UWB标签） / ◯ 跟随机器人（首位机器人UWB）</td></tr>
+<tr><td>机器人排队/序列配置</td><td>表格 | 必填 | 拖拽行可调整顺序，或直接修改序号；列：序列/机器人/角色/跟随对象/操作（含上下移按钮▲▼）</td></tr>
+<tr><td>后续跟随方式</td><td>单选 | 必填 | ◉ 自动跟随（默认间距） / ◯ 手动配置间距</td></tr>
+<tr><td>跟随间距（米）</td><td>数值输入 | 选择手动配置间距时必填 | 单位米（如 1.5）</td></tr>
+<tr><td>队列多媒体内容（可选）</td><td>标签选择器 | 否 | 😀 选择表情包 / 🎵 选择音视频 / 🖼 选择图片</td></tr>
+</tbody>
+</table>
+
+<div class="rule-box">
+<div class="rule-box-title">⚠️ 队列异常提醒规则</div>
+<ul>
+<li>当中间机器人跟丢，或跟随误差超过 <strong>30%</strong> 时，系统将给出对应提示</li>
+<li>任务创建后处于"待下发"状态，需手动点击"下发至设备"将任务推送至机器人端执行</li>
+</ul>
+</div>
+
+<h4>群控脚本校验</h4>
+<div class="rule-box">
+<div class="rule-box-title">群控脚本校验流程</div>
+<ul>
+<li>✅ 机器人数量校验：实际设备数 ≤ 脚本要求设备数</li>
+</ul>
+</div>
+
+<h4>群舞角色绑定</h4>
+<p>选择群控脚本时显示角色绑定面板，支持：</p>
+<ul>
+<li><strong>自动分配：</strong>系统按设备编号自动匹配起始角色（R1领舞，R2伴随...）</li>
+<li><strong>手动绑定：</strong>下拉选择每个虚拟角色对应的实际设备</li>
+<li><strong>绑定状态实时显示：</strong>✅ 已绑定 / ⚠ 未绑定</li>
+</ul>
+</div>
+
+<!-- 5. 脚本库 -->
+<h2 id="s5">5. 脚本库 <span class="priority">P0</span></h2>
+<div class="section">
+<div class="section-desc">管理已编制的运行脚本，支持单机脚本和群控脚本两种类型，包含脚本的发布、版本管理、编辑、删除全生命周期。</div>
+
+<h3>5.1 脚本列表字段</h3>
+<table>
+<thead><tr><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>脚本名称</td><td>含版本号，如"迎宾舞蹈-单机版 v2.1"</td></tr>
+<tr><td>脚本类型</td><td>单机版 / 群控版（标注机数）</td></tr>
+<tr><td>适配机型</td><td>镗钯基础版 / 镗钯激光雷达版</td></tr>
+<tr><td>状态</td><td>已发布（绿） / 草稿（灰） / 审核中（黄）</td></tr>
+<tr><td>时长</td><td>脚本总时长，如"3:25"</td></tr>
+<tr><td>动作数</td><td>脚本包含的动作总数</td></tr>
+<tr><td>更新时间</td><td>最后编辑时间</td></tr>
+<tr><td>操作</td><td>编辑 / 复制 / 发布 / 删除</td></tr>
+</tbody>
+</table>
+
+<h3>5.2 脚本发布流程</h3>
+<div class="flow-box">
+<div class="flow-box-title">脚本发布流程</div>
+<ul>
+<li>📌 脚本编辑完成 → 保存草稿</li>
+<li>✅ 仿真校验（摔倒风险/全身互斥/群控碰撞/关节极限/时间衔接）</li>
+<li>✅ 校验通过 → 点击"发布"</li>
+<li>❌ 状态变为"已发布"，可在任务创建中下选</li>
+<li>❌ 校验不通过 → 等待修改后重新校验</li>
+</ul>
+</div>
+
+<h3>5.3 脚本复制</h3>
+<div class="section-desc" style="margin-bottom:10px;">支持对已创建的脚本进行复制，点击列表操作列"复制"按钮后弹出复制弹窗，支持自定义重命名，确认后生成一条新的脚本。</div>
+<table>
+<thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>原脚本</td><td>文本（只读）</td><td>自动回填被复制脚本的名称，不可编辑</td></tr>
+<tr><td>新脚本名称</td><td>文本输入 | 必填</td><td>默认回填"原脚本名-副本"，支持自定义重命名；为空时不可确认</td></tr>
+</tbody>
+</table>
+<div class="rule-box">
+<div class="rule-box-title">🟧 复制规则</div>
+<ol>
+<li>复制后生成一条全新的脚本记录，完整继承原脚本的分组、适用型号、时间轴与动作编排内容</li>
+<li>新脚本初始状态为"编辑中"，需重新校验发布后才可被任务引用</li>
+<li>新脚本名称允许与原脚本重名（系统以脚本ID区分），但建议用户自定义区分</li>
+<li>任意状态（可用/编辑中/不可用）的脚本均支持复制</li>
+</ol>
+</div>
+</div>
+
+<!-- 6. 脚本编辑器（基础版） -->
+<h2 id="s6">6. 脚本编辑器（基础版） <span class="priority">P0</span></h2>
+<div class="section">
+<div class="section-desc">多轨道面式时间轴编辑器，从位置、动作、交互内容三个维度编排机器人运行脚本。基础版适配镗钯基础版机型，支持头部/躯体/耳朵动作及素材资源。</div>
+
+<h3>6.1 页面布局</h3>
+<table>
+<thead><tr><th>区域</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>左侧：动作库面板</td><td>分Tab切换"动作库"和"素材库"</td></tr>
+<tr><td>中间：时间轴编辑区</td><td>多设备多轨道时间轴，支持拖拽编排</td></tr>
+<tr><td>右侧：属性面板</td><td>选中动作后显示属性编辑（幅度、速度等）</td></tr>
+</tbody>
+</table>
+
+<h3>6.2 左侧动作库分组</h3>
+<p>支持分组间的自定义排序，可拖动调整各分组的上下位置。</p>
+<table>
+<thead><tr><th>分组</th><th>图标</th><th>动作项</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>躯体动作</td><td>🦵</td><td>站立、下蹲前保持、站起后保持、蹲起1次</td><td>4个基础躯体动作</td></tr>
+<tr><td>头部动作</td><td>⭐</td><td>点头1次、摇头1次、摆头1次、低头后保持、抬头后保持、左转头保持、右转头保持</td><td>7个基础头部动作</td></tr>
+<tr><td>耳朵动作</td><td>👂</td><td>左耳旋转、右耳旋转</td><td>2个耳朵动作</td></tr>
+<tr><td>全身动作</td><td>💃</td><td>示例：鞠躬行礼、挥手告别（具体动作待定）</td><td>示例全身复合动作</td></tr>
+<tr><td>自定义动作</td><td>➕</td><td>点击打开自定义动作编辑器编辑</td><td>用户自行编辑的复合动作</td></tr>
+</tbody>
+</table>
+
+<h3>6.3 时间轨道结构</h3>
+<p>每个设备包含以下轨道，按机型能力决定可用轨道：</p>
+<table>
+<thead><tr><th>轨道</th><th>标签</th><th>说明</th><th>互斥规则</th></tr></thead>
+<tbody>
+<tr><td>头部轨道</td><td>⭐ 头部</td><td>头部动作编排</td><td>同一时间点仅允许1个头部动作</td></tr>
+<tr><td>躯体轨道</td><td>🦵 躯体</td><td>躯体动作编排</td><td>同一时间点仅允许1个躯体动作</td></tr>
+<tr><td>耳朵轨道</td><td>👂 耳朵</td><td>耳朵动作编排</td><td>可与任何其他轨道叠加</td></tr>
+<tr><td>音视频轨道</td><td>🎵 音视频</td><td>素材内容（音频/视频）</td><td>同一时间点仅允许1段音频或视频</td></tr>
+<tr><td>交互轨道</td><td>🖼 交互</td><td>素材内容（图片/表情）</td><td>可与音视频轨道叠加</td></tr>
+</tbody>
+</table>
+
+<div class="rule-box">
+<div class="rule-box-title">🟧 轨道互斥规则</div>
+<ul>
+<li>✅ 头部、躯体、耳朵动作可同时分别存在一个</li>
+<li>✅ 耳朵动作可与任何其他轨道叠加</li>
+<li>✅ 素材内容（图片/表情/音频/视频）可与动作轨道叠加</li>
+<li>⚠️ 同一时间点仅允许一段音频或视频</li>
+<li>✅ 动作均按时间轴复制粘贴并移动</li>
+<li>🚫 素材资源支持拖拽到交互轨道</li>
+<li>🆕 当从动作库拖动全身动作时，将根据全身对应的原子动作类型，占用对应部位轨道，且同时要遵循上面的互斥规则</li>
+</ul>
+</div>
+
+<h3>6.4 轨道操作功能</h3>
+<table>
+<thead><tr><th>功能</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>复制粘贴</td><td>支持单个/批量动作在当前设备或跨设备复制粘贴，粘贴时起始时间 = 鼠标对应点击时间位置；支持Ctrl+C / Ctrl+V快捷键进行复制粘贴</td></tr>
+<tr><td>对齐功能（已开启）</td><td>开启时：拖动动作按根器上时间位置就近对齐；关闭时：支持在任意时间点移动</td></tr>
+<tr><td>缩放</td><td>支持整个轨道的缩放查看，可放大/缩小时间轴比例</td></tr>
+<tr><td>悬停高亮</td><td>支持鼠标移动至某个动作块，停留超过2s后，高亮显示该动作块</td></tr>
+<tr><td>单动作预览</td><td>点击轨道上某个单独的动作块时，右侧属性面板切换为预览视图，实时展示该动作在机器人本体上的播放效果；预览面板显示当前效果名称（如"王兰效果·P1"）、机器人/轨道/动作/时间点四要素，提示"点击任意轨道时间栏即可预览该时刻机器人状态"</td></tr>
+</tbody>
+</table>
+
+<h3>6.5 预览&仿真弹窗</h3>
+<div class="preview-screenshot">
+  <img src="preview-simulation.png" alt="预览&仿真弹窗">
+  <div class="preview-caption">预览&仿真弹窗：左侧实时预览效果，右侧5项仿真校验结果</div>
+</div>
+
+<p>点击编辑器顶部"预览&仿真"按钮，打开预览&仿真弹窗，该弹窗包含两个区域：</p>
+
+<h4>左侧：预览效果</h4>
+<table>
+<thead><tr><th>元素</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>效果标识</td><td>左上角显示当前预览的效果名称（如"王兰效果 · P1"）</td></tr>
+<tr><td>运行状态</td><td>右上角显示"运行中"绿色标识</td></tr>
+<tr><td>群控预览画面</td><td>机器人图标 + 设备编号（1/2/3/4），展示群控脚本的多机器人同步预览</td></tr>
+<tr><td>预览提示</td><td>底部"点击播放开始预览"提示文字</td></tr>
+<tr><td>进度条</td><td>当前时间 / 总时长（如 0:00 / 3:25）</td></tr>
+<tr><td>预览控制按钮</td><td>◀ 上一个 / ▶ 播放 / 下一个 ▶ / 单机预览 / 群控预览 / 全程预览 / 局部预览</td></tr>
+</tbody>
+</table>
+
+<h4>右侧：仿真校验结果</h4>
+<table>
+<thead><tr><th>校验项目</th><th>校验内容</th><th>结果展示</th></tr></thead>
+<tbody>
+<tr><td>摔倒风险检测</td><td>物理仿真引擎抓重心偏移</td><td>✅ 通过：0风险 / ⚠ N处风险</td></tr>
+<tr><td>全身动作互斥校验</td><td>全身/躯体轨道无叠加</td><td>✅ 通过：0冲突 / ❌ N处冲突</td></tr>
+<tr><td>群控位置碰撞检测</td><td>多机移动路线无交叉</td><td>✅ 通过：0群撞 / ⚠ N处碰撞</td></tr>
+<tr><td>关节角度极限校验</td><td>动作幅度在物理极限内</td><td>✅ 通过 / ⚠ N处接近极限</td></tr>
+<tr><td>动作时间衔接校验</td><td>相邻动作无时间冲突</td><td>✅ 通过 / ⚠ N处冲突</td></tr>
+</tbody>
+</table>
+
+<p><strong>校验结果示例：</strong>校验通过时显示"全部校验通过 · 已对N台机器人共M个动作完成物理仿真校验"。校验不通过时显示具体设备、时间段、动作名称、幅度、关节角度和极限值，并给出建议（如"将动作幅度降低至80%以提升安全余裕"）。</p>
+
+<div class="note">仿真校验与预览同步进行，基于物理引擎对全部动作进行摔倒风险预判。风险动作数据将被记录用于模型优化。</div>
+</div>
+
+<!-- 7. 脚本编辑器-Pro版 -->
+<h2 id="s7">7. 脚本编辑器-Pro版 <span class="priority p2">P2</span></h2>
+<div class="section">
+<div class="section-desc">多线面式时间轴编辑器，适配镗钯激光雷达版（PRO版），在基础版功能上增加：激光雷达自主移动路径编排、全身动作编排、移动中同步多头部动作、群控仿真校验。</div>
+
+<h3>7.1 与基础版的差异</h3>
+<table>
+<thead><tr><th>能力</th><th>基础版</th><th>PRO版</th></tr></thead>
+<tbody>
+<tr><td>头部/躯体/耳朵动作</td><td>✅</td><td>✅</td></tr>
+<tr><td>全身动作</td><td>❌</td><td>✅</td></tr>
+<tr><td>移动路径编排</td><td>❌</td><td>✅（激光雷达自主移动）</td></tr>
+<tr><td>素材资源</td><td>✅</td><td>✅</td></tr>
+<tr><td>移动中同步多头部动作</td><td>❌</td><td>✅</td></tr>
+<tr><td>群控仿真校验</td><td>基础校验</td><td>物理仿真校验</td></tr>
+</tbody>
+</table>
+
+<h3>7.2 PRO版左侧动作库分组</h3>
+<p>在基础版分组基础上，增加"移动动作"分组：</p>
+<table>
+<thead><tr><th>分组</th><th>图标</th><th>动作项</th></tr></thead>
+<tbody>
+<tr><td>躯体动作</td><td>🦵</td><td>站立、下蹲前保持、站起后保持、蹲起1次</td></tr>
+<tr><td>头部动作</td><td>⭐</td><td>点头1次、摇头1次、摆头1次、低头后保持、抬头后保持、左转头保持、右转头保持</td></tr>
+<tr><td>耳朵动作</td><td>👂</td><td>左耳旋转、右耳旋转</td></tr>
+<tr><td>全身动作</td><td>💃</td><td>示例：鞠躬行礼、挥手告别（具体动作待定）</td></tr>
+<tr><td>移动动作</td><td>🚶</td><td>A→B移动</td></tr>
+<tr><td>自定义动作</td><td>➕</td><td>点击打开自定义动作编辑器</td></tr>
+</tbody>
+</table>
+
+<h3>7.3 PRO版时间轴轨道</h3>
+<p>在基础版轨道基础上，增加位置轨道和全身轨道：</p>
+<table>
+<thead><tr><th>轨道</th><th>标签</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>头部轨道</td><td>⭐ 头部</td><td>头部动作，可在移动中同步编排</td></tr>
+<tr><td>躯体轨道</td><td>🦵 躯体</td><td>躯体动作</td></tr>
+<tr><td>全身轨道</td><td>💃 全身</td><td>全身动作，执行时头部/躯体/耳朵不能叠加</td></tr>
+<tr><td>耳朵轨道</td><td>👂 耳朵</td><td>耳朵动作</td></tr>
+<tr><td>位置轨道</td><td>📍 位置</td><td>移动路径编排（A→B移动），移动时长为预估信</td></tr>
+<tr><td>音视频轨道</td><td>🎵 音视频</td><td>音频/视频素材</td></tr>
+<tr><td>交互轨道</td><td>🖼 交互</td><td>图片/表情素材</td></tr>
+</tbody>
+</table>
+
+<h3>7.4 虚拟舞台路径编辑器（移动动作）</h3>
+<p>当添加移动动作（A→B移动）到位置轨道后，系统打开虚拟舞台路径编辑器弹窗，支持对移动过程进行完整配置：</p>
+
+<h4>虚拟舞台</h4>
+<table>
+<thead><tr><th>元素</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>舞台网格</td><td>深色背景网格画布（如 8m × 4m 范围），用于绘制和调整机器人移动路径</td></tr>
+<tr><td>路径点</td><td>绿色起点、橙色中间点、红色终点；支持添加多个路径点形成折线/弧线路径</td></tr>
+<tr><td>路径连线</td><td>橙色虚线连接各路径点，路径点位置可拖动调整</td></tr>
+<tr><td>机器人图标</td><td>位置轨道上叠加显示当前选中机器人的位置标识（R1-R4）</td></tr>
+</tbody>
+</table>
+
+<h4>移动参数配置</h4>
+<table class="field-table">
+<tbody>
+<tr><td>移动速度</td><td>下拉选择 | 必填 | 25%/50%/75%/100%（默认100%）</td></tr>
+<tr><td>移动时长（秒）</td><td>自动计算 | 不可编辑 | 根据路径长度和速度自动计算（如 3.0s）</td></tr>
+<tr><td>到达后朝向</td><td>下拉选择 | 否 | 面向东/西/南/北/默认（保持当前朝向）</td></tr>
+<tr><td>移动时头部动作</td><td>下拉选择 | 否 | 不编排 / 点头1次 / 摇头1次 / 左转头保持...（与脚本库头部动作同源）</td></tr>
+<tr><td>移动时耳朵动作</td><td>下拉选择 | 否 | 不编排 / 左耳旋转 / 右耳旋转</td></tr>
+<tr><td>同步机器人</td><td>多选标签 | 必填（群控场景）| 显示该任务的全部机器人；勾选需要在移动过程中同步移动的机器人（如 R2 跟随 R1 移动、 R3 跟随 R2 移动）；含同步时间差（0.00s/0.11s/0.23s）</td></tr>
+</tbody>
+</table>
+
+<h4>路径点操作</h4>
+<ul>
+<li>➕ 点击空白处新增路径点</li>
+<li>✏️ 拖动路径点调整位置</li>
+<li>🗑 右键路径点删除</li>
+<li>🔀 支持对所有路径点进行拖拽编辑</li>
+</ul>
+
+<div class="note">
+<strong>说明：</strong>移动时长为预估信（系统根据路径长度和移动速度自动计算）；若移动时长与脚本内后续动作衔接不上，将不进入脚本发布时间轴；移动过程中头部动作、耳朵动作可同步执行；到达后朝向可在路径编辑下方下拉设置。
+</div>
+
+<h3>7.5 仿真校验项（PRO版）</h3>
+<table>
+<thead><tr><th>校验项目</th><th>检测内容</th><th>结果展示</th></tr></thead>
+<tbody>
+<tr><td>摔倒风险检测</td><td>物理仿真引擎抓重心偏移</td><td>✅ 通过：0风险 / ⚠ N处风险</td></tr>
+<tr><td>全身动作互斥校验</td><td>全身动作执行期间，其他部位轨道不能叠加</td><td>✅ 通过：0冲突 / ❌ N处冲突</td></tr>
+<tr><td>群控位置碰撞检测</td><td>多机移动路线无交叉</td><td>✅ 通过：0群撞 / ⚠ N处碰撞</td></tr>
+<tr><td>关节角度极限校验</td><td>动作幅度在物理极限内</td><td>✅ 通过 / ⚠ N处接近极限</td></tr>
+<tr><td>动作时间衔接校验</td><td>相邻动作无时间冲突</td><td>✅ 通过 / ⚠ N处冲突</td></tr>
+</tbody>
+</table>
+
+<div class="note"><strong>风险提示示例：</strong>关节角度接近极限时显示具体设备、时间段、动作名称、幅度、关节角度和极限值，并给出建议（如"将动作幅度降低至80%以提升安全余裕"）。仿真校验与预览同步进行，基于物理引擎对全部动作进行摔倒风险预判。风险动作数据将被记录用于模型优化。</div>
+</div>
+
+<!-- 8. 素材库 -->
+<h2 id="s8">8. 素材库 <span class="priority">P0</span></h2>
+<div class="section">
+<div class="section-desc">管理图片、表情包、音视频文件和动作图标，支持上传、分类、审核、删除。素材上传后需通过AI审核，未通过的转人工复审。</div>
+
+<h3>8.1 素材分类</h3>
+<table>
+<thead><tr><th>分类</th><th>图标</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>图片库</td><td>🖼</td><td>展示用图片素材</td></tr>
+<tr><td>表情包库</td><td>😀</td><td>机器人屏幕表情动画</td></tr>
+<tr><td>音视频文件库</td><td>🎵</td><td>语音播报、背景音乐、视频内容</td></tr>
+<tr><td>动作图标库</td><td>🎞</td><td>用于脚本编排时自定义动作图标</td></tr>
+</tbody>
+</table>
+
+<h3>8.2 素材状态流转</h3>
+<div class="flow-box">
+<div class="flow-box-title">素材审核流程</div>
+<ul>
+<li>📤 用户上传素材</li>
+<li>🤖 AI自动审核</li>
+<li>✅ AI审核通过 → 素材状态变为"可用"</li>
+<li>❌ AI审核不通过 → 转至内部管理平台人工审核</li>
+<li>✅ 人工复审通过 → 素材状态变为"可用"</li>
+<li>❌ 人工审核驳回 → 素材状态不可用，通知上传方</li>
+</ul>
+</div>
+
+<h3>8.3 素材列表字段</h3>
+<table>
+<thead><tr><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>素材预览</td><td>支持已上传素材的预览查看</td></tr>
+<tr><td>素材名称</td><td>如"微笑迎宾"</td></tr>
+<tr><td>状态</td><td>可用（绿）/ 待审核（黄）/ 不可用（红）</td></tr>
+<tr><td>数量</td><td>如"12个表情"</td></tr>
+<tr><td>来源</td><td>默认素材 / 用户上传</td></tr>
+<tr><td>操作</td><td>📥 删除</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 9. 智能体列表 -->
+<h2 id="s9">9. 智能体列表 <span class="priority p1">P1</span></h2>
+<div class="section">
+<div class="section-desc">管理智能体的创建、编辑、删除及属性配置，包括唤醒词、音色、AI模型、适配机型、关联知识库等。</div>
+
+<h3>9.1 智能体性能指标</h3>
+<div class="perf-grid">
+  <div class="perf-card">
+    <div class="label">唤醒成功率</div>
+    <div class="value">≥ 98%</div>
+    <div class="desc">嘈杂环境远场唤醒</div>
+  </div>
+  <div class="perf-card">
+    <div class="label">回复时效</div>
+    <div class="value">≤ 1.2s</div>
+    <div class="desc">首字响应延迟（端到端）</div>
+  </div>
+  <div class="perf-card">
+    <div class="label">回复正确率</div>
+    <div class="value">≥ 92%</div>
+    <div class="desc">基于知识库的问答准确率</div>
+  </div>
+</div>
+
+<h3>9.2 智能体列表字段</h3>
+<table>
+<thead><tr><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>#</td><td>序号</td></tr>
+<tr><td>智能体名称</td><td>如"小铁-迎宾"</td></tr>
+<tr><td>唤醒词</td><td>如"你好小铁"</td></tr>
+<tr><td>音色</td><td>如"温柔女声"、"沉稳男声"、"活泼童声"</td></tr>
+<tr><td>AI模型</td><td>DeepSeek-V3 / 火山引擎-Doubao / OpenAI-GPT-4o</td></tr>
+<tr><td>适配机型</td><td>镗钯基础版 / 镗钯激光雷达版（可多选）</td></tr>
+<tr><td>知识库</td><td>关联的知识库名称</td></tr>
+<tr><td>状态</td><td>已启用（绿）/ 已停用（灰）</td></tr>
+<tr><td>操作</td><td>编辑 / 删除</td></tr>
+</tbody>
+</table>
+
+<h3>9.3 筛选器</h3>
+<table>
+<thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>搜索</td><td>文本输入</td><td>智能体名称 / 唤醒词</td></tr>
+<tr><td>状态</td><td>下拉</td><td>全部 / 已启用 / 已停用</td></tr>
+<tr><td>适配机型</td><td>下拉</td><td>全部机型 / 镗钯基础版 / 镗钯激光雷达版</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 10. 知识库 -->
+<h2 id="s10">10. 知识库 <span class="priority p1">P1</span></h2>
+<div class="section">
+<div class="section-desc">管理知识库的创建、文档上传、向量化和问答生成。文档上传后自动进行AI内容审核，审核通过后进入向量化处理。</div>
+
+<h3>10.1 知识库卡片字段</h3>
+<table>
+<thead><tr><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>知识库名称</td><td>如"镗钯文慧知识库"</td></tr>
+<tr><td>描述</td><td>知识库用途描述</td></tr>
+<tr><td>文档数</td><td>已上传文档数量</td></tr>
+<tr><td>AI模型</td><td>DeepSeek-V3 / 火山引擎-Doubao / OpenAI-GPT-4o</td></tr>
+<tr><td>状态</td><td>运行中（绿） / 处理中（黄）</td></tr>
+</tbody>
+</table>
+
+<h3>10.2 文档上传与审核流程</h3>
+<div class="flow-box">
+<div class="flow-box-title">文档上传审核流程</div>
+<ul>
+<li>📤 上传文档（支持PDF、Word、TXT、Markdown，最大50MB）</li>
+<li>◯ 选择处理方式：模型优化（AI自动优化向向量化）/ 直接问答（原文向量化）</li>
+<li>🤖 AI内容审核（自动）</li>
+<li>✅ AI审核通过 → 自动进入向量化处理</li>
+<li>❌ AI审核不通过 → 转至内部管理平台人工审核</li>
+<li>✅ 人工审核通过 → 进入向量化处理</li>
+<li>❌ 人工审核驳回 → 文档不可用，通知上传方</li>
+</ul>
+</div>
+
+<h3>10.3 文档列表字段</h3>
+<table>
+<thead><tr><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>文档名称</td><td>如"镗钯文慧景点介绍手册.pdf"</td></tr>
+<tr><td>格式</td><td>PDF / Word / TXT / Markdown</td></tr>
+<tr><td>处理方式</td><td>模型优化 / 直接问答</td></tr>
+<tr><td>审核状态</td><td>✅ 审核通过 / ❌ 审核不通过 / ⏳ 待审核</td></tr>
+<tr><td>向量化</td><td>✓ 完成 / 处理中 / 未开始</td></tr>
+<tr><td>问答生成</td><td>✓ 完成 / 处理中 / 未开始</td></tr>
+<tr><td>操作</td><td>查看 / 重新处理 / 删除</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 11. 声纹克隆 -->
+<h2 id="s11">11. 声纹克隆 <span class="priority p2">P2</span></h2>
+<div class="section">
+<div class="section-desc">通过上传声音或录制声音创建克隆声纹，支持试听、编辑和删除。声纹可用于智能体音色配置。</div>
+
+<h3>11.1 创建声纹方式</h3>
+<table>
+<thead><tr><th>方式</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>📤 上传声音</td><td>上传音频文件（WAV、MP3、M4A），建议时长10-30秒</td></tr>
+<tr><td>🎙 录制声音</td><td>在线录制，最长30秒，支持开始/停止/重置</td></tr>
+</tbody>
+</table>
+
+<h3>11.2 声纹列表字段</h3>
+<table>
+<thead><tr><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>声纹图标</td><td>性别头像emoji</td></tr>
+<tr><td>声纹名称</td><td>如"温柔女声"</td></tr>
+<tr><td>描述</td><td>如"温柔亲切的女声音色，适合迎宾场景"</td></tr>
+<tr><td>状态</td><td>可用（绿）</td></tr>
+<tr><td>试听播放按钮</td><td>播放按钮 + 进度条 + 时长</td></tr>
+<tr><td>操作</td><td>编辑 / 删除</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 12. 账户管理 -->
+<h2 id="s12">12. 账户管理 <span class="priority">P0</span></h2>
+<div class="section">
+<div class="section-desc">管理账户信息与权限配置，分"账户资料"和"权限配置"两个Tab页。</div>
+
+<h3>12.1 账户资料</h3>
+<table>
+<thead><tr><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>头像 · 用户名</td><td>头像emoji + 用户名（如"管理员"）</td></tr>
+<tr><td>账户类型</td><td>主账户</td></tr>
+<tr><td>手机号</td><td>脱敏显示，如138****8888</td></tr>
+<tr><td>邮箱</td><td>如admin@tangba.com</td></tr>
+<tr><td>注册时间</td><td>如2025-01-15</td></tr>
+</tbody>
+</table>
+
+<h3>12.2 密码与安全</h3>
+<p>支持修改密码（当前密码 + 新密码 + 确认新密码），查看用户协议。</p>
+
+<h3>12.3 子账户与权限配置</h3>
+<table>
+<thead><tr><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>用户名</td><td>子账户用户名 + 手机号（脱敏）</td></tr>
+<tr><td>角色</td><td>操作员 / 脚本编辑 / 运维</td></tr>
+<tr><td>设备权限</td><td>如"设备01-08"、"全部设备（含看）"、"全部设备"</td></tr>
+<tr><td>功能权限</td><td>如"运行控制脚本执行"、"脚本编辑素材管理"</td></tr>
+<tr><td>状态</td><td>正常 / 禁用</td></tr>
+</tbody>
+</table>
+<div class="rule-box">
+<div class="rule-box-title">🟧 权限规则</div>
+<ul>
+<li>每个租户只能添加一个主账户，支持最大权限。</li>
+<li>主账户可根据实际业务需求，配置其他不同角色的权限，再创建不同的子账号分配给不同的使用人员。</li>
+<li>租户间需进行数据资产隔离。</li>
+</ul>
+</div>
+</div>
+
+<!-- 13. 角色权限 -->
+<h2 id="s13">13. 角色权限 <span class="priority">P0</span></h2>
+<div class="section">
+<div class="section-desc">配置角色，基于设备的数据权限与基于功能点的功能权限。采用RBAC双维度权限模型。</div>
+
+<h3>13.1 三个Tab页</h3>
+<table>
+<thead><tr><th>Tab</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>角色列表</td><td>角色CRUD、角色搜索、复制角色</td></tr>
+<tr><td>数据权限（设备）</td><td>配置角色可访问的设备范围（全部设备/指定设备/指定分组）</td></tr>
+<tr><td>功能权限（功能点）</td><td>配置角色可使用的功能模块（查看/编辑/删除/执行控制）</td></tr>
+</tbody>
+</table>
+
+<h3>13.2 权限维度</h3>
+<table>
+<thead><tr><th>维度</th><th>说明</th><th>示例</th></tr></thead>
+<tbody>
+<tr><td>数据权限</td><td>控制角色可访问的设备范围</td><td>设备01-08 / 全部设备（含看）/ 指定区域</td></tr>
+<tr><td>功能权限</td><td>控制角色可操作的功能模块</td><td>运行控制脚本执行 / 脚本编辑素材管理 / 设备管理-故障处理 日志</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 14. 业务规则与状态机 -->
+<h2 id="s14">14. 业务规则与状态机 <span class="priority">P0</span></h2>
+<div class="section">
+<h3>14.1 运行任务执行指令状态机规则</h3>
+<div class="rule-box">
+<div class="rule-box-title">🟧 详情说明：运行任务执行指令状态机规则</div>
+<p>以下规则与下发验证配套使用（依据任务优先级与机器人当前状态）：</p>
+<ol>
+<li><strong>本体任务排序：</strong>根据任务优先级、最新下发的任务，排序在最前面</li>
+<li><strong>规则2 - 遥控模式：</strong>当机器人处于遥控模式，本体接收到从云端（租户Web平台 &amp; App）下发的所有任务指令时，自动调整状态为任务状态，并执行队列第一个任务</li>
+<li><strong>规则3 - 脚本任务独占：</strong>当机器人处于任务状态，且当前执行的是脚本任务，则机器人处于独占模式，不支持接收新任务执行指令</li>
+<li><strong>规则4 - 跟随+广告互动叠加：</strong>当机器人处于任务状态，且当前执行的是跟随任务，则机器人仅支持接收广告互动任务执行指令，接收后跟随任务和广告互动任务叠加执行</li>
+<li><strong>规则5 - 广告互动任务可打断：</strong>当机器人处于任务状态，且当前执行的是广告互动任务，机器人支持接收新任务指令，接收后立即切换执行新任务</li>
+</ol>
+</div>
+
+<h3>14.2 机器人任务间关系</h3>
+<div class="relation-diagram">
+  <img src="镗钯机器人任务关系.jpg" alt="镗钯机器人任务关系图">
+  <div class="relation-caption">镗钯机器人任务关系：当前结构（模式-任务-切换）→ 优化后结构（任务模式聚合）</div>
+</div>
+<table>
+<thead><tr><th>机器人当前模式</th><th>可接收的任务类型</th><th>行为</th><th>适用规则</th></tr></thead>
+<tbody>
+<tr><td>遥控模式</td><td>脚本/跟随/即时</td><td>自动切换为任务状态，执行队列首任务</td><td>规则2</td></tr>
+<tr><td>脚本任务（独占）</td><td>无</td><td>拒绝所有任务</td><td>规则3</td></tr>
+<tr><td>跟随任务</td><td>仅广告互动任务</td><td>跟随+广告互动叠加执行</td><td>规则4</td></tr>
+<tr><td>广告互动任务</td><td>脚本/跟随/广告互动</td><td>立即切换执行新任务</td><td>规则5</td></tr>
+<tr><td>故障</td><td>无</td><td>拒绝所有指令</td><td>—</td></tr>
+<tr><td>关机/离线</td><td>无</td><td>拒绝所有指令</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h3>14.3 素材/知识库审核规则</h3>
+<table>
+<thead><tr><th>审核环节</th><th>执行方</th><th>规则</th></tr></thead>
+<tbody>
+<tr><td>AI自动审核</td><td>系统</td><td>所有上传素材/文档自动进行内容安全检测，通过的直通可用，不通过的转人工</td></tr>
+<tr><td>人工复审</td><td>内部平台审核员</td><td>审核AI未通过的内容，重点检查黄赌毒、不正当言论等政治审核点</td></tr>
+<tr><td>审核结果</td><td>—</td><td>通过→可用 / 驳回→不可用并通知上传方</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 15. 自定义动作编辑器 -->
+<h2 id="s15">15. 自定义动作编辑器 <span class="priority p1">P1</span></h2>
+<div class="section">
+<div class="section-desc">用户可自行编排复合动作，通过组合原子动作到多轨道时序图，定义每个原子动作的幅度和速度，实现自定义动作的创建、编辑和删除。脚本编辑器和PRO版共用同一个编辑器弹窗。</div>
+
+<h3>15.1 动作基本信息</h3>
+<table>
+<thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>动作名称</td><td>文本</td><td>自定义动作名称</td></tr>
+<tr><td>位置分类</td><td>下拉</td><td>头部 / 躯体 / 耳朵 / 全身</td></tr>
+<tr><td>动作图标</td><td>图标选择器</td><td>支持选择素材库里的动作图标</td></tr>
+<tr><td>描述</td><td>文本</td><td>动作用途说明</td></tr>
+</tbody>
+</table>
+
+<h3>15.2 原子动作库</h3>
+<table>
+<thead><tr><th>位置</th><th>原子动作</th><th>数量</th></tr></thead>
+<tbody>
+<tr><td>头部</td><td>点头、摇头、摆头、低头、抬头、左转头、右转头</td><td>7个</td></tr>
+<tr><td>躯体</td><td>站立、下蹲、站起、蹲起</td><td>4个</td></tr>
+<tr><td>耳朵</td><td>左耳天线角度、右耳天线角度</td><td>2个</td></tr>
+</tbody>
+</table>
+
+<h3>15.3 多轨道时序图</h3>
+<table>
+<thead><tr><th>轨道</th><th>默认数量</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>头部轨道</td><td>1条</td><td>头部动作编排</td></tr>
+<tr><td>躯体轨道</td><td>1条</td><td>躯体动作编排</td></tr>
+<tr><td>耳朵轨道</td><td>1条</td><td>支持左耳和右耳天线控制</td></tr>
+<tr><td>全身轨道</td><td>3条</td><td>全身复合动作编排</td></tr>
+</tbody>
+</table>
+
+<div class="rule-box">
+<div class="rule-box-title">🟧 轨道规则</div>
+<ol>
+<li>默认轨道不可删除，额外添加的轨道可删除</li>
+<li>不同轨道的原子动作可并线同时执行</li>
+<li>每个原子动作可设置幅度（0-100）和速度（0-100），颗粒度1%可调</li>
+<li>时序图横轴为时间轴（秒），总时长取所有轨道中最大的起始+时长</li>
+<li>不同部位的轨道可支持用户自定义添加</li>
+<li>不同原子动作间有互斥关系，具体互斥逻辑待梳理后再同步</li>
+</ol>
+</div>
+
+<h3>15.4 操作流程</h3>
+<div class="flow-box">
+<div class="flow-box-title">自定义动作创建流程</div>
+<ul>
+<li>➕ 点击"自定义动作" → 打开编辑器弹窗</li>
+<li>📝 填写动作名称、选择位置、选择图标、填写描述</li>
+<li>🎯 从原子动作库拖拽原子动作到时序轨道</li>
+<li>⚙️ 点击原子动作块，设置幅度和速度（时长自动计算）</li>
+<li>📊 时序图实时显示时间轴和块位置</li>
+<li>✅ 保存 → 自定义动作出现在左侧动作库列表</li>
+<li>🔄 支持编辑已有自定义动作</li>
+<li>🗑 支持删除自定义动作</li>
+</ul>
+</div>
+</div>
+
+</div>
+
+<div style="text-align:center;padding:32px 0;color:var(--text-tertiary);font-size:13px;">
+— 文档结束 · 镗钯RaaS管理平台（租户）PRD v1.0 · 编写人：赵玉梅 · 2026-08-14 —
+</div>
+
+</body>
+</html>
