@@ -2917,6 +2917,9 @@ var plaCombinerData = {};
 var plaExtraLanes = {};
 var plaSelectedBlock = null;
 var plaEditingId = null;
+var plaPreviewSeq = [];
+var plaPreviewTotal = 1;
+var plaPreviewTimer = null;
 var plaSyncTargetId = null;
 
 // ===== 原子动作数据（与租户平台同步） =====
@@ -3617,49 +3620,70 @@ function deletePlatformAction(id) {
   showToast('动作已删除');
 }
 
-// ===== 预览 =====
-function previewPlatformAction(id) {
-  var a = PLATFORM_ACTIONS.find(function(x){ return x.id === id; });
-  if (!a) return;
-  document.getElementById('pla-preview-icon').textContent = a.icon;
-  document.getElementById('pla-preview-name').textContent = a.name;
-  var posText = a.position === 'head' ? '头部' : a.position === 'torso' ? '躯体' : a.position === 'ear' ? '耳朵' : '全身';
-  document.getElementById('pla-preview-meta').textContent = posText + ' · ' + a.atomicCount + '个原子动作 · 总时长 ' + plaFmtTime(a.totalDuration);
-  document.getElementById('pla-preview-desc').textContent = a.desc || '（无描述）';
+// ===== 预览（独立窗口，样式对齐租户平台脚本编辑器-自定义动作预览） =====
 
-  // 渲染只读时序图（按原子动作同名轨道）
-  var pos = a.position;
-  var actions = plaGetPositionAtomicActions(pos);
-  var totalTime = plaGetTotalTimeForBlocks(a.blocks || {});
-  var html = '<div class="ca-tl-ruler">';
-  for (var i = 0; i <= 5; i++) {
-    var t = (totalTime / 5) * i;
-    html += '<div class="ca-tl-ruler-tick">' + plaFmtTime(t) + '</div>';
-  }
-  html += '</div>';
-  actions.forEach(function(act, i){
-    if (i > 0) html += '<div class="ca-tl-parallel-hint">🔗 可并线（不互斥）</div>';
-    var blocks = (a.blocks && a.blocks[act.id]) || [];
-    var barCls = 'bar-head';
-    if (act.group === 'torso') barCls = 'bar-torso';
-    else if (act.group === 'ear-left') barCls = 'bar-ear-l';
-    else if (act.group === 'ear-right') barCls = 'bar-ear-r';
-    html += '<div class="ca-tl-lane-row">';
-    html += '<div class="ca-tl-lane-label">' + act.icon + ' ' + act.name + '</div>';
-    html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '">';
-    blocks.forEach(function(b){
-      var left = Math.max(0, Math.min(95, (b.startTime / totalTime) * 100));
-      var width = Math.max(3, Math.min(100 - left, (b.duration / totalTime) * 100));
-      html += '<div class="pla-tl-bar ' + barCls + '" style="left:' + left + '%;width:' + width + '%;cursor:default;" title="' + b.name + ' (' + plaFmtTime(b.startTime) + '→' + plaFmtTime(b.startTime + b.duration) + ')">' + b.icon + ' ' + b.name.substring(0,4) + '</div>';
-    });
-    if (blocks.length === 0) html += '<div class="ca-tl-lane-hint">无原子动作</div>';
-    html += '</div></div>';
+// 从组合数据中提取按时间排序的动作序列
+function plaGetPreviewSeqFromData(blocksData) {
+  var seq = [];
+  Object.keys(blocksData || {}).forEach(function(k){
+    (blocksData[k] || []).forEach(function(b){ seq.push(b); });
   });
-  document.getElementById('pla-preview-tl-body').innerHTML = html;
+  seq.sort(function(a, b){ return (a.startTime || 0) - (b.startTime || 0); });
+  return seq;
+}
+
+// 渲染独立窗口预览（机器人姿态演示 + 动作序列）
+function plaRenderPreviewScreen(opts) {
+  plaStopPreview();
+  if (opts.title) document.getElementById('pla-preview-title').textContent = opts.title;
+  document.getElementById('pla-preview-icon').textContent = opts.icon || '🤖';
+  document.getElementById('pla-preview-name').textContent = opts.name || '未命名动作';
+  document.getElementById('pla-preview-meta').textContent = opts.meta || '';
+  document.getElementById('pla-preview-desc').textContent = opts.desc || '（无描述）';
+
+  var seq = plaGetPreviewSeqFromData(opts.blocksData);
+  plaPreviewSeq = seq;
+  plaPreviewTotal = opts.totalTime || 1;
+
+  var seqHtml = seq.map(function(b, i){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border-light);border-radius:var(--radius-sm);background:#fafafa;">'
+      + '<span style="width:24px;height:24px;border-radius:50%;background:#8b5cf6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">' + (i + 1) + '</span>'
+      + '<span style="font-size:18px;">' + (b.icon || '🤖') + '</span>'
+      + '<span style="flex:1;font-size:13px;font-weight:500;">' + (b.name || '原子动作') + '</span>'
+      + '<span style="font-size:12px;color:var(--text-secondary);">幅度 ' + (b.amplitude || 0) + ' · 速度 ' + (b.speed || 0) + ' · ' + (b.duration || 0) + 's</span>'
+      + '</div>';
+  }).join('');
+  document.getElementById('pla-preview-seq').innerHTML = seqHtml;
+
+  // 重置播放画面
+  document.getElementById('pla-preview-robot').textContent = opts.icon || '🤖';
+  document.getElementById('pla-preview-robot').style.transform = 'none';
+  document.getElementById('pla-preview-act').textContent = '点击下方「播放动作效果」查看实际姿态';
+  document.getElementById('pla-preview-progress').style.width = '0%';
+  document.getElementById('pla-preview-ptime').textContent = '0:00';
   openModal('modal-platform-action-preview');
 }
 
-// 编辑中实时预览（读取当前组合数据）
+function previewPlatformAction(id) {
+  var a = PLATFORM_ACTIONS.find(function(x){ return x.id === id; });
+  if (!a) return;
+  var posText = a.position === 'head' ? '头部' : a.position === 'torso' ? '躯体' : a.position === 'ear' ? '耳朵' : '全身';
+  var blocks = a.blocks || {};
+  var totalTime = plaGetTotalTimeForBlocks(blocks);
+  var totalBlocks = 0;
+  Object.keys(blocks).forEach(function(k){ totalBlocks += (blocks[k] || []).length; });
+  plaRenderPreviewScreen({
+    title: '👁 动作预览 · ' + a.name,
+    name: a.name,
+    icon: a.icon,
+    desc: a.desc || '（无描述）',
+    meta: posText + ' · ' + totalBlocks + '个原子动作 · 总时长 ' + plaFmtTime(totalTime),
+    totalTime: totalTime,
+    blocksData: blocks
+  });
+}
+
+// 编辑中预览（读取当前组合数据）
 function previewCurrentPlatformAction() {
   var name = (document.getElementById('pla-name').value || '').trim() || '未命名动作';
   var position = document.getElementById('pla-position').value;
@@ -3667,40 +3691,47 @@ function previewCurrentPlatformAction() {
   var totalBlocks = 0;
   Object.keys(plaCombinerData).forEach(function(k){ totalBlocks += (plaCombinerData[k] || []).length; });
   if (totalBlocks === 0) { alert('请先添加至少一个原子动作再预览'); return; }
-  document.getElementById('pla-preview-title').textContent = '👁 动作预览 · ' + name;
-  document.getElementById('pla-preview-icon').textContent = plaSelectedIcon;
-  document.getElementById('pla-preview-name').textContent = name;
-  document.getElementById('pla-preview-meta').textContent = posText + ' · ' + totalBlocks + '个原子动作 · 总时长 ' + plaFmtTime(plaGetTotalTime());
-  document.getElementById('pla-preview-desc').textContent = (document.getElementById('pla-desc').value || '').trim() || '（无描述）';
-
-  var actions = plaGetPositionAtomicActions(position);
   var totalTime = plaGetTotalTime();
-  var html = '<div class="ca-tl-ruler">';
-  for (var i = 0; i <= 5; i++) {
-    var t = (totalTime / 5) * i;
-    html += '<div class="ca-tl-ruler-tick">' + plaFmtTime(t) + '</div>';
-  }
-  html += '</div>';
-  actions.forEach(function(act, i){
-    if (i > 0) html += '<div class="ca-tl-parallel-hint">🔗 可并线（不互斥）</div>';
-    var blocks = plaCombinerData[act.id] || [];
-    var barCls = 'bar-head';
-    if (act.group === 'torso') barCls = 'bar-torso';
-    else if (act.group === 'ear-left') barCls = 'bar-ear-l';
-    else if (act.group === 'ear-right') barCls = 'bar-ear-r';
-    html += '<div class="ca-tl-lane-row">';
-    html += '<div class="ca-tl-lane-label">' + act.icon + ' ' + act.name + '</div>';
-    html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '">';
-    blocks.forEach(function(b){
-      var left = Math.max(0, Math.min(95, (b.startTime / totalTime) * 100));
-      var width = Math.max(3, Math.min(100 - left, (b.duration / totalTime) * 100));
-      html += '<div class="pla-tl-bar ' + barCls + '" style="left:' + left + '%;width:' + width + '%;cursor:default;" title="' + b.name + ' (' + plaFmtTime(b.startTime) + '→' + plaFmtTime(b.startTime + b.duration) + ')">' + b.icon + ' ' + b.name.substring(0,4) + '</div>';
-    });
-    if (blocks.length === 0) html += '<div class="ca-tl-lane-hint">无原子动作</div>';
-    html += '</div></div>';
+  plaRenderPreviewScreen({
+    title: '👁 动作效果预览 · ' + name,
+    name: name,
+    icon: plaSelectedIcon,
+    desc: (document.getElementById('pla-desc').value || '').trim() || '（无描述）',
+    meta: posText + ' · ' + totalBlocks + '个原子动作 · 总时长 ' + plaFmtTime(totalTime),
+    totalTime: totalTime,
+    blocksData: plaCombinerData
   });
-  document.getElementById('pla-preview-tl-body').innerHTML = html;
-  openModal('modal-platform-action-preview');
+}
+
+// 播放：按编排顺序逐帧展示机器人姿态（幅度影响幅度、速度影响节奏）
+function plaPlayPreview() {
+  plaStopPreview();
+  var seq = plaPreviewSeq;
+  if (!seq.length) return;
+  var total = plaPreviewTotal || 1;
+  var robotEl = document.getElementById('pla-preview-robot');
+  var actEl = document.getElementById('pla-preview-act');
+  var progEl = document.getElementById('pla-preview-progress');
+  var timeEl = document.getElementById('pla-preview-ptime');
+  var idx = 0;
+  function showStep() {
+    if (idx >= seq.length) { plaStopPreview(); actEl.textContent = '✅ 播放完成'; return; }
+    var b = seq[idx];
+    robotEl.textContent = b.icon || '🤖';
+    var scale = 0.8 + (b.amplitude / 100) * 0.5;
+    robotEl.style.transform = 'scale(' + scale.toFixed(2) + ') rotate(' + ((idx % 2) ? 3 : -3) + 'deg)';
+    actEl.textContent = (idx + 1) + '/' + seq.length + ' · ' + b.name + '（幅度' + b.amplitude + ' · 速度' + b.speed + '）';
+    progEl.style.width = Math.min(100, (b.startTime / total) * 100) + '%';
+    timeEl.textContent = plaFmtTime(b.startTime);
+    var realMs = Math.max(600, (b.duration || 1) * 500);
+    idx++;
+    plaPreviewTimer = setTimeout(showStep, realMs);
+  }
+  showStep();
+}
+
+function plaStopPreview() {
+  if (plaPreviewTimer) { clearTimeout(plaPreviewTimer); plaPreviewTimer = null; }
 }
 
 // ===== 同步流程 =====
@@ -4051,18 +4082,6 @@ if (document.readyState === 'interactive' || document.readyState === 'complete')
           </div>
         </div>
       </div>
-
-      <!-- 创建中实时预览区域 -->
-      <div class="form-group">
-        <label class="form-label">效果预览 <span style="font-size:11px;color:var(--text-tertiary);font-weight:400;">（创建动作过程中实时显示，随原子动作编排、幅度 / 速度 / 时间自动更新）</span></label>
-        <div class="ca-tl-main" id="pla-live-preview">
-          <div class="ca-tl-preview-header">
-            <span>👁 效果预览（实时）</span>
-            <span style="font-weight:400;color:var(--text-tertiary);font-size:10px;" id="pla-live-preview-meta">未添加原子动作</span>
-          </div>
-          <div class="ca-tl-body" id="pla-live-preview-tl-body" style="min-height:60px;"></div>
-        </div>
-      </div>
     </div>
 
     <div class="modal-footer">
@@ -4074,7 +4093,7 @@ if (document.readyState === 'interactive' || document.readyState === 'complete')
   </div>
 </div>
 
-<!-- 2. 预览平台动作模态框 -->
+<!-- 2. 预览平台动作模态框（独立窗口，样式对齐租户平台脚本编辑器-自定义动作预览） -->
 <div class="modal-overlay" id="modal-platform-action-preview">
   <div class="modal-box" style="width:680px;">
     <div class="modal-header">
@@ -4090,12 +4109,26 @@ if (document.readyState === 'interactive' || document.readyState === 'complete')
           <div id="pla-preview-desc" style="font-size:12px;color:var(--text-tertiary);margin-top:6px;">动作描述</div>
         </div>
       </div>
-      <div id="pla-preview-timeline" class="ca-tl-main">
-        <div class="ca-tl-preview-header">
-          <span>⏱ 时序图</span>
-          <span style="font-weight:400;color:var(--text-tertiary);font-size:10px;">只读模式</span>
+      <div id="pla-preview-effect">
+        <!-- 实际动作效果预览屏（样式对齐租户平台脚本编辑器右侧效果预览） -->
+        <div id="pla-preview-screen" style="background:#0f0f1a;height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border-radius:var(--radius-md);overflow:hidden;">
+          <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:22px 22px;"></div>
+          <div id="pla-preview-robot" style="font-size:96px;filter:drop-shadow(0 4px 20px rgba(139,92,246,0.35));transition:all .3s;z-index:1;">🤖</div>
+          <div id="pla-preview-act" style="font-size:14px;font-weight:600;color:#e2e8f0;margin-top:10px;z-index:1;">点击下方「播放动作效果」查看实际姿态</div>
+          <div style="position:absolute;left:12px;right:12px;bottom:10px;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;z-index:2;overflow:hidden;">
+            <div id="pla-preview-progress" style="height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#6366f1);border-radius:3px;transition:width .25s;"></div>
+          </div>
+          <div id="pla-preview-ptime" style="position:absolute;bottom:22px;right:12px;background:rgba(0,0,0,0.6);padding:2px 8px;border-radius:4px;font-size:11px;color:#a0a0b8;font-family:monospace;z-index:3;">0:00</div>
         </div>
-        <div class="ca-tl-body" id="pla-preview-tl-body"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+          <button class="btn btn-primary btn-sm" onclick="plaPlayPreview()">▶ 播放动作效果</button>
+          <button class="btn btn-outline btn-sm" onclick="plaStopPreview()">⏹ 停止</button>
+          <span id="pla-preview-hint" style="font-size:12px;color:var(--text-tertiary);">按编排顺序逐帧展示机器人姿态（幅度影响幅度、速度影响节奏）</span>
+        </div>
+        <div style="margin-top:14px;">
+          <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">动作序列（按编排顺序）</div>
+          <div id="pla-preview-seq" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">

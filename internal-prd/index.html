@@ -64,7 +64,7 @@ tr:hover td{background:var(--bg)}
 <div class="sub">PRD 产品需求文档 · Product Requirements Document</div>
 <div class="meta">
 <span><strong>版本</strong>v2.0</span>
-<span><strong>日期</strong>2026-08-14</span>
+<span><strong>日期</strong>2026-08-19</span>
 <span><strong>编写人</strong>赵玉梅</span>
 <span><strong>状态</strong>已更新</span>
 </div>
@@ -404,7 +404,15 @@ tr:hover td{background:var(--bg)}
 </div>
 
 <h4>7.5.3.2 自定义动作效果预览</h4>
-<p>编辑器提供<strong>实时效果预览</strong>能力。创建 / 编辑动作弹窗内设有<strong>「效果预览」显示区域</strong>：在创建过程中，该区域随原子动作的拖入、编排及幅度 / 速度 / 时间调整<strong>自动实时刷新</strong>，以只读时序图形式展示动作组合效果，便于边编辑边校验。此外，也可点击弹窗底部「👁 预览」按钮，以独立弹窗查看完整预览；或从动效库列表的"预览"入口查看已保存动作的时序图。</p>
+<p>编辑器提供<strong>独立窗口预览</strong>能力，用于在正式保存前校验动作组合效果，预览统一收敛到独立窗口（创建 / 编辑弹窗内不再内嵌"实时效果预览"区域）：</p>
+<ul>
+<li>创建 / 编辑动作弹窗底部保留「👁 预览」按钮，点击后以<strong>独立弹窗</strong>展示完整预览（含机器人实际姿态演示 + 动作序列）；</li>
+<li>从动作库列表的"预览"入口，也可查看已保存动作的独立窗口预览。</li>
+</ul>
+<div class="info-box">
+<strong>预览样式统一：</strong>独立窗口预览的视觉样式（深色预览屏、机器人姿态演示、播放 / 停止、动作序列列表）与<strong>租户平台 · 脚本编辑器 · 自定义动作 · 弹窗内"👁 预览"独立窗口</strong>保持一致，确保平台方与租户方体验统一。<br>
+<strong>调整说明：</strong>本期去掉创建 / 编辑弹窗底部的"实时效果预览"内嵌区域，预览仅通过「👁 预览」以独立窗口查看，避免弹窗内重复展示。
+</div>
 
 <div class="rule-box">
 <div class="rule-title">🟧 轨道规则</div>
@@ -436,8 +444,13 @@ tr:hover td{background:var(--bg)}
 <div class="step"><div class="step-num">2</div><div class="step-content"><strong>编辑：</strong>在草稿状态下编辑原子动作组合，修改不影响已发布版本</div></div>
 <div class="step"><div class="step-num">3</div><div class="step-content"><strong>发布：</strong>点击"发布"后状态变为"已发布"，可被同步给租户</div></div>
 <div class="step"><div class="step-num">4</div><div class="step-content"><strong>再编辑：</strong>已发布的动作再次修改后，需重新发布并同步</div></div>
-<div class="step"><div class="step-num">5</div><div class="step-content"><strong>同步：</strong>点击"同步"选择目标租户（指定租户或全部租户），动作下发到租户平台</div></div>
+<div class="step"><div class="step-num">5</div><div class="step-content"><strong>同步：</strong>点击"同步"选择目标租户（指定租户或全部租户），动作直接下发到租户平台</div></div>
 <div class="step"><div class="step-num">6</div><div class="step-content"><strong>租户引用：</strong>租户在自有动作库中查看已同步的平台动作，可在脚本编辑器中引用</div></div>
+</div>
+
+<div class="info-box success">
+<strong>本期同步推送方式（租户自动接收）：</strong>平台动作发布并同步后，<strong>目标租户自动接收并入库</strong>，无需租户侧手动确认 / 审核。即：内部平台点击"同步" → 动作直接下发至所选租户 → 租户动作库立即出现该动作并可直接引用。<br>
+<strong>不在本期范围：</strong>租户手动确认接收、租户侧二次审核 / 拒收等交互能力，本期不做。
 </div>
 
 <div class="info-box">
@@ -898,7 +911,7 @@ AI检测命中风险模型的内容，自动流转至人工审核队列，状态
 </div>
 
 <div style="text-align:center;padding:32px 0;color:var(--text-tertiary);font-size:13px;">
-— 文档结束 · 镋钯RaaS管理平台（内部）PRD v2.0 · 编写人：赵玉梅 · 2026-08-14 —
+— 文档结束 · 镋钯RaaS管理平台（内部）PRD v2.0 · 编写人：赵玉梅 · 2026-08-19 —
 </div>
 
 </div>
