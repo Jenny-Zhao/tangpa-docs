@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>镗钯RaaS管理平台（内部）- PRD产品需求文档</title>
+<title>镋钯RaaS管理平台（内部）- PRD产品需求文档</title>
 <style>
 :root{--primary:#2563eb;--primary-light:#dbeafe;--success:#16a34a;--success-light:#dcfce7;--warning:#d97706;--warning-light:#fef3c7;--danger:#dc2626;--danger-light:#fee2e2;--text:#1e293b;--text-secondary:#64748b;--text-tertiary:#94a3b8;--border:#e2e8f0;--bg:#f8fafc;--bg-card:#fff;--radius:8px;--radius-sm:6px}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -60,7 +60,7 @@ tr:hover td{background:var(--bg)}
 
 <!-- ====== 封面 ====== -->
 <div class="cover">
-<h1>镗钯RaaS管理平台（内部）</h1>
+<h1>镋钯RaaS管理平台（内部）</h1>
 <div class="sub">PRD 产品需求文档 · Product Requirements Document</div>
 <div class="meta">
 <span><strong>版本</strong>v2.0</span>
@@ -93,7 +93,7 @@ tr:hover td{background:var(--bg)}
 <!-- ====== 1. 产品概述 ====== -->
 <div class="section" id="s1">
 <h2>1. 产品概述</h2>
-<p><strong>定位：</strong>镗钯RaaS管理平台（内部）是面向平台运营团队的全局管理后台，负责跨租户设备监控、平台资源管理、内容审核、动作库发布与同步、以及租户生命周期管理。</p>
+<p><strong>定位：</strong>镋钯RaaS管理平台（内部）是面向平台运营团队的全局管理后台，负责跨租户设备监控、平台资源管理、内容审核、动作库发布与同步、以及租户生命周期管理。</p>
 <p><strong>与租户平台的关系：</strong>内部平台是"平台方"视角，拥有全局只读监控权 + 平台资源管理权 + 审核权 + 系统管理权；租户平台是"租户方"视角，负责自有设备/任务/脚本的日常运营。两者通过"审核流程"和"动作库同步"形成业务闭环。</p>
 
 <div class="info-box">
@@ -105,9 +105,9 @@ tr:hover td{background:var(--bg)}
 <h3>导航结构</h3>
 <table>
 <tr><th>分组</th><th>菜单项</th><th>说明</th></tr>
-<tr><td>镗钯机器人</td><td>设备总览、设备列表</td><td>全局设备状态监控与设备台账</td></tr>
-<tr><td>镗钯租户资产</td><td>运行任务、智能体</td><td>跨租户只读查看任务执行与智能体配置</td></tr>
-<tr><td>镗钯平台资源</td><td>素材库、动作库</td><td>平台级素材管理与动作创建/发布/同步</td></tr>
+<tr><td>镋钯机器人</td><td>设备总览、设备列表</td><td>全局设备状态监控与设备台账</td></tr>
+<tr><td>镋钯租户资产</td><td>运行任务、智能体</td><td>跨租户只读查看任务执行与智能体配置</td></tr>
+<tr><td>镋钯平台资源</td><td>素材库、动作库</td><td>平台级素材管理与动作创建/发布/同步</td></tr>
 <tr><td>审核管理</td><td>内容审核</td><td>AI审核 + 人工复审双轨机制</td></tr>
 <tr><td>系统管理</td><td>账号管理、角色权限、租户管理</td><td>内部账号、RBAC权限、租户CRUD</td></tr>
 </table>
@@ -176,7 +176,7 @@ tr:hover td{background:var(--bg)}
 <h2>4. 设备列表 <span class="priority p0">P0</span></h2>
 
 <h3>4.1 功能说明</h3>
-<p>跨所有租户统一管理设备台账，支持添加设备、查看设备详情、搜索与状态筛选。每台设备必须隶属到某个租户下。</p>
+<p>跨所有租户统一管理设备台账，支持添加设备、查看设备详情、搜索与状态筛选。设备列表<strong>显示全部设备</strong>，既包括已绑定租户的设备，也包括<strong>已生产但未出售 / 尚未绑定租户</strong>的设备；未绑定租户的设备在「所属租户」列显示「-」，并在操作栏提供「绑定」入口，绑定后可由对应租户运营。</p>
 
 <h3>4.2 统计卡片</h3>
 <table>
@@ -185,6 +185,7 @@ tr:hover td{background:var(--bg)}
 <tr><td>在线</td><td>当前在线数及在线率</td></tr>
 <tr><td>故障</td><td>故障设备数，需运维介入</td></tr>
 <tr><td>离线</td><td>离线设备数及占比</td></tr>
+<tr><td>未绑定租户</td><td>已生产未出售 / 尚未绑定到任何租户的设备数</td></tr>
 </table>
 
 <h3>4.3 设备表格字段</h3>
@@ -193,13 +194,23 @@ tr:hover td{background:var(--bg)}
 <tr><td>设备ID</td><td>系统唯一标识，如 RB-2024-0001</td></tr>
 <tr><td>设备名称</td><td>可读名称，如 小镋-01</td></tr>
 <tr><td>型号</td><td>设备型号，如 TBot-X1 导览型、TBot-S2 表演型、TBot-P3 配送型</td></tr>
-<tr><td>所属租户</td><td>设备隶属的租户名称</td></tr>
+<tr><td>所属租户</td><td>设备隶属的租户名称；<strong>未绑定租户时显示「-」</strong></td></tr>
 <tr><td>状态</td><td>在线 / 离线 / 故障</td></tr>
 <tr><td>最后在线</td><td>最后在线时间戳</td></tr>
-<tr><td>操作</td><td>查看详情</td></tr>
+<tr><td>操作</td><td>查看详情；已绑定设备支持<strong>解绑</strong>，未绑定设备支持<strong>绑定</strong></td></tr>
 </table>
 
-<h3>4.4 添加设备弹窗</h3>
+<h3>4.4 绑定 / 解绑操作</h3>
+<table class="field-table">
+<tr><td>查看详情</td><td>打开设备详情弹窗，查看型号、所属租户、固件版本、在线状态、故障记录、日志与监控</td></tr>
+<tr><td>绑定（未绑定设备）</td><td>点击「绑定」→ 选择目标租户 → 确认后设备归属该租户，租户可在自有平台运营该设备；绑定后操作栏变为「解绑」</td></tr>
+<tr><td>解绑（已绑定设备）</td><td>点击「解绑」→ 二次确认后设备从原租户移除，变为未绑定状态，「所属租户」列显示「-」，操作栏变回「绑定」</td></tr>
+</table>
+<div class="info-box">
+<strong>说明：</strong>已生产未出售的设备需绑定租户后方可投入使用；解绑后的设备重新进入「未绑定租户」资产池，可再次分配给其他租户。
+</div>
+
+<h3>4.5 添加设备弹窗</h3>
 <table class="field-table">
 <tr><td>设备编码 *</td><td>输入设备唯一编码或扫描二维码</td></tr>
 <tr><td>设备昵称</td><td>可选，给设备起名（如：小镋-01）</td></tr>
@@ -209,10 +220,10 @@ tr:hover td{background:var(--bg)}
 <strong>添加逻辑：</strong>设备需处于开机状态才能添加。开机后设备屏幕会显示二维码，可在App端扫码添加。添加时必须指定所属租户。
 </div>
 
-<h3>4.5 筛选与搜索</h3>
+<h3>4.6 筛选与搜索</h3>
 <ul>
-<li>按设备ID搜索</li>
-<li>按状态筛选：全部 / 在线 / 离线 / 故障</li>
+<li>按设备ID / 设备名称搜索</li>
+<li>按状态筛选：全部 / 在线 / 离线 / 故障 / <strong>未绑定租户</strong></li>
 <li>分页展示，支持翻页</li>
 </ul>
 </div>
@@ -340,7 +351,7 @@ tr:hover td{background:var(--bg)}
 </ul>
 
 <h3>7.5 动作创建/编辑器（原子动作组合器）</h3>
-<p>与租户平台「15. 自定义动作编辑器」共用同一套编辑器，需求说明完全一致，内容如下：</p>
+<p>内部平台「动作库」的自定义动作编辑器与租户平台（第 15 章）设计思路一致，并在轨道模型上进一步优化：<strong>右侧按原子动作自动生成同名轨道、支持自定义动作效果预览、原子动作属性支持幅度/速度/时间三个维度（速度与时间互为变量）</strong>。详细说明如下：</p>
 
 <h4>7.5.1 动作基本信息</h4>
 <table class="field-table">
@@ -363,25 +374,46 @@ tr:hover td{background:var(--bg)}
 </tbody>
 </table>
 
-<h4>7.5.3 多轨道时序图</h4>
+<h4>7.5.3 多轨道时序图（原子动作同名轨道）</h4>
+<p>编辑器采用<strong>「左侧原子动作库 → 右侧同名轨道」</strong>的映射设计：</p>
+<ul>
+<li>左侧列出当前位置（头部 / 躯体 / 耳朵 / 全身）下的全部原子动作；</li>
+<li>右侧<strong>自动生成与每个原子动作一一对应、并以原子动作名称命名的轨道</strong>（例如"点头""摇头""左耳天线角度"各占一条独立轨道）；</li>
+<li>从左侧拖拽某原子动作，落到其同名轨道上即可编排；空轨道显示"拖拽「动作名」到此轨道"提示；</li>
+<li>不同原子动作轨道之间可<strong>并线同时执行</strong>，同一原子动作轨道内的多个动作按顺序执行（互斥）。</li>
+</ul>
+
+<h4>7.5.3.1 原子动作属性配置（幅度 / 速度 / 时间）</h4>
+<p>点击时序轨道上的单个原子动作块，可在右侧属性面板设置三个维度：</p>
 <table>
-<thead><tr><th>轨道</th><th>默认数量</th><th>说明</th></tr></thead>
+<thead><tr><th>维度</th><th>范围</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>头部轨道</td><td>1条</td><td>头部动作编排</td></tr>
-<tr><td>躯体轨道</td><td>1条</td><td>躯体动作编排</td></tr>
-<tr><td>耳朵轨道</td><td>1条</td><td>支持左耳和右耳天线控制</td></tr>
-<tr><td>全身轨道</td><td>3条</td><td>全身复合动作编排</td></tr>
+<tr><td>幅度</td><td>0–100</td><td>动作幅度，颗粒度 1% 可调；修改幅度会按当前速度重新计算时长</td></tr>
+<tr><td>速度</td><td>0–100</td><td>动作速度，颗粒度 1% 可调</td></tr>
+<tr><td>时间</td><td>0.5–20 秒</td><td>单个原子动作的执行时长，支持直接输入</td></tr>
 </tbody>
 </table>
+<div class="rule-box">
+<div class="rule-title">🔁 速度与时间互为变量</div>
+<ol>
+<li>调整<strong>速度</strong>时，系统按公式自动<strong>输出时间</strong>（时长 = 0.5 + 幅度×0.025 + (100−速度)×0.02）；</li>
+<li>调整<strong>时间</strong>时，系统按同一公式反向求解，<strong>自动变化速度</strong>（速度随幅度与设定时长联动，并钳制在 0–100 内）；</li>
+<li><strong>幅度</strong>作为独立维度，修改幅度会按当前速度重新计算时长；</li>
+<li>三者联动，确保任一维度调整后时长与速度始终保持一致。</li>
+</ol>
+</div>
+
+<h4>7.5.3.2 自定义动作效果预览</h4>
+<p>编辑器提供<strong>实时效果预览</strong>能力。创建 / 编辑动作弹窗内设有<strong>「效果预览」显示区域</strong>：在创建过程中，该区域随原子动作的拖入、编排及幅度 / 速度 / 时间调整<strong>自动实时刷新</strong>，以只读时序图形式展示动作组合效果，便于边编辑边校验。此外，也可点击弹窗底部「👁 预览」按钮，以独立弹窗查看完整预览；或从动效库列表的"预览"入口查看已保存动作的时序图。</p>
 
 <div class="rule-box">
 <div class="rule-title">🟧 轨道规则</div>
 <ol>
-<li>默认轨道不可删除，额外添加的轨道可删除</li>
-<li>不同轨道的原子动作可并线同时执行</li>
-<li>每个原子动作可设置幅度（0-100）和速度（0-100），颗粒度1%可调</li>
+<li>右侧轨道由左侧原子动作自动生成，轨道名称即原子动作名称，无需手动添加/删除轨道</li>
+<li>不同原子动作轨道的原子动作可并线同时执行</li>
+<li>每个原子动作可设置幅度（0-100）、速度（0-100）、时间（0.5-20秒），颗粒度1%可调</li>
 <li>时序图横轴为时间轴（秒），总时长取所有轨道中最大的起始+时长</li>
-<li>不同部位的轨道可支持用户自定义添加</li>
+<li>同一原子动作轨道内的多个动作按顺序执行（互斥）</li>
 <li>不同原子动作间有互斥关系，具体互斥逻辑待梳理后再同步</li>
 </ol>
 </div>
@@ -391,7 +423,7 @@ tr:hover td{background:var(--bg)}
 <div class="step"><div class="step-num">1</div><div class="step-content">点击"自定义动作" → 打开编辑器弹窗</div></div>
 <div class="step"><div class="step-num">2</div><div class="step-content">填写动作名称、选择位置、选择图标、填写描述</div></div>
 <div class="step"><div class="step-num">3</div><div class="step-content">从原子动作库拖拽原子动作到时序轨道</div></div>
-<div class="step"><div class="step-num">4</div><div class="step-content">点击原子动作块，设置幅度和速度（时长自动计算）</div></div>
+<div class="step"><div class="step-num">4</div><div class="step-content">点击原子动作块，设置幅度、速度、时间（速度与时间互为变量：调速度自动输出时间，调时间自动反算速度）</div></div>
 <div class="step"><div class="step-num">5</div><div class="step-content">时序图实时显示时间轴和块位置</div></div>
 <div class="step"><div class="step-num">6</div><div class="step-content">保存 → 自定义动作出现在动作库列表</div></div>
 <div class="step"><div class="step-num">7</div><div class="step-content">支持编辑已有自定义动作</div></div>
@@ -674,7 +706,7 @@ tr:hover td{background:var(--bg)}
 <p>选择角色后配置该角色的功能权限，按三大模块分组：</p>
 <table>
 <tr><th>模块</th><th>功能点</th></tr>
-<tr><td>设备管理</td><td>设备总览查看、镗钯机器人管理、运行任务查看</td></tr>
+<tr><td>设备管理</td><td>设备总览查看、镋钯机器人管理、运行任务查看</td></tr>
 <tr><td>内容运营</td><td>素材库管理、智能体管理、模型管理、内容审核</td></tr>
 <tr><td>系统管理</td><td>账号管理、角色权限、租户管理</td></tr>
 </table>
@@ -866,7 +898,7 @@ AI检测命中风险模型的内容，自动流转至人工审核队列，状态
 </div>
 
 <div style="text-align:center;padding:32px 0;color:var(--text-tertiary);font-size:13px;">
-— 文档结束 · 镗钯RaaS管理平台（内部）PRD v2.0 · 编写人：赵玉梅 · 2026-08-14 —
+— 文档结束 · 镋钯RaaS管理平台（内部）PRD v2.0 · 编写人：赵玉梅 · 2026-08-14 —
 </div>
 
 </div>

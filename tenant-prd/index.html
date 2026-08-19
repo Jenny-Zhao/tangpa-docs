@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>镗钯RaaS管理平台（租户）- PRD产品需求文档</title>
+<title>镋钯RaaS管理平台（租户）- PRD产品需求文档</title>
 <style>
 :root{--primary:#6366f1;--accent:#6366f1;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--text-primary:#1f2937;--text-secondary:#6b7280;--text-tertiary:#9ca3af;--bg-page:#f9fafb;--bg-tag:#f3f4f6;--border:#e5e7eb;--border-light:#f3f4f6;--radius-sm:6px;--radius-md:8px;--radius-lg:12px;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -88,7 +88,7 @@ tr:hover td{background:#f9fafb;}
 <div class="container">
 
 <div class="page-header">
-  <h1>📘 镗钯RaaS管理平台（租户）</h1>
+  <h1>📘 镋钯RaaS管理平台（租户）</h1>
   <div class="subtitle">PRD 产品需求文档 · Product Requirements Document</div>
   <div class="meta-card">
     <div class="meta-cell">
@@ -141,12 +141,12 @@ tr:hover td{background:#f9fafb;}
 <h2 id="s1">1. 产品总览</h2>
 <div class="section">
 <h3>1.1 产品定位</h3>
-<p>镗钯租户管理平台是镗钯机器人RaaS（Robot as a Service）平台的租户端Web管理系统。面向文旅景区、科技馆展厅、商业综合体等B端租户用户，提供设备管理、任务编排与下发、脚本编辑、素材管理、智能体配置、知识库管理等全链路运营能力。</p>
+<p>镋钯租户管理平台是镋钯机器人RaaS（Robot as a Service）平台的租户端Web管理系统。面向文旅景区、科技馆展厅、商业综合体等B端租户用户，提供设备管理、任务编排与下发、脚本编辑、素材管理、智能体配置、知识库管理等全链路运营能力。</p>
 <p><strong>核心价值：</strong>租户无需管理机器人运层技术，通过可视化界面即可完成机器人运动剧本编排、任务下发执行、内容运营管理，实现"零代码"机器人运营。</p>
 <p><strong>机型支持：</strong></p>
 <ul>
-<li>镗钯基础版</li>
-<li>镗钯激光雷达版</li>
+<li>镋钯基础版</li>
+<li>镋钯激光雷达版</li>
 </ul>
 </div>
 
@@ -179,8 +179,7 @@ tr:hover td{background:#f9fafb;}
 <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
 <tbody>
 <tr><td>设备名称</td><td>文本输入</td><td>模糊搜索设备名称</td></tr>
-<tr><td>设备型号</td><td>下拉选择</td><td>全部 / 镗钯基础版 / 镗钯激光雷达版</td></tr>
-<tr><td>所属租户</td><td>下拉选择</td><td>全部 / 文旅景区A / 科技馆展厅 / 商业综合体B</td></tr>
+<tr><td>设备型号</td><td>下拉选择</td><td>全部 / 镋钯基础版 / 镋钯激光雷达版</td></tr>
 <tr><td>状态</td><td>下拉选择</td><td>全部 / 运行中 / 关机·离线 / 故障</td></tr>
 </tbody>
 </table>
@@ -205,11 +204,21 @@ tr:hover td{background:#f9fafb;}
 <thead><tr><th>操作</th><th>按钮说明</th><th>校验逻辑</th></tr></thead>
 <tbody>
 <tr><td>远程监控</td><td>打开远程监控弹窗，查看机器人实时画面</td><td>设备需为运行中状态</td></tr>
-<tr><td>智能体</td><td>打开智能体关联弹窗，为设备绑定/解绑智能体</td><td>—</td></tr>
-<tr><td>运动任务</td><td>打开设备运动任务弹窗，查看该设备当前任务队列</td><td>—</td></tr>
-<tr><td>编辑</td><td>打开设备详情弹窗，修改设备名称等属性</td><td>—</td></tr>
+<tr><td>智能体</td><td>打开智能体关联弹窗，为设备关联/更换/解绑智能体</td><td>每台设备<b>仅可关联 1 个智能体</b>（单选），不支持多选；选择新智能体将替换当前关联，解绑后处于「未关联」状态</td></tr>
+<tr><td>运动任务</td><td>打开设备运动任务弹窗，<b>统一展示本机已同步的所有任务</b>（含已下发的脚本任务、跟随任务与即时任务），可直接执行 / 删除</td><td>不再区分「已下发任务」「即时任务」两个 Tab，全部任务在同列表内展示</td></tr>
+<tr><td>编辑</td><td>打开设备编辑弹窗，修改机器人名称</td><td>弹窗<b>仅支持修改机器人名称</b>；所属租户由登录账号固定不可修改；智能体关联请在「智能体」入口调整，不在编辑弹窗内</td></tr>
 </tbody>
 </table>
+
+<div class="note">
+<p>📌 <b>本期约束：</b></p>
+<ul>
+<li><b>编辑设备</b>：因登录账号已确定设备隶属的租户，编辑弹窗仅支持修改「机器人名称」，不提供所属租户修改项；智能体关联改由卡片「智能体」入口调整，不在编辑弹窗内。</li>
+<li><b>智能体关联</b>：由原先支持多个调整为<b>仅可关联 1 个</b>，不再支持多选。</li>
+<li><b>运动任务入口</b>：卡片的「运动任务」弹窗<b>不再区分 Tab</b>，统一展示本机已同步的所有任务（脚本 / 跟随 / 即时），可直接执行或删除；即时任务的创建入口仍保留在「运动任务」页（见第 4 章）。</li>
+<li><b>故障设备</b>：本期<b>去掉「报修」入口</b>，故障设备卡片不再提供报修操作。</li>
+</ul>
+</div>
 
 <h3>3.4 设备模式说明</h3>
 <table>
@@ -228,7 +237,7 @@ tr:hover td{background:#f9fafb;}
 <!-- 4. 运行任务页 -->
 <h2 id="s4">4. 运行任务页 <span class="priority">P0</span></h2>
 <div class="section">
-<div class="section-desc">创建和管理机器人执行任务，支持脚本任务和跟随任务两种类型。核心逻辑是任务下发时需通过设备状态机校验，校验通过才能将执行指令推送至机器人本体。</div>
+<div class="section-desc">创建和管理机器人执行任务，支持<b>脚本任务</b>、<b>跟随任务</b>与<b>即时广告任务</b>三种类型。任务执行采用<b>两步流程</b>：先「同步至设备」（含设备在线校验、脚本任务仿真校验），同步成功后再「立即执行」。</div>
 
 <h3>4.1 任务列表</h3>
 <table>
@@ -236,33 +245,39 @@ tr:hover td{background:#f9fafb;}
 <tbody>
 <tr><td>#</td><td>序号（彩色圆形序号）</td></tr>
 <tr><td>任务名称</td><td>如"迎宾舞蹈-单机版 v2.1"</td></tr>
-<tr><td>任务类型</td><td>■ 脚本任务 / 👀 跟随任务</td></tr>
+<tr><td>任务类型</td><td>🎬 脚本任务 / 👥 跟随任务 / ⚡ 即时广告任务</td></tr>
 <tr><td>目标设备</td><td>设备名称列表，逗号分隔</td></tr>
-<tr><td>状态</td><td>已下发（绿）/ 待下发（黄）</td></tr>
+<tr><td>状态</td><td>已同步（绿）/ 待同步（黄）</td></tr>
 <tr><td>创建时间</td><td>YYYY-MM-DD HH:mm</td></tr>
-<tr><td>操作</td><td>查看 / 编辑 / 执行任务（已下发）/ 下发设备（待下发）</td></tr>
+<tr><td>操作</td><td>查看 / 编辑 / 立即执行（已同步）/ 同步至设备（待同步）</td></tr>
 </tbody>
 </table>
 
-<h3>4.2 任务下发校验逻辑（核心）</h3>
+<h3>4.2 同步至设备校验逻辑（核心 · 第一步）</h3>
 <div class="flow-box">
-<div class="flow-box-title">🟧 任务下发校验规则（validateAndDispatch）</div>
-<p>当用户点击"下发设备"按钮时，系统执行以下校验：</p>
+<div class="flow-box-title">🟧 同步至设备校验规则（validateAndDispatch）</div>
+<p>当用户点击"同步至设备"按钮时，系统执行以下校验：</p>
 <ol>
-<li><strong>设备状态校验：</strong>遍历所有目标设备，检查是否有设备处于"故障"或"离线"状态
+<li><strong>校验1 · 设备在线校验：</strong>遍历所有目标设备，检查是否有设备处于"故障"或"离线"状态
 <ul>
-<li>存在故障/离线设备 → 下发失败，Toast提示"下发失败：目标设备XXX处于故障/离线状态，无法接收任务"</li>
-<li>全部设备正常 → 下发成功，Toast提示"下发成功：任务「XXX」已推送至N台设备执行"</li>
+<li>存在故障/离线设备 → 同步失败，Toast提示"同步失败：目标设备XXX处于故障/离线状态，无法接收任务"</li>
+<li>全部设备正常 → 进入下一步</li>
 </ul>
 </li>
-<li><strong>下发成功：</strong>任务状态从"待下发"变为"已下发"，操作按钮从"下发设备"变为"执行任务"</li>
+<li><strong>校验2 · 脚本任务虚拟仿真校验（仅脚本任务）：</strong>脚本任务在同步前必须先执行虚拟仿真校验，<b>无论校验通过与否都会弹出「虚拟仿真校验结果」弹窗</b>，展示仿真结果详情，用户可抉择：
+<ul>
+<li>仿真通过 → 弹窗显示"✅ 校验通过"，用户可点击「继续同步」完成同步，或点击「暂不同步」取消；</li>
+<li>仿真未通过（存在风险）→ 弹窗显示"⚠️ 校验未通过（存在风险）"及风险说明，用户可点击「带风险继续同步」（仍同步但带风险），或点击「暂不同步」取消。</li>
+</ul>
+</li>
+<li><strong>同步成功：</strong>Toast提示"同步成功：任务「XXX」已同步至N台设备"，任务状态从"待同步"变为"已同步"，操作按钮从"同步至设备"变为"立即执行"</li>
 </ol>
 </div>
 
-<h3>4.3 执行任务校验逻辑（核心）</h3>
+<h3>4.3 立即执行校验逻辑（核心 · 第二步）</h3>
 <div class="flow-box">
-<div class="flow-box-title">🟧 执行任务校验规则（validateExecuteScript）</div>
-<p>当用户点击"执行任务"按钮时，系统依据机器人当前模式与任务优先级规则进行校验：</p>
+<div class="flow-box-title">🟧 立即执行校验规则（validateExecuteScript）</div>
+<p>当用户点击"立即执行"按钮时，系统依据机器人当前模式与任务优先级规则进行校验：</p>
 <ol>
 <li><strong>查找首个有效设备：</strong>在目标设备列表中找到第一个处于remote/script/follow/advert模式的设备</li>
 <li><strong>无有效设备（全部故障/离线）</strong> → 校验不通过，展示"目标设备均处于故障/离线状态，无法下发执行指令"</li>
@@ -283,13 +298,33 @@ tr:hover td{background:#f9fafb;}
 </ol>
 </div>
 
+<div class="note">
+<p>📌 <b>「立即执行」运行时行为（本期明确）：</b></p>
+<ul>
+<li>机器人进入任务状态时，<b>默认进入任务态</b>，手柄上显示对应标识信息（如红灯亮起）；</li>
+<li>任务执行结束后，机器人<b>自动回到遥操模式</b>；</li>
+<li>任务执行过程中，遥控器<b>急停（E-Stop）始终生效且为最高优先级</b>，可随时中断任务。</li>
+</ul>
+</div>
+
 <h3>4.4 创建运动任务弹窗</h3>
 <h4>任务类型选择</h4>
 <table>
 <thead><tr><th>类型</th><th>说明</th><th>图标</th></tr></thead>
 <tbody>
-<tr><td>脚本执行任务</td><td>选择脚本库中的脚本，下发至设备执行</td><td>📦</td></tr>
-<tr><td>跟随任务</td><td>配置UWB跟随编队，列队运动</td><td>👀</td></tr>
+<tr><td>脚本执行任务</td><td>选择脚本库中的脚本，同步至设备执行</td><td>🎬</td></tr>
+<tr><td>跟随任务</td><td>配置UWB跟随编队，列队运动</td><td>👥</td></tr>
+<tr><td>即时广告任务</td><td>将音视频 / 图片 / 表情包作为即时广告投放展示（即原设备卡片的"即时任务"创建入口，本期迁移至此）</td><td>⚡</td></tr>
+</tbody>
+</table>
+
+<h4>即时广告任务表单字段</h4>
+<table class="field-table">
+<tbody>
+<tr><td>任务名称 *</td><td>文本输入 | 必填 | 如"开业大促-即时广告"</td></tr>
+<tr><td>目标设备 *</td><td>下拉选择 | 必填 | 选择单台目标设备</td></tr>
+<tr><td>广告媒体内容 *</td><td>媒体选择器 | 必填 | 分三类 Tab：🎬 音视频 / 🖼️ 图片 / 🙂 表情包，从素材库选择</td></tr>
+<tr><td>播放方式</td><td>单选 | 否 | 循环播放 / 单次播放</td></tr>
 </tbody>
 </table>
 
@@ -314,7 +349,7 @@ tr:hover td{background:#f9fafb;}
 <tr><td>机器人排队/序列配置</td><td>表格 | 必填 | 拖拽行可调整顺序，或直接修改序号；列：序列/机器人/角色/跟随对象/操作（含上下移按钮▲▼）</td></tr>
 <tr><td>后续跟随方式</td><td>单选 | 必填 | ◉ 自动跟随（默认间距） / ◯ 手动配置间距</td></tr>
 <tr><td>跟随间距（米）</td><td>数值输入 | 选择手动配置间距时必填 | 单位米（如 1.5）</td></tr>
-<tr><td>队列多媒体内容（可选）</td><td>标签选择器 | 否 | 😀 选择表情包 / 🎵 选择音视频 / 🖼 选择图片</td></tr>
+<tr><td>队列多媒体内容（按机器人差异化配置）</td><td>表格 | 否 | 以「机器人」为行，逐台配置：😀 表情包 / 🎵 音视频 / 🖼 图片；每台机器人可独立选择不同素材，实现「一队多面」的差异化展示（执行时各自显示对应内容）</td></tr>
 </tbody>
 </table>
 
@@ -322,7 +357,7 @@ tr:hover td{background:#f9fafb;}
 <div class="rule-box-title">⚠️ 队列异常提醒规则</div>
 <ul>
 <li>当中间机器人跟丢，或跟随误差超过 <strong>30%</strong> 时，系统将给出对应提示</li>
-<li>任务创建后处于"待下发"状态，需手动点击"下发至设备"将任务推送至机器人端执行</li>
+<li>任务创建后处于"待同步"状态，需先手动点击"同步至设备"，再点击"立即执行"开始执行</li>
 </ul>
 </div>
 
@@ -354,7 +389,7 @@ tr:hover td{background:#f9fafb;}
 <tbody>
 <tr><td>脚本名称</td><td>含版本号，如"迎宾舞蹈-单机版 v2.1"</td></tr>
 <tr><td>脚本类型</td><td>单机版 / 群控版（标注机数）</td></tr>
-<tr><td>适配机型</td><td>镗钯基础版 / 镗钯激光雷达版</td></tr>
+<tr><td>适配机型</td><td>镋钯基础版 / 镋钯激光雷达版</td></tr>
 <tr><td>状态</td><td>已发布（绿） / 草稿（灰） / 审核中（黄）</td></tr>
 <tr><td>时长</td><td>脚本总时长，如"3:25"</td></tr>
 <tr><td>动作数</td><td>脚本包含的动作总数</td></tr>
@@ -398,7 +433,7 @@ tr:hover td{background:#f9fafb;}
 <!-- 6. 脚本编辑器（基础版） -->
 <h2 id="s6">6. 脚本编辑器（基础版） <span class="priority">P0</span></h2>
 <div class="section">
-<div class="section-desc">多轨道面式时间轴编辑器，从位置、动作、交互内容三个维度编排机器人运行脚本。基础版适配镗钯基础版机型，支持头部/躯体/耳朵动作及素材资源。</div>
+<div class="section-desc">多轨道面式时间轴编辑器，从位置、动作、交互内容三个维度编排机器人运行脚本。基础版适配镋钯基础版机型，支持头部/躯体/耳朵动作及素材资源。</div>
 
 <h3>6.1 页面布局</h3>
 <table>
@@ -406,7 +441,7 @@ tr:hover td{background:#f9fafb;}
 <tbody>
 <tr><td>左侧：动作库面板</td><td>分Tab切换"动作库"和"素材库"</td></tr>
 <tr><td>中间：时间轴编辑区</td><td>多设备多轨道时间轴，支持拖拽编排</td></tr>
-<tr><td>右侧：属性面板</td><td>选中动作后显示属性编辑（幅度、速度等）</td></tr>
+<tr><td>右侧：属性面板</td><td>选中动作后显示属性编辑：<strong>动作幅度倍数</strong>、<strong>动作速率倍数</strong>、<strong>动作时间（秒）</strong>。其中<b>速率与时间均可自定义输入，且互为变量</b>——调整速率自动计算时间，调整时间自动反算速率（幅度独立设置）</td></tr>
 </tbody>
 </table>
 
@@ -461,7 +496,17 @@ tr:hover td{background:#f9fafb;}
 </tbody>
 </table>
 
-<h3>6.5 预览&仿真弹窗</h3>
+<h3>6.5 动作执行规则</h3>
+<div class="rule-box">
+<div class="rule-box-title">🟧 动作执行规则</div>
+<ol>
+<li><strong>姿态保持（规则1）：</strong>动作执行完毕后<strong>保持最后一帧姿态，不自动回正</strong>；如需回正，需显式添加回正动作。多个连续动作之间直接衔接，<strong>以上一动作末帧为起点</strong>继续执行下一动作。</li>
+<li><strong>组合动作缩放踩点（规则2）：</strong>支持自定义组合动作在轨道上以<strong>缩放编辑</strong>方式自动同比例调整动作时间，以满足音乐节拍匹配、精准踩点需求；但<strong>每个原子动作的执行时间不得小于该动作对应关节运动能力的下限</strong>。</li>
+<li><strong>自定义动作二次编辑（规则3）：</strong>自定义动作支持二次编辑且<strong>不影响历史脚本</strong>：每次修改保存后<strong>生成新 UUID</strong>，已有脚本引用的仍为旧版本快照，保证历史脚本执行不受影响。</li>
+</ol>
+</div>
+
+<h3>6.6 预览&仿真弹窗</h3>
 <div class="preview-screenshot">
   <img src="preview-simulation.png" alt="预览&仿真弹窗">
   <div class="preview-caption">预览&仿真弹窗：左侧实时预览效果，右侧5项仿真校验结果</div>
@@ -502,7 +547,7 @@ tr:hover td{background:#f9fafb;}
 <!-- 7. 脚本编辑器-Pro版 -->
 <h2 id="s7">7. 脚本编辑器-Pro版 <span class="priority p2">P2</span></h2>
 <div class="section">
-<div class="section-desc">多线面式时间轴编辑器，适配镗钯激光雷达版（PRO版），在基础版功能上增加：激光雷达自主移动路径编排、全身动作编排、移动中同步多头部动作、群控仿真校验。</div>
+<div class="section-desc">多线面式时间轴编辑器，适配镋钯激光雷达版（PRO版），在基础版功能上增加：激光雷达自主移动路径编排、全身动作编排、移动中同步多头部动作、群控仿真校验。</div>
 
 <h3>7.1 与基础版的差异</h3>
 <table>
@@ -604,6 +649,8 @@ tr:hover td{background:#f9fafb;}
 <div class="section">
 <div class="section-desc">管理图片、表情包、音视频文件和动作图标，支持上传、分类、审核、删除。素材上传后需通过AI审核，未通过的转人工复审。</div>
 
+<div class="note">📦 上传限制：<strong>单个素材文件大小需 ≤ 2G</strong>，超出将无法上传；支持 PNG / JPG / MP3 / MP4 等格式。</div>
+
 <h3>8.1 素材分类</h3>
 <table>
 <thead><tr><th>分类</th><th>图标</th><th>说明</th></tr></thead>
@@ -651,13 +698,12 @@ tr:hover td{background:#f9fafb;}
 <div class="perf-grid">
   <div class="perf-card">
     <div class="label">唤醒成功率</div>
-    <div class="value">≥ 98%</div>
+    <div class="value">≥ 95%</div>
     <div class="desc">嘈杂环境远场唤醒</div>
   </div>
   <div class="perf-card">
     <div class="label">回复时效</div>
-    <div class="value">≤ 1.2s</div>
-    <div class="desc">首字响应延迟（端到端）</div>
+    <div class="value">≤ 2s</div>
   </div>
   <div class="perf-card">
     <div class="label">回复正确率</div>
@@ -675,7 +721,7 @@ tr:hover td{background:#f9fafb;}
 <tr><td>唤醒词</td><td>如"你好小铁"</td></tr>
 <tr><td>音色</td><td>如"温柔女声"、"沉稳男声"、"活泼童声"</td></tr>
 <tr><td>AI模型</td><td>DeepSeek-V3 / 火山引擎-Doubao / OpenAI-GPT-4o</td></tr>
-<tr><td>适配机型</td><td>镗钯基础版 / 镗钯激光雷达版（可多选）</td></tr>
+<tr><td>适配机型</td><td>镋钯基础版 / 镋钯激光雷达版（可多选）</td></tr>
 <tr><td>知识库</td><td>关联的知识库名称</td></tr>
 <tr><td>状态</td><td>已启用（绿）/ 已停用（灰）</td></tr>
 <tr><td>操作</td><td>编辑 / 删除</td></tr>
@@ -688,7 +734,7 @@ tr:hover td{background:#f9fafb;}
 <tbody>
 <tr><td>搜索</td><td>文本输入</td><td>智能体名称 / 唤醒词</td></tr>
 <tr><td>状态</td><td>下拉</td><td>全部 / 已启用 / 已停用</td></tr>
-<tr><td>适配机型</td><td>下拉</td><td>全部机型 / 镗钯基础版 / 镗钯激光雷达版</td></tr>
+<tr><td>适配机型</td><td>下拉</td><td>全部机型 / 镋钯基础版 / 镋钯激光雷达版</td></tr>
 </tbody>
 </table>
 </div>
@@ -702,7 +748,7 @@ tr:hover td{background:#f9fafb;}
 <table>
 <thead><tr><th>字段</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>知识库名称</td><td>如"镗钯文慧知识库"</td></tr>
+<tr><td>知识库名称</td><td>如"镋钯文慧知识库"</td></tr>
 <tr><td>描述</td><td>知识库用途描述</td></tr>
 <tr><td>文档数</td><td>已上传文档数量</td></tr>
 <tr><td>AI模型</td><td>DeepSeek-V3 / 火山引擎-Doubao / OpenAI-GPT-4o</td></tr>
@@ -728,7 +774,7 @@ tr:hover td{background:#f9fafb;}
 <table>
 <thead><tr><th>字段</th><th>说明</th></tr></thead>
 <tbody>
-<tr><td>文档名称</td><td>如"镗钯文慧景点介绍手册.pdf"</td></tr>
+<tr><td>文档名称</td><td>如"镋钯文慧景点介绍手册.pdf"</td></tr>
 <tr><td>格式</td><td>PDF / Word / TXT / Markdown</td></tr>
 <tr><td>处理方式</td><td>模型优化 / 直接问答</td></tr>
 <tr><td>审核状态</td><td>✅ 审核通过 / ❌ 审核不通过 / ⏳ 待审核</td></tr>
@@ -851,8 +897,8 @@ tr:hover td{background:#f9fafb;}
 
 <h3>14.2 机器人任务间关系</h3>
 <div class="relation-diagram">
-  <img src="镗钯机器人任务关系.jpg" alt="镗钯机器人任务关系图">
-  <div class="relation-caption">镗钯机器人任务关系：当前结构（模式-任务-切换）→ 优化后结构（任务模式聚合）</div>
+  <img src="镋钯机器人任务关系.jpg" alt="镋钯机器人任务关系图">
+  <div class="relation-caption">镋钯机器人任务关系：当前结构（模式-任务-切换）→ 优化后结构（任务模式聚合）</div>
 </div>
 <table>
 <thead><tr><th>机器人当前模式</th><th>可接收的任务类型</th><th>行为</th><th>适用规则</th></tr></thead>
@@ -880,7 +926,7 @@ tr:hover td{background:#f9fafb;}
 <!-- 15. 自定义动作编辑器 -->
 <h2 id="s15">15. 自定义动作编辑器 <span class="priority p1">P1</span></h2>
 <div class="section">
-<div class="section-desc">用户可自行编排复合动作，通过组合原子动作到多轨道时序图，定义每个原子动作的幅度和速度，实现自定义动作的创建、编辑和删除。脚本编辑器和PRO版共用同一个编辑器弹窗。</div>
+<div class="section-desc">用户可自行编排复合动作，通过组合原子动作到时序图，定义每个原子动作的幅度、速度和时间，实现自定义动作的创建、编辑和删除。编辑器采用<strong>同名轨道</strong>设计（左侧每个原子动作对应右侧一条以该动作命名的轨道），并在弹窗内提供<strong>效果预览</strong>与<strong>速度↔时间</strong>自动互算。脚本编辑器和PRO版共用同一个编辑器弹窗。</div>
 
 <h3>15.1 动作基本信息</h3>
 <table>
@@ -903,50 +949,52 @@ tr:hover td{background:#f9fafb;}
 </tbody>
 </table>
 
-<h3>15.3 多轨道时序图</h3>
+<h3>15.3 同名轨道时序图（原子动作 → 轨道）</h3>
+<div class="section-desc">编辑器右侧时序图按"左侧原子动作"自动生成对应轨道：<strong>左侧有几个原子动作，右侧即有对应该原子动作的几条轨道，每条轨道名称即为原子动作名称</strong>。从左侧原子动作库拖拽原子动作到其同名轨道即可编排，不同原子动作轨道可同时执行（并线），同一原子动作轨道内按顺序执行（互斥）。</div>
 <table>
-<thead><tr><th>轨道</th><th>默认数量</th><th>说明</th></tr></thead>
+<thead><tr><th>位置</th><th>对应的原子动作同名轨道</th></tr></thead>
 <tbody>
-<tr><td>头部轨道</td><td>1条</td><td>头部动作编排</td></tr>
-<tr><td>躯体轨道</td><td>1条</td><td>躯体动作编排</td></tr>
-<tr><td>耳朵轨道</td><td>1条</td><td>支持左耳和右耳天线控制</td></tr>
-<tr><td>全身轨道</td><td>3条</td><td>全身复合动作编排</td></tr>
+<tr><td>头部</td><td>点头1次、摇头1次、摆头1次、低头后保持、左转头保持、右转头保持（各 1 条同名轨道）</td></tr>
+<tr><td>躯体</td><td>站立、下蹲后保持、站起后保持、蹲起1次（各 1 条同名轨道）</td></tr>
+<tr><td>耳朵</td><td>左耳天线角度、右耳天线角度（各 1 条同名轨道）</td></tr>
+<tr><td>全身</td><td>头部 + 躯体 + 耳朵全部原子动作的同名轨道</td></tr>
 </tbody>
 </table>
 
 <div class="rule-box">
-<div class="rule-box-title">🟧 轨道规则</div>
+<div class="rule-box-title">🟧 轨道与属性规则</div>
 <ol>
-<li>默认轨道不可删除，额外添加的轨道可删除</li>
-<li>不同轨道的原子动作可并线同时执行</li>
-<li>每个原子动作可设置幅度（0-100）和速度（0-100），颗粒度1%可调</li>
-<li>时序图横轴为时间轴（秒），总时长取所有轨道中最大的起始+时长</li>
-<li>不同部位的轨道可支持用户自定义添加</li>
-<li>不同原子动作间有互斥关系，具体互斥逻辑待梳理后再同步</li>
+<li>每个原子动作对应一条以<strong>原子动作名称命名</strong>的轨道，左侧原子动作增减时右侧轨道自动增减</li>
+<li>不同原子动作轨道之间可并线同时执行；同一原子动作轨道内按时间顺序排列（互斥）</li>
+<li>每个原子动作块可配置三个属性维度：<strong>幅度（0-100）、速度（0-100）、时间（秒）</strong></li>
+<li>🔁 <strong>速度与时间互为变量</strong>：调整速度后自动输出时间，调整时间后自动反算速度（时长 = f(幅度, 速度) 自动计算）</li>
+<li>时序图横轴为时间轴（秒），总时长取所有轨道中最大（起始 + 时长），最小 5 秒</li>
+<li>编辑器内提供<strong>实时效果预览</strong>：创建过程中随编排、幅度 / 速度 / 时间自动刷新；点击"预览"按钮打开<strong>实际动作效果预览</strong>弹窗——以机器人预览屏逐帧展示真实姿态（幅度影响幅度、速度影响节奏），并列出动作序列与总时长，而非仅展示时间轴</li>
 </ol>
 </div>
 
 <h3>15.4 操作流程</h3>
 <div class="flow-box">
-<div class="flow-box-title">自定义动作创建流程</div>
+<div class="flow-box-title">自定义动作创建 / 编辑流程</div>
 <ul>
 <li>➕ 点击"自定义动作" → 打开编辑器弹窗</li>
 <li>📝 填写动作名称、选择位置、选择图标、填写描述</li>
-<li>🎯 从原子动作库拖拽原子动作到时序轨道</li>
-<li>⚙️ 点击原子动作块，设置幅度和速度（时长自动计算）</li>
-<li>📊 时序图实时显示时间轴和块位置</li>
+<li>🎯 从原子动作库拖拽原子动作到其<strong>同名轨道</strong>（右侧轨道随左侧原子动作自动生成）</li>
+<li>⚙️ 点击原子动作块，设置幅度、速度、时间（速度↔时间自动互算，时长自动计算）</li>
+<li>👁 编辑器内实时效果预览，或点击"预览"打开实际动作效果预览（机器人预览屏逐帧展示姿态，可播放）</li>
 <li>✅ 保存 → 自定义动作出现在左侧动作库列表</li>
-<li>🔄 支持编辑已有自定义动作</li>
+<li>🔄 支持编辑已有自定义动作（点击列表中的编辑按钮重新打开编辑器）</li>
 <li>🗑 支持删除自定义动作</li>
 </ul>
 </div>
-</div>
+
+<div class="note">⚠️ 数据隔离：用户自定义动作支持修改；修改动作定义后<strong>不会影响已编排到脚本中的该动作副本</strong>——脚本在引用自定义动作时即生成独立快照，二者互不干扰。</div>
 
 </div>
-
 <div style="text-align:center;padding:32px 0;color:var(--text-tertiary);font-size:13px;">
-— 文档结束 · 镗钯RaaS管理平台（租户）PRD v1.0 · 编写人：赵玉梅 · 2026-08-14 —
+— 文档结束 · 镋钯RaaS管理平台（租户）PRD v1.0 · 编写人：赵玉梅 · 2026-08-14 —
 </div>
 
+</div>
 </body>
 </html>

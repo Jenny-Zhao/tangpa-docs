@@ -18,21 +18,21 @@
       <div class="logo-text">成都人形<br><span style="font-size:10px;font-weight:400;opacity:0.6;">内部管理平台</span></div>
     </div>
     <nav class="sidebar-nav">
-      <div class="nav-group-title">镗钯机器人</div>
+      <div class="nav-group-title">镋钯机器人</div>
       <div class="nav-item active" onclick="navigateTo('page-device-overview')">
         <span class="nav-icon">📊</span> 设备总览
       </div>
       <div class="nav-item" onclick="navigateTo('page-device')">
         <span class="nav-icon">📡</span> 设备列表
       </div>
-      <div class="nav-group-title">镗钯租户资产</div>
+      <div class="nav-group-title">镋钯租户资产</div>
       <div class="nav-item" onclick="navigateTo('page-task')">
         <span class="nav-icon">🎮</span> 运行任务
       </div>
       <div class="nav-item" onclick="navigateTo('page-agent')">
         <span class="nav-icon">🧠</span> 智能体
       </div>
-      <div class="nav-group-title">镗钯平台资源</div>
+      <div class="nav-group-title">镋钯平台资源</div>
       <div class="nav-item" onclick="navigateTo('page-material')">
         <span class="nav-icon">🎨</span> 素材库
       </div>
@@ -148,13 +148,13 @@
 </div>
 
 <!-- ============================================================ -->
-<!-- 页面1: 镗钯机器人 / 设备列表 -->
+<!-- 页面1: 镋钯机器人 / 设备列表 -->
 <!-- ============================================================ -->
 <div id="page-device" class="page">
   <div class="page-header">
     <div>
       <div class="page-title">设备列表</div>
-      <div class="page-subtitle">跨所有租户统一掌握设备运行状态（只读视角）</div>
+      <div class="page-subtitle">跨所有租户统一掌握设备运行状态，支持设备与租户的绑定 / 解绑</div>
     </div>
     <div class="flex gap-2">
       <button class="btn btn-outline btn-sm">导出清单</button>
@@ -187,18 +187,25 @@
       <div class="stat-value">175</div>
       <div class="stat-change down">↓ 13.6%</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#fff7ed;color:#f59e0b;">📦</div>
+      <div class="stat-label">未绑定租户</div>
+      <div class="stat-value" id="stat-unbound">0</div>
+      <div class="stat-change" style="color:var(--text-tertiary);">已生产未出售</div>
+    </div>
   </div>
 
   <div class="card">
-    <div class="card-header">
-      <div class="card-title">设备列表（全部租户）</div>
+      <div class="card-header">
+      <div class="card-title">设备列表（全部租户 · 含未绑定）</div>
       <div class="flex gap-2">
-        <input class="filter-input" placeholder="搜索设备ID">
-        <select class="filter-select">
-          <option>全部状态</option>
-          <option>在线</option>
-          <option>离线</option>
-          <option>故障</option>
+        <input class="filter-input" id="dev-search" placeholder="搜索设备ID / 名称" oninput="renderInternalDeviceList()">
+        <select class="filter-select" id="dev-status-filter" onchange="renderInternalDeviceList()">
+          <option value="">全部状态</option>
+          <option value="online">在线</option>
+          <option value="offline">离线</option>
+          <option value="fault">故障</option>
+          <option value="unbound">未绑定租户</option>
         </select>
       </div>
     </div>
@@ -216,44 +223,7 @@
               <th>操作</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>RB-2024-0001</td>
-              <td>小镋-01</td>
-              <td>TBot-X1 导览型</td>
-              <td>杭州文旅集团</td>
-              <td><span class="tag tag-success">在线</span></td>
-              <td>2026-08-10 09:42</td>
-              <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-device')">查看</button></td>
-            </tr>
-            <tr>
-              <td>RB-2024-0188</td>
-              <td>小镋-05</td>
-              <td>TBot-S2 表演型</td>
-              <td>西安大唐不夜城</td>
-              <td><span class="tag tag-danger">故障</span></td>
-              <td>2026-08-09 22:15</td>
-              <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-device')">查看</button></td>
-            </tr>
-            <tr>
-              <td>RB-2023-0742</td>
-              <td>小镋-12</td>
-              <td>TBot-X1 导览型</td>
-              <td>成都宽窄巷子</td>
-              <td><span class="tag tag-default">离线</span></td>
-              <td>2026-08-07 18:30</td>
-              <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-device')">查看</button></td>
-            </tr>
-            <tr>
-              <td>RB-2024-0225</td>
-              <td>小镋-18</td>
-              <td>TBot-P3 配送型</td>
-              <td>苏州园林景区</td>
-              <td><span class="tag tag-success">在线</span></td>
-              <td>2026-08-10 09:55</td>
-              <td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-device')">查看</button></td>
-            </tr>
-          </tbody>
+          <tbody id="internal-device-tbody"></tbody>
         </table>
       </div>
       <div class="pagination">
@@ -580,7 +550,7 @@
 
 
 <!-- ============================================================ -->
-<!-- 页面: 镗钯平台资源 / 动作库 -->
+<!-- 页面: 镋钯平台资源 / 动作库 -->
 <!-- ============================================================ -->
 <div id="page-action-library" class="page">
   <div class="page-header">
@@ -1615,7 +1585,7 @@
             <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">设备管理</div>
             <div style="display:flex;flex-direction:column;gap:8px;">
               <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 设备总览查看</label>
-              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 镗钯机器人管理</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 镋钯机器人管理</label>
               <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 运行任务查看</label>
             </div>
           </div>
@@ -2103,7 +2073,7 @@
 <div class="modal-overlay" id="modal-device">
   <div class="modal-box">
     <div class="modal-header">
-      <div class="modal-title">设备详情 · RB-2024-0188</div>
+      <div class="modal-title" id="modal-device-title">设备详情</div>
       <button class="modal-close" onclick="closeModal('modal-device')">×</button>
     </div>
     <div class="modal-body">
@@ -2115,10 +2085,10 @@
       </div>
       <div id="d-prop" class="tab-pane">
         <div class="grid-2">
-          <div class="form-group"><label class="form-label">型号</label><div class="text-secondary">TBot-S2 表演型</div></div>
-          <div class="form-group"><label class="form-label">所属租户</label><div class="text-secondary">西安大唐不夜城</div></div>
-          <div class="form-group"><label class="form-label">固件版本</label><div class="text-secondary">v2.3.1</div></div>
-          <div class="form-group"><label class="form-label">在线状态</label><span class="tag tag-danger">故障</span></div>
+          <div class="form-group"><label class="form-label">型号</label><div class="text-secondary" id="d-prop-model">-</div></div>
+          <div class="form-group"><label class="form-label">所属租户</label><div class="text-secondary" id="d-prop-tenant">-</div></div>
+          <div class="form-group"><label class="form-label">固件版本</label><div class="text-secondary" id="d-prop-fw">v2.3.1</div></div>
+          <div class="form-group"><label class="form-label">在线状态</label><span id="d-prop-status"></span></div>
         </div>
       </div>
       <div id="d-fault" class="tab-pane" style="display:none;">
@@ -2133,6 +2103,35 @@
       </div>
     </div>
     <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-device')">关闭</button></div>
+  </div>
+</div>
+
+<!-- ===== 弹窗: 绑定设备到租户 ===== -->
+<div class="modal-overlay" id="modal-bind-device">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">绑定设备到租户</div>
+      <button class="modal-close" onclick="closeModal('modal-bind-device')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">目标设备</label>
+        <div class="text-secondary" id="bind-device-name" style="font-weight:600;">-</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">所属租户 <span class="required">*</span></label>
+        <select class="form-select" id="bind-tenant-select">
+          <option value="">请选择租户</option>
+        </select>
+      </div>
+      <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--info);">
+        ℹ 绑定后，该设备将归属所选租户，租户可在自有平台查看并运营该设备。已生产未出售的设备需绑定租户后方可投入使用。
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-bind-device')">取消</button>
+      <button class="btn btn-primary" onclick="confirmBindDevice()">确认绑定</button>
+    </div>
   </div>
 </div>
 
@@ -2316,7 +2315,7 @@
       <div class="grid-2">
         <div style="display:flex;flex-direction:column;gap:6px;">
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 设备总览</label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 镗钯机器人</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 镋钯机器人</label>
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 运行任务</label>
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 素材库</label>
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);"><input type="checkbox" checked> 内容审核</label>
@@ -3154,6 +3153,31 @@ function plaCalcDuration(amp, spd) {
   return Math.round((0.5 + (amp / 100) * 2.5 + ((100 - spd) / 100) * 2.0) * 10) / 10;
 }
 
+// 反算速度：给定幅度与期望时长，输出速度（速度与时间互为变量）
+function plaCalcSpeed(amp, dur) {
+  // dur = 0.5 + (amp/100)*2.5 + ((100-spd)/100)*2.0  =>  反解 spd
+  var spd = 100 - 100 * (dur - 0.5 - (amp / 100) * 2.5) / 2.0;
+  if (spd < 0) spd = 0;
+  if (spd > 100) spd = 100;
+  spd = Math.round(spd);
+  return { speed: spd, duration: plaCalcDuration(amp, spd) };
+}
+
+// 获取当前位置下的全部原子动作（每条轨道对应一个原子动作）
+function plaGetPositionAtomicActions(pos) {
+  var groups = [];
+  if (pos === 'head' || pos === 'full') groups.push('head');
+  if (pos === 'torso' || pos === 'full') groups.push('torso');
+  if (pos === 'ear' || pos === 'full') { groups.push('ear-left'); groups.push('ear-right'); }
+  var list = [];
+  groups.forEach(function(g){
+    (PLA_ATOMIC_ACTIONS[g] || []).forEach(function(a){
+      list.push({ id: a.id, name: a.name, icon: a.icon, group: g });
+    });
+  });
+  return list;
+}
+
 function plaGetTotalTime() {
   var maxEnd = 0;
   Object.keys(plaCombinerData).forEach(function(k){
@@ -3239,7 +3263,8 @@ function renderPlaTimeline() {
   var body = document.getElementById('pla-tl-body');
   if (!body) return;
   var pos = document.getElementById('pla-position').value;
-  var lanes = plaGetCurrentLanes(pos);
+  // 右侧轨道：左侧每个原子动作对应一条以原子动作命名的轨道
+  var actions = plaGetPositionAtomicActions(pos);
   var totalTime = plaGetTotalTime();
   var html = '';
 
@@ -3250,35 +3275,77 @@ function renderPlaTimeline() {
   }
   html += '</div>';
 
-  lanes.forEach(function(lane, i){
-    if (i > 0) html += '<div class="ca-tl-parallel-hint">🔗 可并线（不互斥）</div>';
-    var blocks = plaCombinerData[lane.key] || [];
-    var barCls = plaGetBarCls(lane.key);
-    var laneLabel = lane.label.replace(/[^\u4e00-\u9fa5a-zA-Z\d\s]/g,'');
-    var isExtra = false;
-    if (plaExtraLanes[pos]) {
-      for (var e = 0; e < plaExtraLanes[pos].length; e++) {
-        if (plaExtraLanes[pos][e].key === lane.key) { isExtra = true; break; }
-      }
-    }
+  actions.forEach(function(a, i){
+    if (i > 0) html += '<div class="ca-tl-parallel-hint">🔗 可并线（不同原子动作轨道同时执行）</div>';
+    var blocks = plaCombinerData[a.id] || [];
+    var barCls = 'bar-head';
+    if (a.group === 'torso') barCls = 'bar-torso';
+    else if (a.group === 'ear-left') barCls = 'bar-ear-l';
+    else if (a.group === 'ear-right') barCls = 'bar-ear-r';
     html += '<div class="ca-tl-lane-row">';
-    html += '<div class="ca-tl-lane-label">' + laneLabel + (isExtra ? '<span class="ca-tl-lane-del" onclick="plaRemoveLane(\'' + pos + '\',\'' + lane.key + '\')" title="删除轨道">×</span>' : '') + '</div>';
-    html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '" data-lane="' + lane.key + '" data-total="' + totalTime + '" ondragover="onDragOverPlaTl(event)" ondragleave="onDragLeavePlaTl(event)" ondrop="onDropToPlaTl(event,\'' + lane.key + '\')">';
+    html += '<div class="ca-tl-lane-label">' + a.icon + ' ' + a.name + '</div>';
+    html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '" data-lane="' + a.id + '" data-total="' + totalTime + '" ondragover="onDragOverPlaTl(event)" ondragleave="onDragLeavePlaTl(event)" ondrop="onDropToPlaTl(event,\'' + a.id + '\')">';
     if (blocks.length === 0) {
-      html += '<div class="ca-tl-lane-hint">拖拽原子动作到此</div>';
+      html += '<div class="ca-tl-lane-hint">拖拽「' + a.name + '」到此轨道</div>';
     } else {
       blocks.forEach(function(b, idx){
         var left = Math.max(0, Math.min(95, (b.startTime / totalTime) * 100));
         var width = Math.max(3, Math.min(100 - left, (b.duration / totalTime) * 100));
-        var selCls = (plaSelectedBlock && plaSelectedBlock.lane === lane.key && plaSelectedBlock.idx === idx) ? ' selected' : '';
-        var delHtml = '<span class="bar-del" onclick="event.stopPropagation();plaRemoveBlock(\'' + lane.key + '\',' + idx + ')">×</span>';
-        html += '<div class="pla-tl-bar ' + barCls + selCls + '" style="left:' + left + '%;width:' + width + '%;" onclick="selectPlaBlock(\'' + lane.key + '\',' + idx + ')" title="' + b.name + ' (' + plaFmtTime(b.startTime) + '→' + plaFmtTime(b.startTime + b.duration) + ')">' + b.icon + ' ' + b.name.substring(0,4) + delHtml + '</div>';
+        var selCls = (plaSelectedBlock && plaSelectedBlock.lane === a.id && plaSelectedBlock.idx === idx) ? ' selected' : '';
+        var delHtml = '<span class="bar-del" onclick="event.stopPropagation();plaRemoveBlock(\'' + a.id + '\',' + idx + ')">×</span>';
+        html += '<div class="pla-tl-bar ' + barCls + selCls + '" style="left:' + left + '%;width:' + width + '%;" onclick="selectPlaBlock(\'' + a.id + '\',' + idx + ')" title="' + b.name + ' (' + plaFmtTime(b.startTime) + '→' + plaFmtTime(b.startTime + b.duration) + ')">' + b.icon + ' ' + b.name.substring(0,4) + delHtml + '</div>';
       });
     }
     html += '</div></div>';
   });
 
-  html += '<div class="ca-tl-add-lane" onclick="plaAddLane(\'' + pos + '\')"><span>+</span> 添加新轨道（可并线）</div>';
+  body.innerHTML = html;
+  renderPlaLivePreview();
+}
+
+// 编辑中实时预览（内联显示区，随编排自动刷新）
+function renderPlaLivePreview() {
+  var meta = document.getElementById('pla-live-preview-meta');
+  var body = document.getElementById('pla-live-preview-tl-body');
+  if (!body) return;
+  var nameEl = document.getElementById('pla-name');
+  var name = nameEl ? (nameEl.value || '').trim() : '';
+  var position = (document.getElementById('pla-position') || {}).value || 'head';
+  var totalBlocks = 0;
+  Object.keys(plaCombinerData).forEach(function(k){ totalBlocks += (plaCombinerData[k] || []).length; });
+  if (totalBlocks === 0) {
+    if (meta) meta.textContent = '未添加原子动作';
+    body.innerHTML = '<div class="ca-tl-lane-hint" style="padding:18px;text-align:center;">🪄 从左侧拖拽原子动作到轨道后，此处实时显示预览</div>';
+    return;
+  }
+  var posText = position === 'head' ? '头部' : position === 'torso' ? '躯体' : position === 'ear' ? '耳朵' : '全身';
+  if (meta) meta.textContent = (name || '未命名动作') + ' · ' + posText + ' · ' + totalBlocks + '个原子 · 总时长 ' + plaFmtTime(plaGetTotalTime());
+  var actions = plaGetPositionAtomicActions(position);
+  var totalTime = plaGetTotalTime();
+  var html = '<div class="ca-tl-ruler">';
+  for (var i = 0; i <= 5; i++) {
+    var t = (totalTime / 5) * i;
+    html += '<div class="ca-tl-ruler-tick">' + plaFmtTime(t) + '</div>';
+  }
+  html += '</div>';
+  actions.forEach(function(act, i){
+    if (i > 0) html += '<div class="ca-tl-parallel-hint">🔗 可并线（不互斥）</div>';
+    var blocks = plaCombinerData[act.id] || [];
+    var barCls = 'bar-head';
+    if (act.group === 'torso') barCls = 'bar-torso';
+    else if (act.group === 'ear-left') barCls = 'bar-ear-l';
+    else if (act.group === 'ear-right') barCls = 'bar-ear-r';
+    html += '<div class="ca-tl-lane-row">';
+    html += '<div class="ca-tl-lane-label">' + act.icon + ' ' + act.name + '</div>';
+    html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '">';
+    blocks.forEach(function(b){
+      var left = Math.max(0, Math.min(95, (b.startTime / totalTime) * 100));
+      var width = Math.max(3, Math.min(100 - left, (b.duration / totalTime) * 100));
+      html += '<div class="pla-tl-bar ' + barCls + '" style="left:' + left + '%;width:' + width + '%;cursor:default;" title="' + b.name + ' (' + plaFmtTime(b.startTime) + '→' + plaFmtTime(b.startTime + b.duration) + ')">' + b.icon + ' ' + b.name.substring(0,4) + '</div>';
+    });
+    if (blocks.length === 0) html += '<div class="ca-tl-lane-hint">无原子动作</div>';
+    html += '</div></div>';
+  });
   body.innerHTML = html;
 }
 
@@ -3294,22 +3361,24 @@ function onDragOverPlaTl(e) {
 function onDragLeavePlaTl(e) {
   e.currentTarget.classList.remove('drop-active');
 }
-function onDropToPlaTl(e, laneKey) {
+function onDropToPlaTl(e, actionId) {
   e.preventDefault();
   e.currentTarget.classList.remove('drop-active');
   document.querySelectorAll('.pla-palette-item.dragging').forEach(function(el){ el.classList.remove('dragging'); });
-  try { var data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch(err) { return; }
+  var data;
+  try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch(err) { return; }
+  // 拖入的原子动作自动落入其对应的同名轨道
   var rect = e.currentTarget.getBoundingClientRect();
   var x = e.clientX - rect.left;
   var totalTime = plaGetTotalTime();
   var startSec = Math.round((x / rect.width) * totalTime * 10) / 10;
   startSec = Math.max(0, Math.min(totalTime - 0.5, startSec));
-  plaAddBlock(laneKey, data.actionId, data.actionName, data.icon, startSec);
+  plaAddBlock(actionId, data.actionName, data.icon, startSec);
 }
 
-function plaAddBlock(laneKey, actionId, actionName, icon, startSec) {
-  if (!plaCombinerData[laneKey]) plaCombinerData[laneKey] = [];
-  var blocks = plaCombinerData[laneKey];
+function plaAddBlock(actionId, actionName, icon, startSec) {
+  if (!plaCombinerData[actionId]) plaCombinerData[actionId] = [];
+  var blocks = plaCombinerData[actionId];
   var amplitude = 80;
   var speed = 60;
   var duration = plaCalcDuration(amplitude, speed);
@@ -3378,11 +3447,12 @@ function showPlaBlockEditor() {
     + '<div class="ca-editor-props">'
     +   '<div class="ca-editor-prop"><label>幅度</label><input type="range" min="0" max="100" value="' + b.amplitude + '" oninput="updatePlaBlockProp(\'' + plaSelectedBlock.lane + '\',' + plaSelectedBlock.idx + ',\'amplitude\',this.value)"><span class="ep-val">' + b.amplitude + '</span></div>'
     +   '<div class="ca-editor-prop"><label>速度</label><input type="range" min="0" max="100" value="' + b.speed + '" oninput="updatePlaBlockProp(\'' + plaSelectedBlock.lane + '\',' + plaSelectedBlock.idx + ',\'speed\',this.value)"><span class="ep-val">' + b.speed + '</span></div>'
+    +   '<div class="ca-editor-prop"><label>时间(秒)</label><input type="number" min="0.5" max="20" step="0.1" value="' + b.duration + '" oninput="updatePlaBlockProp(\'' + plaSelectedBlock.lane + '\',' + plaSelectedBlock.idx + ',\'duration\',this.value)"><span class="ep-val">' + b.duration + 's</span></div>'
     + '</div>'
     + '<div class="ca-editor-info">'
-    +   '<span>⏱ 时长: ' + plaFmtTime(b.duration) + '（自动计算）</span>'
     +   '<span>🕐 起始: ' + plaFmtTime(b.startTime) + '</span>'
     +   '<span>✅ 结束: ' + plaFmtTime(endSec) + '</span>'
+    +   '<span style="color:#8b5cf6;">🔁 速度↔时间 互为变量，改其一自动计算另一个</span>'
     +   '<span style="color:#ef4444;cursor:pointer;" onclick="plaRemoveBlock(\'' + plaSelectedBlock.lane + '\',' + plaSelectedBlock.idx + ')">🗑 删除</span>'
     + '</div>';
 }
@@ -3394,9 +3464,21 @@ function hidePlaBlockEditor() {
 
 function updatePlaBlockProp(laneKey, idx, prop, val) {
   if (!plaCombinerData[laneKey] || !plaCombinerData[laneKey][idx]) return;
-  plaCombinerData[laneKey][idx][prop] = parseInt(val);
   var b = plaCombinerData[laneKey][idx];
-  b.duration = plaCalcDuration(b.amplitude, b.speed);
+  if (prop === 'amplitude') {
+    b.amplitude = parseInt(val);
+    b.duration = plaCalcDuration(b.amplitude, b.speed);
+  } else if (prop === 'speed') {
+    b.speed = parseInt(val);
+    b.duration = plaCalcDuration(b.amplitude, b.speed);
+  } else if (prop === 'duration') {
+    var dur = parseFloat(val);
+    if (isNaN(dur)) dur = 0.5;
+    dur = Math.max(0.5, Math.min(20, dur));
+    var calc = plaCalcSpeed(b.amplitude, dur);
+    b.speed = calc.speed;
+    b.duration = calc.duration;
+  }
   plaRecalcTimings(laneKey);
   renderPlaTimeline();
   showPlaBlockEditor();
@@ -3545,9 +3627,9 @@ function previewPlatformAction(id) {
   document.getElementById('pla-preview-meta').textContent = posText + ' · ' + a.atomicCount + '个原子动作 · 总时长 ' + plaFmtTime(a.totalDuration);
   document.getElementById('pla-preview-desc').textContent = a.desc || '（无描述）';
 
-  // 渲染只读时序图
+  // 渲染只读时序图（按原子动作同名轨道）
   var pos = a.position;
-  var lanes = plaGetCurrentLanes.call(null, pos) || PLA_POSITION_LANES[pos] || [];
+  var actions = plaGetPositionAtomicActions(pos);
   var totalTime = plaGetTotalTimeForBlocks(a.blocks || {});
   var html = '<div class="ca-tl-ruler">';
   for (var i = 0; i <= 5; i++) {
@@ -3555,13 +3637,59 @@ function previewPlatformAction(id) {
     html += '<div class="ca-tl-ruler-tick">' + plaFmtTime(t) + '</div>';
   }
   html += '</div>';
-  lanes.forEach(function(lane, i){
+  actions.forEach(function(act, i){
     if (i > 0) html += '<div class="ca-tl-parallel-hint">🔗 可并线（不互斥）</div>';
-    var blocks = (a.blocks && a.blocks[lane.key]) || [];
-    var barCls = plaGetBarCls(lane.key);
-    var laneLabel = lane.label.replace(/[^\u4e00-\u9fa5a-zA-Z\d\s]/g,'');
+    var blocks = (a.blocks && a.blocks[act.id]) || [];
+    var barCls = 'bar-head';
+    if (act.group === 'torso') barCls = 'bar-torso';
+    else if (act.group === 'ear-left') barCls = 'bar-ear-l';
+    else if (act.group === 'ear-right') barCls = 'bar-ear-r';
     html += '<div class="ca-tl-lane-row">';
-    html += '<div class="ca-tl-lane-label">' + laneLabel + '</div>';
+    html += '<div class="ca-tl-lane-label">' + act.icon + ' ' + act.name + '</div>';
+    html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '">';
+    blocks.forEach(function(b){
+      var left = Math.max(0, Math.min(95, (b.startTime / totalTime) * 100));
+      var width = Math.max(3, Math.min(100 - left, (b.duration / totalTime) * 100));
+      html += '<div class="pla-tl-bar ' + barCls + '" style="left:' + left + '%;width:' + width + '%;cursor:default;" title="' + b.name + ' (' + plaFmtTime(b.startTime) + '→' + plaFmtTime(b.startTime + b.duration) + ')">' + b.icon + ' ' + b.name.substring(0,4) + '</div>';
+    });
+    if (blocks.length === 0) html += '<div class="ca-tl-lane-hint">无原子动作</div>';
+    html += '</div></div>';
+  });
+  document.getElementById('pla-preview-tl-body').innerHTML = html;
+  openModal('modal-platform-action-preview');
+}
+
+// 编辑中实时预览（读取当前组合数据）
+function previewCurrentPlatformAction() {
+  var name = (document.getElementById('pla-name').value || '').trim() || '未命名动作';
+  var position = document.getElementById('pla-position').value;
+  var posText = position === 'head' ? '头部' : position === 'torso' ? '躯体' : position === 'ear' ? '耳朵' : '全身';
+  var totalBlocks = 0;
+  Object.keys(plaCombinerData).forEach(function(k){ totalBlocks += (plaCombinerData[k] || []).length; });
+  if (totalBlocks === 0) { alert('请先添加至少一个原子动作再预览'); return; }
+  document.getElementById('pla-preview-title').textContent = '👁 动作预览 · ' + name;
+  document.getElementById('pla-preview-icon').textContent = plaSelectedIcon;
+  document.getElementById('pla-preview-name').textContent = name;
+  document.getElementById('pla-preview-meta').textContent = posText + ' · ' + totalBlocks + '个原子动作 · 总时长 ' + plaFmtTime(plaGetTotalTime());
+  document.getElementById('pla-preview-desc').textContent = (document.getElementById('pla-desc').value || '').trim() || '（无描述）';
+
+  var actions = plaGetPositionAtomicActions(position);
+  var totalTime = plaGetTotalTime();
+  var html = '<div class="ca-tl-ruler">';
+  for (var i = 0; i <= 5; i++) {
+    var t = (totalTime / 5) * i;
+    html += '<div class="ca-tl-ruler-tick">' + plaFmtTime(t) + '</div>';
+  }
+  html += '</div>';
+  actions.forEach(function(act, i){
+    if (i > 0) html += '<div class="ca-tl-parallel-hint">🔗 可并线（不互斥）</div>';
+    var blocks = plaCombinerData[act.id] || [];
+    var barCls = 'bar-head';
+    if (act.group === 'torso') barCls = 'bar-torso';
+    else if (act.group === 'ear-left') barCls = 'bar-ear-l';
+    else if (act.group === 'ear-right') barCls = 'bar-ear-r';
+    html += '<div class="ca-tl-lane-row">';
+    html += '<div class="ca-tl-lane-label">' + act.icon + ' ' + act.name + '</div>';
     html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '">';
     blocks.forEach(function(b){
       var left = Math.max(0, Math.min(95, (b.startTime / totalTime) * 100));
@@ -3654,11 +3782,129 @@ function formatNow() {
   return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
 }
 
+// ===== 设备列表：显示全部设备（含未绑定租户）/ 绑定解绑 =====
+var INTERNAL_DEVICE_DATA = [
+  { id:'RB-2024-0001', name:'小镋-01', model:'TBot-X1 导览型', tenant:'杭州文旅集团', status:'online', lastOnline:'2026-08-10 09:42' },
+  { id:'RB-2024-0188', name:'小镋-05', model:'TBot-S2 表演型', tenant:'西安大唐不夜城', status:'fault', lastOnline:'2026-08-09 22:15' },
+  { id:'RB-2023-0742', name:'小镋-12', model:'TBot-X1 导览型', tenant:'成都宽窄巷子', status:'offline', lastOnline:'2026-08-07 18:30' },
+  { id:'RB-2024-0225', name:'小镋-18', model:'TBot-P3 配送型', tenant:'苏州园林景区', status:'online', lastOnline:'2026-08-10 09:55' },
+  { id:'RB-2025-0512', name:'小镋-09', model:'TBot-X1 导览型', tenant:null, status:'offline', lastOnline:'2026-08-06 14:20' },
+  { id:'RB-2025-0601', name:'小镋-21', model:'TBot-S2 表演型', tenant:null, status:'offline', lastOnline:'2026-08-05 11:08' },
+  { id:'RB-2025-0633', name:'小镋-25', model:'TBot-P3 配送型', tenant:null, status:'offline', lastOnline:'2026-08-04 20:45' }
+];
+
+var INTERNAL_DEVICE_STATUS = {
+  online:  { tag:'在线', cls:'tag-success' },
+  offline: { tag:'离线', cls:'tag-default' },
+  fault:   { tag:'故障', cls:'tag-danger' }
+};
+
+var plaBindTargetId = null;
+
+function getDeviceById(id){ return INTERNAL_DEVICE_DATA.find(function(d){ return d.id === id; }); }
+
+function renderInternalDeviceList() {
+  var tbody = document.getElementById('internal-device-tbody');
+  if (!tbody) return;
+  var q = ((document.getElementById('dev-search') || {}).value || '').trim().toLowerCase();
+  var statusFilter = (document.getElementById('dev-status-filter') || {}).value || '';
+  var rows = INTERNAL_DEVICE_DATA.filter(function(d){
+    if (q && d.id.toLowerCase().indexOf(q) === -1 && d.name.toLowerCase().indexOf(q) === -1) return false;
+    if (statusFilter === 'unbound') { if (d.tenant) return false; }
+    else if (statusFilter && d.status !== statusFilter) return false;
+    return true;
+  });
+  var unboundCount = INTERNAL_DEVICE_DATA.filter(function(d){ return !d.tenant; }).length;
+  var ub = document.getElementById('stat-unbound');
+  if (ub) ub.textContent = unboundCount;
+
+  if (rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-tertiary);">无匹配设备</td></tr>';
+    return;
+  }
+  var html = '';
+  rows.forEach(function(d){
+    var st = INTERNAL_DEVICE_STATUS[d.status] || {tag:d.status, cls:'tag-default'};
+    var tenantCell = d.tenant ? d.tenant : '<span style="color:var(--text-tertiary);">-</span>';
+    var opHtml = '<button class="btn btn-ghost btn-sm" onclick="openDeviceDetail(\'' + d.id + '\')">查看</button>';
+    if (d.tenant) {
+      opHtml += '<button class="btn btn-ghost btn-sm" style="color:#f59e0b;" onclick="unbindDeviceFromTenant(\'' + d.id + '\')">解绑</button>';
+    } else {
+      opHtml += '<button class="btn btn-ghost btn-sm" style="color:var(--accent);" onclick="openBindDevice(\'' + d.id + '\')">绑定</button>';
+    }
+    html += '<tr>'
+      + '<td>' + d.id + '</td>'
+      + '<td>' + d.name + '</td>'
+      + '<td>' + d.model + '</td>'
+      + '<td>' + tenantCell + '</td>'
+      + '<td><span class="tag ' + st.cls + '">' + st.tag + '</span></td>'
+      + '<td>' + d.lastOnline + '</td>'
+      + '<td><div style="display:flex;flex-wrap:wrap;gap:4px;">' + opHtml + '</div></td>'
+      + '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function populateBindTenantOptions() {
+  var sel = document.getElementById('bind-tenant-select');
+  if (!sel) return;
+  var html = '<option value="">请选择租户</option>';
+  (typeof PLATFORM_TENANTS !== 'undefined' ? PLATFORM_TENANTS : []).forEach(function(t){
+    html += '<option value="' + t.id + '">' + t.name + '</option>';
+  });
+  sel.innerHTML = html;
+}
+
+function openBindDevice(id) {
+  var d = getDeviceById(id);
+  if (!d) return;
+  plaBindTargetId = id;
+  document.getElementById('bind-device-name').textContent = d.id + ' · ' + d.name;
+  populateBindTenantOptions();
+  document.getElementById('bind-tenant-select').value = '';
+  openModal('modal-bind-device');
+}
+
+function confirmBindDevice() {
+  var d = getDeviceById(plaBindTargetId);
+  if (!d) return;
+  var sel = document.getElementById('bind-tenant-select');
+  var tid = sel.value;
+  if (!tid) { alert('请选择要绑定的租户'); return; }
+  var t = (typeof PLATFORM_TENANTS !== 'undefined' ? PLATFORM_TENANTS : []).find(function(x){ return x.id === tid; });
+  d.tenant = t ? t.name : tid;
+  closeModal('modal-bind-device');
+  renderInternalDeviceList();
+  showToast('已绑定：' + d.id + ' → ' + d.tenant);
+}
+
+function unbindDeviceFromTenant(id) {
+  var d = getDeviceById(id);
+  if (!d) return;
+  if (!confirm('确定将设备「' + d.id + '」从租户「' + d.tenant + '」解绑吗？解绑后设备变为未绑定状态。')) return;
+  d.tenant = null;
+  closeModal('modal-device');
+  renderInternalDeviceList();
+  showToast('已解绑：' + d.id + ' 当前未绑定租户');
+}
+
+function openDeviceDetail(id) {
+  var d = getDeviceById(id);
+  if (!d) return;
+  document.getElementById('modal-device-title').textContent = '设备详情 · ' + d.id;
+  document.getElementById('d-prop-model').textContent = d.model;
+  document.getElementById('d-prop-tenant').textContent = d.tenant || '-';
+  document.getElementById('d-prop-fw').textContent = 'v2.3.1';
+  var st = INTERNAL_DEVICE_STATUS[d.status] || {tag:d.status, cls:'tag-default'};
+  document.getElementById('d-prop-status').innerHTML = '<span class="tag ' + st.cls + '">' + st.tag + '</span>';
+  openModal('modal-device');
+}
+
 // 页面进入时初始化
-document.addEventListener('DOMContentLoaded', function(){ renderPlatformActionList(); });
+document.addEventListener('DOMContentLoaded', function(){ renderPlatformActionList(); renderInternalDeviceList(); });
 // 若DOMContentLoaded已触发
 if (document.readyState === 'interactive' || document.readyState === 'complete') {
-  setTimeout(function(){ renderPlatformActionList(); }, 0);
+  setTimeout(function(){ renderPlatformActionList(); renderInternalDeviceList(); }, 0);
 }
 
 </script>
@@ -3779,12 +4025,12 @@ if (document.readyState === 'interactive' || document.readyState === 'complete')
 
       <!-- 原子动作组合区 -->
       <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">原子动作组合 <span style="font-size:11px;color:var(--text-tertiary);font-weight:400;">（从左侧拖拽原子动作到时序图的不同轨道，每个位置默认多条轨道，不互斥的动作可同时执行；点击块可调整幅度和速度，时长由幅度和速度自动计算）</span></label>
+        <label class="form-label">原子动作组合 <span style="font-size:11px;color:var(--text-tertiary);font-weight:400;">（右侧为左侧每个原子动作对应的同名轨道；从左侧拖拽原子动作到其同名轨道，不同原子动作轨道可同时执行；点击块可设置幅度、速度、时间，速度与时间互为变量：调速度自动输出时间，调时间自动反算速度）</span></label>
         <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;flex-wrap:wrap;">
-          <span style="color:#3b82f6;">🔗 并线：不同轨道上的原子动作可同时执行</span>
-          <span style="color:#ef4444;">🚫 互斥：同一轨道内的原子动作按顺序执行</span>
-          <span style="color:var(--text-tertiary);">📊 点击时序块可调整幅度和速度</span>
-          <span style="color:#8b5cf6;">⏱ 时长 = f(幅度, 速度)，自动计算（单位：秒）</span>
+          <span style="color:#3b82f6;">🔗 并线：不同原子动作轨道同时执行</span>
+          <span style="color:#ef4444;">🚫 互斥：同一原子动作轨道内按顺序执行</span>
+          <span style="color:var(--text-tertiary);">📊 点击时序块可设置幅度/速度/时间</span>
+          <span style="color:#8b5cf6;">🔁 速度↔时间 互为变量（单位：秒）</span>
         </div>
 
         <div style="display:flex;gap:0;border:1px solid var(--border-light);border-radius:var(--radius-md);overflow:hidden;">
@@ -3805,10 +4051,23 @@ if (document.readyState === 'interactive' || document.readyState === 'complete')
           </div>
         </div>
       </div>
+
+      <!-- 创建中实时预览区域 -->
+      <div class="form-group">
+        <label class="form-label">效果预览 <span style="font-size:11px;color:var(--text-tertiary);font-weight:400;">（创建动作过程中实时显示，随原子动作编排、幅度 / 速度 / 时间自动更新）</span></label>
+        <div class="ca-tl-main" id="pla-live-preview">
+          <div class="ca-tl-preview-header">
+            <span>👁 效果预览（实时）</span>
+            <span style="font-weight:400;color:var(--text-tertiary);font-size:10px;" id="pla-live-preview-meta">未添加原子动作</span>
+          </div>
+          <div class="ca-tl-body" id="pla-live-preview-tl-body" style="min-height:60px;"></div>
+        </div>
+      </div>
     </div>
 
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closePlatformActionEditor()">取消</button>
+      <button class="btn btn-outline" onclick="previewCurrentPlatformAction()">👁 预览</button>
       <button class="btn btn-outline" onclick="saveAsPlatformDraft()">保存草稿</button>
       <button class="btn btn-primary" onclick="saveAndPublishPlatformAction()">保存并发布</button>
     </div>
@@ -3915,9 +4174,9 @@ if (document.readyState === 'interactive' || document.readyState === 'complete')
 
       <h4 style="margin:0 0 10px;font-size:14px;color:var(--text-primary);">核心流程</h4>
       <ol style="margin:0 0 14px;padding-left:20px;color:var(--text-secondary);">
-        <li><strong>创建</strong>：选择位置（头部/躯体/耳朵/全身），挑选动作图标，从原子动作库拖拽组合</li>
-        <li><strong>编排</strong>：同一轨道内的原子动作按顺序执行（互斥），不同轨道可同时执行（并线）</li>
-        <li><strong>调参</strong>：点击时序块调整幅度和速度，时长自动计算</li>
+        <li><strong>创建</strong>：选择位置（头部/躯体/耳朵/全身），挑选动作图标，右侧自动生成与左侧原子动作一一对应的同名轨道</li>
+        <li><strong>编排</strong>：从左侧原子动作库拖拽动作到其同名轨道；同一轨道内动作按顺序执行（互斥），不同原子动作轨道可同时执行（并线）</li>
+        <li><strong>调参</strong>：点击时序块设置幅度、速度、时间；速度与时间为互变量（改速度自动输出时间，改时间自动反算速度）</li>
         <li><strong>保存</strong>：可保存为草稿（租户不可见）或直接发布</li>
         <li><strong>同步</strong>：已发布的动作可同步给指定租户或全部租户</li>
       </ol>

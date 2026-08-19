@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>镗钯RaaS租户平台</title>
+  <title>镋钯RaaS租户平台</title>
 
   <link rel="stylesheet" href="styles/main.css">
 
@@ -150,7 +150,7 @@
 
     .media-item-meta { font-size:11px; color:var(--text-secondary); margin-top:2px; }
 
-  
+
 
 
 
@@ -221,6 +221,16 @@
     .custom-action-item:active { cursor:grabbing; }
 
     .custom-action-item.dragging { opacity:0.4; }
+
+    .custom-action-item { display:flex; align-items:center; gap:6px; padding:6px 8px; }
+
+    .ca-edit, .ca-delete { margin-left:auto; cursor:pointer; opacity:0.6; font-weight:bold; }
+
+    .ca-edit { color:#3b82f6; margin-left:4px; }
+
+    .ca-delete { color:#ef4444; margin-left:4px; }
+
+    .ca-edit:hover, .ca-delete:hover { opacity:1; }
 
     .timeline-track-area.drag-over { background:rgba(99,102,241,0.06) !important; box-shadow:inset 0 0 0 2px var(--accent); }
 
@@ -332,7 +342,7 @@
 
       <div class="logo-icon">🤖</div>
 
-      <div class="logo-text">镗钯RaaS租户平台<br><span style="font-size:10px;font-weight:400;opacity:0.6;">租户运营端</span></div>
+      <div class="logo-text">镋钯RaaS租户平台<br><span style="font-size:10px;font-weight:400;opacity:0.6;">租户运营端</span></div>
 
     </div>
 
@@ -457,14 +467,6 @@
       <span class="filter-label">设备型号：</span>
 
       <select class="filter-select"><option>全部</option><option>镋钯-T1</option><option>镋钯-T2</option></select>
-
-    </div>
-
-    <div class="filter-group">
-
-      <span class="filter-label">所属租户：</span>
-
-      <select class="filter-select"><option>全部</option><option>文旅景区A</option><option>科技馆展厅</option><option>商业综合体B</option></select>
 
     </div>
 
@@ -672,7 +674,7 @@
 
           <div class="device-meta">所属租户：文旅景区A · 当前模式：<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;background:#dbeafe;color:#2563eb;font-size:11px;font-weight:500;">🎮 遥操模式</span></div>
 
-          <div class="device-meta">关联智能体：🤖 文旅导览智能体、💬 互动问答智能体</div>
+          <div class="device-meta">关联智能体：🤖 文旅导览智能体</div>
 
         </div>
 
@@ -750,7 +752,13 @@
 
       <div class="device-actions">
 
-        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="showToast('已提交维修申请')">报修</button>
+        <button class="btn btn-outline btn-sm" style="border-color:var(--primary);color:var(--primary);font-weight:600;" onclick="openModal('modal-remote-monitor')">📹 远程监控</button>
+
+        <button class="btn btn-ghost btn-sm" onclick="openModal('modal-device-agents')">智能体</button>
+
+        <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="openModal('modal-device-tasks')">运动任务</button>
+
+        <button class="btn btn-ghost btn-sm" onclick="openModal('modal-edit-device')">编辑</button>
 
       </div>
 
@@ -1170,11 +1178,25 @@
 
           </div>
 
+        </div>        <!-- 创建中实时预览区域 -->
+        <div class="form-group" style="margin-top:16px;">
+          <label class="form-label">效果预览 <span style="font-size:11px;color:var(--text-tertiary);font-weight:400;">（创建动作过程中实时显示，随原子动作编排、幅度 / 速度 / 时间自动更新）</span></label>
+          <div class="ca-tl-main" id="ca-live-preview">
+            <div class="ca-tl-preview-header">
+              <span>👁 效果预览（实时）</span>
+              <span style="font-weight:400;color:var(--text-tertiary);font-size:10px;" id="ca-live-preview-meta">未添加原子动作</span>
+            </div>
+            <div class="ca-tl-body" id="ca-live-preview-tl-body" style="min-height:60px;"></div>
+          </div>
         </div>
 
-      </div>
+        <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:var(--info);margin-top:14px;line-height:1.7;">
+          ℹ 用户自定义的动作支持修改；修改动作定义后，<strong>不会影响已编排到脚本中的该动作副本</strong>（脚本在引用时即生成独立快照，数据隔离）。
+        </div>
 
-      <div class="modal-footer">
+
+      </div>
+<div class="modal-footer">
 
         <button class="btn btn-outline" onclick="closeModal('modal-device-interaction')">取消</button>
 
@@ -1206,7 +1228,7 @@
 
         <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--info);margin-bottom:16px;">
 
-          ℹ 修改设备关联的智能体，可选择1个或多个。修改后立即生效。
+          ℹ 修改设备关联的智能体，仅可选择 1 个（单选），不支持多选。修改后立即生效。
 
         </div>
 
@@ -1326,109 +1348,9 @@
 
         </div>
 
-        <div class="form-group">
-
-          <label class="form-label">所属租户 <span class="required">*</span></label>
-
-          <select class="form-select">
-
-            <option value="">请选择租户</option>
-
-            <option selected>文旅景区A</option>
-
-            <option>科技馆展厅</option>
-
-            <option>商业综合体B</option>
-
-            <option>主题乐园C</option>
-
-            <option>博物馆D</option>
-
-            <option>酒店集团E</option>
-
-          </select>
-
-        </div>
-
-        <div class="form-group">
-
-          <label class="form-label">关联智能体 <span style="font-size:12px;color:var(--text-tertiary);font-weight:400;">（非必选，可多选）</span></label>
-
-          <div style="display:flex;flex-direction:column;gap:8px;">
-
-            <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--accent);border-radius:var(--radius-sm);background:var(--accent-bg);cursor:pointer;">
-
-              <input type="checkbox" checked>
-
-              <span style="font-size:24px;">🤖</span>
-
-              <div style="flex:1;">
-
-                <div style="font-size:14px;font-weight:600;">文旅导览智能体</div>
-
-                <div style="font-size:12px;color:var(--text-secondary);">基于GPT-4 · 知识库：景区导览文档</div>
-
-              </div>
-
-              <span class="tag tag-accent">已关联</span>
-
-            </label>
-
-            <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;">
-
-              <input type="checkbox">
-
-              <span style="font-size:24px;">👋</span>
-
-              <div style="flex:1;">
-
-                <div style="font-size:14px;font-weight:600;">迎宾接待智能体</div>
-
-                <div style="font-size:12px;color:var(--text-secondary);">基于通义千问 · 知识库：接待话术</div>
-
-              </div>
-
-            </label>
-
-            <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;">
-
-              <input type="checkbox">
-
-              <span style="font-size:24px;">💬</span>
-
-              <div style="flex:1;">
-
-                <div style="font-size:14px;font-weight:600;">互动问答智能体</div>
-
-                <div style="font-size:12px;color:var(--text-secondary);">基于文心一言 · 知识库：FAQ问答</div>
-
-              </div>
-
-            </label>
-
-            <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;">
-
-              <input type="checkbox">
-
-              <span style="font-size:24px;">🚶</span>
-
-              <div style="flex:1;">
-
-                <div style="font-size:14px;font-weight:600;">巡游领队智能体</div>
-
-                <div style="font-size:12px;color:var(--text-secondary);">基于DeepSeek · 知识库：巡游路线</div>
-
-              </div>
-
-            </label>
-
-          </div>
-
-        </div>
-
         <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--info);">
 
-          ℹ 修改后立即生效。机器人名称和所属租户变更将影响设备归属和权限。
+          ℹ 所属租户由当前登录账号确定，不可修改；智能体关联请在设备卡片点击「智能体」入口调整。本弹窗仅支持修改机器人名称。
 
         </div>
 
@@ -1464,417 +1386,92 @@
 
       <div class="modal-body" style="max-height:560px;overflow-y:auto;padding:0;">
 
-        <div class="tabs" style="padding:0 20px;border-bottom-color:var(--border-light);">
-
-          <div class="tab active" data-tab-group="device-task-tabs" onclick="switchTab('modal-device-tasks','device-task-tabs',0)">已下发任务</div>
-
-          <div class="tab" data-tab-group="device-task-tabs" onclick="switchTab('modal-device-tasks','device-task-tabs',1)">即时任务</div>
-
-        </div>
-
         <div style="padding:16px 20px 20px;">
 
-          <!-- Tab 0: 已下发任务 -->
-
-          <div data-tab-content="device-task-tabs-0">
-
-            <table class="data-table">
-
-              <thead>
-
-                <tr>
-
-                  <th style="width:40px;">#</th>
-
-                  <th>任务名称</th>
-
-                  <th>任务类型</th>
-
-                  <th style="width:120px;">下发时间</th>
-
-                  <th style="width:130px;text-align:center;">操作</th>
-
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                <tr>
-
-                  <td style="text-align:center;">1</td>
-
-                  <td style="font-weight:500;">迎宾舞蹈-单机版 v2.1</td>
-
-                  <td><span class="tag tag-accent">🎬 脚本</span></td>
-
-                  <td style="font-size:12px;color:var(--text-secondary);">08-05 14:20</td>
-
-                  <td style="text-align:center;">
-
-                    <button class="btn btn-ghost btn-sm" style="color:var(--accent);" onclick="showToast('任务已执行：迎宾舞蹈-单机版 v2.1')">执行</button>
-
-                    <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="showToast('已删除任务：迎宾舞蹈-单机版 v2.1')">删除</button>
-
-                  </td>
-
-                </tr>
-
-                <tr>
-
-                  <td style="text-align:center;">2</td>
-
-                  <td style="font-weight:500;">巡游路线A-跟随编队</td>
-
-                  <td><span class="tag" style="background:#ede9fe;color:#7c3aed;">👥 跟随</span></td>
-
-                  <td style="font-size:12px;color:var(--text-secondary);">08-05 15:05</td>
-
-                  <td style="text-align:center;">
-
-                    <button class="btn btn-ghost btn-sm" style="color:var(--accent);" onclick="showToast('任务已执行：巡游路线A-跟随编队')">执行</button>
-
-                    <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="showToast('已删除任务：巡游路线A-跟随编队')">删除</button>
-
-                  </td>
-
-                </tr>
-
-                <tr>
-
-                  <td style="text-align:center;">3</td>
-
-                  <td style="font-weight:500;">群控方阵表演-4机版 v1.3</td>
-
-                  <td><span class="tag tag-accent">🎬 脚本</span></td>
-
-                  <td style="font-size:12px;color:var(--text-secondary);">08-04 10:30</td>
-
-                  <td style="text-align:center;">
-
-                    <button class="btn btn-ghost btn-sm" style="color:var(--accent);" onclick="showToast('任务已执行：群控方阵表演-4机版 v1.3')">执行</button>
-
-                    <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="showToast('已删除任务：群控方阵表演-4机版 v1.3')">删除</button>
-
-                  </td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
+          <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--info);margin-bottom:14px;">
+            ℹ 本机已同步的所有任务（含已下发的脚本任务、跟随任务与即时任务），统一展示，可直接执行或删除。
           </div>
 
-
-
-          <!-- Tab 1: 即时任务 -->
-
-          <div data-tab-content="device-task-tabs-1" style="display:none;">
-
-            <div class="media-tabs">
-
-              <div class="media-tab active" data-tab-group="instant-media" onclick="switchTab('modal-device-tasks','instant-media',0)">🎬 音视频</div>
-
-              <div class="media-tab" data-tab-group="instant-media" onclick="switchTab('modal-device-tasks','instant-media',1)">🖼️ 图片</div>
-
-              <div class="media-tab" data-tab-group="instant-media" onclick="switchTab('modal-device-tasks','instant-media',2)">🙂 表情包</div>
-
-            </div>
-
-
-
-            <!-- 音视频 -->
-
-            <div data-tab-content="instant-media-0">
-
-              <div class="media-search-row">
-
-                <div class="media-search">
-
-                  <span style="font-size:13px;color:var(--text-secondary);">🔍</span>
-
-                  <input placeholder="搜索音视频文件...">
-
-                </div>
-
-              </div>
-
-              <div class="selected-media-title">已选音视频</div>
-
-              <div class="selected-media-list">
-
-                <div class="selected-media-item">
-
-                  <div class="media-icon-box music">🎵</div>
-
-                  <div class="media-info">
-
-                    <div class="media-name">迎宾舞曲.mp3</div>
-
-                    <div class="media-meta">音频 · 3:25 · 4.2MB</div>
-
-                  </div>
-
-                  <span class="media-type-tag">音频</span>
-
-                  <button class="media-remove" onclick="showToast('已移除：迎宾舞曲.mp3')">×</button>
-
-                </div>
-
-                <div class="selected-media-item">
-
-                  <div class="media-icon-box music">🎵</div>
-
-                  <div class="media-info">
-
-                    <div class="media-name">景区背景音乐.mp3</div>
-
-                    <div class="media-meta">音频 · 5:12 · 6.8MB</div>
-
-                  </div>
-
-                  <span class="media-type-tag">音频</span>
-
-                  <button class="media-remove" onclick="showToast('已移除：景区背景音乐.mp3')">×</button>
-
-                </div>
-
-                <div class="selected-media-item">
-
-                  <div class="media-icon-box video">▶️</div>
-
-                  <div class="media-info">
-
-                    <div class="media-name">景区宣传短片.mp4</div>
-
-                    <div class="media-meta">视频 · 0:45 · 18.5MB</div>
-
-                  </div>
-
-                  <span class="media-type-tag">视频</span>
-
-                  <button class="media-remove" onclick="showToast('已移除：景区宣传短片.mp4')">×</button>
-
-                </div>
-
-              </div>
-
-              <div class="media-library-title">素材库</div>
-
-              <div class="media-grid">
-
-                <div class="media-grid-item" onclick="showToast('已添加：欢快节奏.mp3')">
-
-                  <div class="media-icon-box music">🎵</div>
-
-                  <div class="media-name">欢快节奏.mp3</div>
-
-                </div>
-
-                <div class="media-grid-item" onclick="showToast('已添加：古典悠扬.mp3')">
-
-                  <div class="media-icon-box music">🎵</div>
-
-                  <div class="media-name">古典悠扬.mp3</div>
-
-                </div>
-
-                <div class="media-grid-item" onclick="showToast('已添加：儿童欢乐.mp3')">
-
-                  <div class="media-icon-box music">🎵</div>
-
-                  <div class="media-name">儿童欢乐.mp3</div>
-
-                </div>
-
-                <div class="media-grid-item" onclick="showToast('已添加：机器人舞蹈.mp4')">
-
-                  <div class="media-icon-box video">▶️</div>
-
-                  <div class="media-name">机器人舞蹈.mp4</div>
-
-                </div>
-
-                <div class="media-grid-item" onclick="showToast('已添加：迎宾引导.mp4')">
-
-                  <div class="media-icon-box video">▶️</div>
-
-                  <div class="media-name">迎宾引导.mp4</div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-
-            <!-- 图片 -->
-
-            <div data-tab-content="instant-media-1" style="display:none;">
-
-              <div class="media-search-row">
-
-                <div class="media-search">
-
-                  <span style="font-size:13px;color:var(--text-secondary);">🔍</span>
-
-                  <input placeholder="搜索图片文件...">
-
-                </div>
-
-              </div>
-
-              <div class="selected-media-title">已选图片</div>
-
-              <div class="selected-media-list">
-
-                <div class="selected-media-item">
-
-                  <div class="media-icon-box image">🖼️</div>
-
-                  <div class="media-info">
-
-                    <div class="media-name">欢迎海报.jpg</div>
-
-                    <div class="media-meta">图片 · 1920×1080 · 2.1MB</div>
-
-                  </div>
-
-                  <span class="media-type-tag">图片</span>
-
-                  <button class="media-remove" onclick="showToast('已移除：欢迎海报.jpg')">×</button>
-
-                </div>
-
-              </div>
-
-              <div class="media-library-title">素材库</div>
-
-              <div class="media-grid">
-
-                <div class="media-grid-item" onclick="showToast('已添加：景区导览图.jpg')">
-
-                  <div class="media-icon-box image">🖼️</div>
-
-                  <div class="media-name">景区导览图.jpg</div>
-
-                </div>
-
-                <div class="media-grid-item" onclick="showToast('已添加：活动展架.jpg')">
-
-                  <div class="media-icon-box image">🖼️</div>
-
-                  <div class="media-name">活动展架.jpg</div>
-
-                </div>
-
-                <div class="media-grid-item" onclick="showToast('已添加：合影背景.jpg')">
-
-                  <div class="media-icon-box image">🖼️</div>
-
-                  <div class="media-name">合影背景.jpg</div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-
-            <!-- 表情包 -->
-
-            <div data-tab-content="instant-media-2" style="display:none;">
-
-              <div class="media-search-row">
-
-                <div class="media-search">
-
-                  <span style="font-size:13px;color:var(--text-secondary);">🔍</span>
-
-                  <input placeholder="搜索表情包...">
-
-                </div>
-
-              </div>
-
-              <div class="selected-media-title">已选表情</div>
-
-              <div class="selected-media-list">
-
-                <div class="selected-media-item">
-
-                  <div class="media-icon-box emoji">👋</div>
-
-                  <div class="media-info">
-
-                    <div class="media-name">挥手.gif</div>
-
-                    <div class="media-meta">表情包 · 240×240 · 256KB</div>
-
-                  </div>
-
-                  <span class="media-type-tag">表情</span>
-
-                  <button class="media-remove" onclick="showToast('已移除：挥手.gif')">×</button>
-
-                </div>
-
-              </div>
-
-              <div class="media-library-title">素材库</div>
-
-              <div class="media-grid">
-
-                <div class="media-grid-item" onclick="showToast('已添加：开心.gif')">
-
-                  <div class="media-icon-box emoji">😊</div>
-
-                  <div class="media-name">开心.gif</div>
-
-                </div>
-
-                <div class="media-grid-item" onclick="showToast('已添加：鼓掌.gif')">
-
-                  <div class="media-icon-box emoji">👏</div>
-
-                  <div class="media-name">鼓掌.gif</div>
-
-                </div>
-
-                <div class="media-grid-item" onclick="showToast('已添加：比心.gif')">
-
-                  <div class="media-icon-box emoji">❤️</div>
-
-                  <div class="media-name">比心.gif</div>
-
-                </div>
-
-                <div class="media-grid-item" onclick="showToast('已添加：跳舞.gif')">
-
-                  <div class="media-icon-box emoji">💃</div>
-
-                  <div class="media-name">跳舞.gif</div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-
-            <div class="instant-actions">
-
-              <button class="btn btn-outline" onclick="closeModal('modal-device-tasks')">取消</button>
-
-              <button class="btn btn-primary" onclick="closeModal('modal-device-tasks');showToast('即时任务已确认，正在同步至机器人执行…')">确认设置</button>
-
-            </div>
-
-          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">#</th>
+                <th>任务名称</th>
+                <th>任务类型</th>
+                <th style="width:120px;">下发时间</th>
+                <th style="width:90px;">状态</th>
+                <th style="width:130px;text-align:center;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="text-align:center;">1</td>
+                <td style="font-weight:500;">迎宾舞蹈-单机版 v2.1</td>
+                <td><span class="tag tag-accent">🎬 脚本</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">08-05 14:20</td>
+                <td><span class="tag tag-success">已下发</span></td>
+                <td style="text-align:center;">
+                  <button class="btn btn-ghost btn-sm" style="color:var(--accent);" onclick="showToast('任务已执行：迎宾舞蹈-单机版 v2.1')">执行</button>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="showToast('已删除任务：迎宾舞蹈-单机版 v2.1')">删除</button>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">2</td>
+                <td style="font-weight:500;">巡游路线A-跟随编队</td>
+                <td><span class="tag" style="background:#ede9fe;color:#7c3aed;">👥 跟随</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">08-05 15:05</td>
+                <td><span class="tag tag-success">已下发</span></td>
+                <td style="text-align:center;">
+                  <button class="btn btn-ghost btn-sm" style="color:var(--accent);" onclick="showToast('任务已执行：巡游路线A-跟随编队')">执行</button>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="showToast('已删除任务：巡游路线A-跟随编队')">删除</button>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">3</td>
+                <td style="font-weight:500;">群控方阵表演-4机版 v1.3</td>
+                <td><span class="tag tag-accent">🎬 脚本</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">08-04 10:30</td>
+                <td><span class="tag tag-success">已下发</span></td>
+                <td style="text-align:center;">
+                  <button class="btn btn-ghost btn-sm" style="color:var(--accent);" onclick="showToast('任务已执行：群控方阵表演-4机版 v1.3')">执行</button>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="showToast('已删除任务：群控方阵表演-4机版 v1.3')">删除</button>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">4</td>
+                <td style="font-weight:500;">欢迎广播-背景音乐</td>
+                <td><span class="tag tag-accent">⚡ 即时·音视频</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">08-05 09:10</td>
+                <td><span class="tag tag-success">已下发</span></td>
+                <td style="text-align:center;">
+                  <button class="btn btn-ghost btn-sm" style="color:var(--accent);" onclick="showToast('任务已执行：欢迎广播-背景音乐')">执行</button>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="showToast('已删除任务：欢迎广播-背景音乐')">删除</button>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">5</td>
+                <td style="font-weight:500;">合影引导-欢迎海报</td>
+                <td><span class="tag" style="background:#fef3c7;color:#d97706;">⚡ 即时·图片</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">08-04 16:40</td>
+                <td><span class="tag tag-success">已下发</span></td>
+                <td style="text-align:center;">
+                  <button class="btn btn-ghost btn-sm" style="color:var(--accent);" onclick="showToast('任务已执行：合影引导-欢迎海报')">执行</button>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="showToast('已删除任务：合影引导-欢迎海报')">删除</button>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align:center;">6</td>
+                <td style="font-weight:500;">迎宾挥手-表情包</td>
+                <td><span class="tag" style="background:#ede9fe;color:#7c3aed;">⚡ 即时·表情包</span></td>
+                <td style="font-size:12px;color:var(--text-secondary);">08-03 11:25</td>
+                <td><span class="tag tag-default">已结束</span></td>
+                <td style="text-align:center;">
+                  <button class="btn btn-ghost btn-sm" style="color:var(--accent);" onclick="showToast('任务已执行：迎宾挥手-表情包')">执行</button>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="showToast('已删除任务：迎宾挥手-表情包')">删除</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
         </div>
 
@@ -1940,7 +1537,7 @@
 
         <!-- 可添加智能体列表 -->
 
-        <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text-secondary);">可添加智能体（3）</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text-secondary);">可选为关联智能体 · 单选（选后替换当前关联）（3）</div>
 
         <div style="display:flex;flex-direction:column;gap:8px;">
 
@@ -1956,7 +1553,7 @@
 
             </div>
 
-            <button class="btn btn-outline btn-sm" style="color:var(--primary);border-color:var(--primary);" onclick="showToast('已添加智能体：迎宾接待智能体')">添加</button>
+            <button class="btn btn-outline btn-sm" style="color:var(--primary);border-color:var(--primary);" onclick="showToast('已替换为关联智能体：迎宾接待智能体')">设为关联</button>
 
           </div>
 
@@ -1972,7 +1569,7 @@
 
             </div>
 
-            <button class="btn btn-outline btn-sm" style="color:var(--primary);border-color:var(--primary);" onclick="showToast('已添加智能体：互动问答智能体')">添加</button>
+            <button class="btn btn-outline btn-sm" style="color:var(--primary);border-color:var(--primary);" onclick="showToast('已替换为关联智能体：互动问答智能体')">设为关联</button>
 
           </div>
 
@@ -1988,7 +1585,7 @@
 
             </div>
 
-            <button class="btn btn-outline btn-sm" style="color:var(--primary);border-color:var(--primary);" onclick="showToast('已添加智能体：巡游领队智能体')">添加</button>
+            <button class="btn btn-outline btn-sm" style="color:var(--primary);border-color:var(--primary);" onclick="showToast('已替换为关联智能体：巡游领队智能体')">设为关联</button>
 
           </div>
 
@@ -1998,7 +1595,7 @@
 
         <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--info);margin-top:16px;">
 
-          ℹ 每台设备可关联多个智能体，机器人运行时将根据场景自动切换或手动切换激活的智能体。
+          ℹ 每台设备仅可关联 1 个智能体，不支持多选。选择新的智能体将替换当前关联；移除后该设备将处于「未关联」状态。
 
         </div>
 
@@ -2015,98 +1612,6 @@
   </div>
 
 
-
-  <!-- 弹窗：执行任务校验确认 -->
-
-  <div class="modal-overlay" id="modal-execute-script-confirm">
-
-    <div class="modal-box" style="width:460px;">
-
-      <div class="modal-header">
-
-        <div class="modal-title">⚠ 执行任务确认</div>
-
-        <button class="modal-close" onclick="closeModal('modal-execute-script-confirm')">×</button>
-
-      </div>
-
-      <div class="modal-body">
-
-        <div style="display:flex;gap:12px;align-items:flex-start;">
-
-          <span style="font-size:28px;color:var(--warning);">⚠</span>
-
-          <div style="flex:1;">
-
-            <div style="font-size:14px;font-weight:600;margin-bottom:8px;">即将向目标设备下发并执行任务</div>
-
-            <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
-
-              请确认以下信息无误：
-
-            </div>
-
-            <div style="margin-top:10px;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px;">
-
-              <div style="color:var(--text-tertiary);">任务名称</div>
-
-              <div style="font-weight:500;">迎宾舞蹈-单机版 v2.1</div>
-
-              <div style="color:var(--text-tertiary);">目标设备</div>
-
-              <div style="font-weight:500;">4 台</div>
-
-              <div style="color:var(--text-tertiary);">执行方式</div>
-
-              <div style="font-weight:500;">重复执行 · 3次</div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="modal-footer">
-
-        <button class="btn btn-outline" onclick="closeModal('modal-execute-script-confirm')">取消</button>
-
-        <button class="btn btn-primary" style="background:var(--danger);" onclick="closeModal('modal-execute-script-confirm');showToast('脚本已下发，正在执行…')">确认执行</button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- 弹窗：执行任务状态机校验结果 -->
-
-  <div class="modal-overlay" id="modal-execute-result">
-
-    <div class="modal-box" style="width:600px;">
-
-      <div class="modal-header">
-
-        <div class="modal-title" id="exec-result-title">⚙ 执行任务校验</div>
-
-        <button class="modal-close" onclick="closeModal('modal-execute-result')">×</button>
-
-      </div>
-
-      <div class="modal-body" id="exec-result-body"></div>
-
-      <div class="modal-footer">
-
-        <button class="btn btn-outline" onclick="closeModal('modal-execute-result')">关闭</button>
-
-      </div>
-
-    </div>
-
-  </div>
 
 
 
@@ -2444,7 +1949,7 @@
 
       <div class="page-title">运行任务</div>
 
-      <div class="page-subtitle">创建和管理机器人执行任务，支持脚本任务和跟随任务的下发与执行</div>
+      <div class="page-subtitle">创建和管理机器人执行任务，支持脚本任务、跟随任务与即时广告任务；任务需先「同步至设备」再「立即执行」</div>
 
     </div>
 
@@ -2464,7 +1969,7 @@
 
     <div class="card-header">
 
-      <div class="card-title">运动任务列表 <span class="tag tag-accent" style="margin-left:8px;">3 个任务</span></div>
+      <div class="card-title">运动任务列表 <span class="tag tag-accent" style="margin-left:8px;">4 个任务</span></div>
 
     </div>
 
@@ -2506,7 +2011,7 @@
 
             <td style="font-size:12px;">小镋-01、小镋-02、小镋-04、小镋-07</td>
 
-            <td><span class="tag tag-success"><span class="status-dot online"></span>已下发</span></td>
+            <td><span class="tag tag-success"><span class="status-dot online"></span>已同步</span></td>
 
             <td style="font-size:12px;color:var(--text-secondary);">2026-08-05 14:20</td>
 
@@ -2516,7 +2021,7 @@
 
               <button class="btn btn-ghost btn-sm" onclick="openEditTaskModal('script')">编辑</button>
 
-              <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);" onclick="validateExecuteScript('迎宾舞蹈-单机版 v2.1','script','小镋-01、小镋-02、小镋-04、小镋-07')">执行任务</button>
+              <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);" onclick="validateExecuteScript('迎宾舞蹈-单机版 v2.1','script','小镋-01、小镋-02、小镋-04、小镋-07')">立即执行</button>
 
             </td>
 
@@ -2532,7 +2037,7 @@
 
             <td style="font-size:12px;">小镋-01、小镋-02、小镋-03、小镋-04</td>
 
-            <td><span class="tag tag-warning"><span class="status-dot warning"></span>待下发</span></td>
+            <td><span class="tag tag-warning"><span class="status-dot warning"></span>待同步</span></td>
 
             <td style="font-size:12px;color:var(--text-secondary);">2026-08-05 15:05</td>
 
@@ -2542,7 +2047,7 @@
 
               <button class="btn btn-ghost btn-sm" onclick="openEditTaskModal('follow')">编辑</button>
 
-              <button class="btn btn-primary btn-sm" onclick="validateAndDispatch(this,'巡游路线A-跟随编队','follow','小镋-01、小镋-02、小镋-03、小镋-04')">下发至设备</button>
+              <button class="btn btn-primary btn-sm" onclick="validateAndDispatch(this,'巡游路线A-跟随编队','follow','小镋-01、小镋-02、小镋-03、小镋-04')">同步至设备</button>
 
             </td>
 
@@ -2558,7 +2063,7 @@
 
             <td style="font-size:12px;">小镋-01、小镋-02、小镋-03、小镋-05</td>
 
-            <td><span class="tag tag-warning"><span class="status-dot warning"></span>待下发</span></td>
+            <td><span class="tag tag-warning"><span class="status-dot warning"></span>待同步</span></td>
 
             <td style="font-size:12px;color:var(--text-secondary);">2026-08-05 16:30</td>
 
@@ -2568,7 +2073,33 @@
 
               <button class="btn btn-ghost btn-sm" onclick="openEditTaskModal('script')">编辑</button>
 
-              <button class="btn btn-primary btn-sm" onclick="validateAndDispatch(this,'群控方阵表演-4机版 v1.3','script','小镋-01、小镋-02、小镋-03、小镋-05')">下发至设备</button>
+              <button class="btn btn-primary btn-sm" onclick="validateAndDispatch(this,'群控方阵表演-4机版 v1.3','script','小镋-01、小镋-02、小镋-03、小镋-05')">同步至设备</button>
+
+            </td>
+
+          </tr>
+
+          <tr>
+
+            <td style="text-align:center;"><span style="display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:50%;background:#ef4444;color:white;font-size:11px;font-weight:600;">4</span></td>
+
+            <td style="font-weight:500;">开业大促-即时广告</td>
+
+            <td><span class="tag" style="background:#fef2f2;color:#dc2626;">⚡ 即时广告任务</span></td>
+
+            <td style="font-size:12px;">小镋-07</td>
+
+            <td><span class="tag tag-warning"><span class="status-dot warning"></span>待同步</span></td>
+
+            <td style="font-size:12px;color:var(--text-secondary);">2026-08-06 09:12</td>
+
+            <td style="text-align:center;">
+
+              <button class="btn btn-ghost btn-sm" onclick="openTaskDetail('instant')">查看</button>
+
+              <button class="btn btn-ghost btn-sm" onclick="openEditTaskModal('instant')">编辑</button>
+
+              <button class="btn btn-primary btn-sm" onclick="validateAndDispatch(this,'开业大促-即时广告','instant','小镋-07')">同步至设备</button>
 
             </td>
 
@@ -2644,7 +2175,7 @@
 
                 <div style="font-size:14px;font-weight:600;color:var(--accent);">脚本执行任务</div>
 
-                <div style="font-size:12px;color:var(--text-secondary);">选择脚本库中的脚本，下发至设备执行</div>
+                <div style="font-size:12px;color:var(--text-secondary);">选择脚本库中的脚本，同步至设备执行</div>
 
               </div>
 
@@ -2661,6 +2192,22 @@
                 <div style="font-size:14px;font-weight:600;">跟随任务</div>
 
                 <div style="font-size:12px;color:var(--text-secondary);">配置UWB跟随编队，列队运动</div>
+
+              </div>
+
+            </label>
+
+            <label style="flex:1;display:flex;align-items:center;gap:10px;padding:16px;border:2px solid var(--border);border-radius:var(--radius-md);cursor:pointer;">
+
+              <input type="radio" name="task-type" value="instant" onchange="switchTaskType('instant')">
+
+              <span style="font-size:28px;">⚡</span>
+
+              <div>
+
+                <div style="font-size:14px;font-weight:600;">即时广告任务</div>
+
+                <div style="font-size:12px;color:var(--text-secondary);">音视频/图片/表情包，即时投放展示</div>
 
               </div>
 
@@ -2772,7 +2319,7 @@
 
                     </td>
 
-                    <td style="padding:8px 12px;font-weight:600;color:var(--accent);">🎬 镗钯01</td>
+                    <td style="padding:8px 12px;font-weight:600;color:var(--accent);">🎬 镋钯01</td>
 
                     <td style="padding:8px 12px;">
 
@@ -2806,7 +2353,7 @@
 
                     </td>
 
-                    <td style="padding:8px 12px;font-weight:600;color:#3b82f6;">🎬 镗钯02</td>
+                    <td style="padding:8px 12px;font-weight:600;color:#3b82f6;">🎬 镋钯02</td>
 
                     <td style="padding:8px 12px;">
 
@@ -2840,7 +2387,7 @@
 
                     </td>
 
-                    <td style="padding:8px 12px;font-weight:600;color:#10b981;">🎬 镗钯03</td>
+                    <td style="padding:8px 12px;font-weight:600;color:#10b981;">🎬 镋钯03</td>
 
                     <td style="padding:8px 12px;">
 
@@ -2874,7 +2421,7 @@
 
                     </td>
 
-                    <td style="padding:8px 12px;font-weight:600;color:#f59e0b;">🎬 镗钯04</td>
+                    <td style="padding:8px 12px;font-weight:600;color:#f59e0b;">🎬 镋钯04</td>
 
                     <td style="padding:8px 12px;">
 
@@ -2908,7 +2455,7 @@
 
                     </td>
 
-                    <td style="padding:8px 12px;font-weight:600;color:var(--text-secondary);">🎬 镗钯05</td>
+                    <td style="padding:8px 12px;font-weight:600;color:var(--text-secondary);">🎬 镋钯05</td>
 
                     <td style="padding:8px 12px;">
 
@@ -3522,17 +3069,85 @@
 
           <div class="form-group">
 
-            <label class="form-label">队列多媒体内容（可选）</label>
+            <label class="form-label">队列多媒体内容 <span style="font-weight:400;font-size:12px;color:var(--text-tertiary);">（按机器人差异化配置 · 每个机器人可显示不同内容）</span></label>
 
-            <div class="flex gap-3" style="flex-wrap:wrap;">
+            <div style="border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;">
 
-              <button class="btn btn-outline btn-sm">😊 选择表情包</button>
+              <table style="width:100%;font-size:13px;border-collapse:collapse;">
 
-              <button class="btn btn-outline btn-sm">🎵 选择音视频</button>
+                <thead>
 
-              <button class="btn btn-outline btn-sm">🖼️ 选择图片</button>
+                  <tr style="background:#f9fafb;">
+
+                    <th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);">机器人</th>
+
+                    <th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);">表情包</th>
+
+                    <th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);">音视频</th>
+
+                    <th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);">图片</th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  <tr>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);font-weight:500;">R1 小镋-01</td>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);"><button class="btn btn-outline btn-sm">😊 选择</button></td>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);"><button class="btn btn-outline btn-sm">🎵 选择</button></td>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);"><button class="btn btn-outline btn-sm">🖼️ 选择</button></td>
+
+                  </tr>
+
+                  <tr>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);font-weight:500;">R2 小镋-02</td>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);"><button class="btn btn-outline btn-sm">😊 选择</button></td>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);"><button class="btn btn-outline btn-sm">🎵 选择</button></td>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);"><button class="btn btn-outline btn-sm">🖼️ 选择</button></td>
+
+                  </tr>
+
+                  <tr>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);font-weight:500;">R3 小镋-03</td>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);"><button class="btn btn-outline btn-sm">😊 选择</button></td>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);"><button class="btn btn-outline btn-sm">🎵 选择</button></td>
+
+                    <td style="padding:8px 12px;border-bottom:1px solid var(--border-light);"><button class="btn btn-outline btn-sm">🖼️ 选择</button></td>
+
+                  </tr>
+
+                  <tr>
+
+                    <td style="padding:8px 12px;font-weight:500;">R4 小镋-04</td>
+
+                    <td style="padding:8px 12px;"><button class="btn btn-outline btn-sm">😊 选择</button></td>
+
+                    <td style="padding:8px 12px;"><button class="btn btn-outline btn-sm">🎵 选择</button></td>
+
+                    <td style="padding:8px 12px;"><button class="btn btn-outline btn-sm">🖼️ 选择</button></td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
 
             </div>
+
+            <div style="font-size:12px;color:var(--text-tertiary);margin-top:6px;">提示：队列中每台机器人可独立配置表情包 / 音视频 / 图片，执行时各自显示对应内容，实现「一队多面」的差异化展示。</div>
 
           </div>
 
@@ -3546,9 +3161,121 @@
 
 
 
+        <!-- ===== 即时广告任务属性区（默认隐藏） ===== -->
+
+        <div id="task-instant-config" style="display:none;">
+
+          <div class="form-group">
+
+            <label class="form-label">目标设备 <span class="required">*</span></label>
+
+            <select class="form-select">
+
+              <option value="">请选择设备</option>
+
+              <option>小镋-01（在线 · 闲置）</option>
+
+              <option>小镋-02（在线 · 闲置）</option>
+
+              <option>小镋-04（在线 · 闲置）</option>
+
+              <option>小镋-07（在线 · 执勤中）</option>
+
+            </select>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">广告媒体内容 <span class="required">*</span></label>
+
+            <div class="media-tabs">
+
+              <div class="media-tab active" data-tab-group="instant-create" onclick="switchTab('modal-create-task','instant-create',0)">🎬 音视频</div>
+
+              <div class="media-tab" data-tab-group="instant-create" onclick="switchTab('modal-create-task','instant-create',1)">🖼️ 图片</div>
+
+              <div class="media-tab" data-tab-group="instant-create" onclick="switchTab('modal-create-task','instant-create',2)">🙂 表情包</div>
+
+            </div>
+
+            <div data-tab-content="instant-create-0">
+
+              <div class="media-library-title">素材库</div>
+
+              <div class="media-grid">
+
+                <div class="media-grid-item" onclick="showToast('已选：迎宾舞曲.mp3')"><div class="media-icon-box music">🎵</div><div class="media-name">迎宾舞曲.mp3</div></div>
+
+                <div class="media-grid-item" onclick="showToast('已选：景区背景音乐.mp3')"><div class="media-icon-box music">🎵</div><div class="media-name">景区背景音乐.mp3</div></div>
+
+                <div class="media-grid-item" onclick="showToast('已选：景区宣传短片.mp4')"><div class="media-icon-box video">▶️</div><div class="media-name">景区宣传短片.mp4</div></div>
+
+              </div>
+
+            </div>
+
+            <div data-tab-content="instant-create-1" style="display:none;">
+
+              <div class="media-library-title">素材库</div>
+
+              <div class="media-grid">
+
+                <div class="media-grid-item" onclick="showToast('已选：欢迎海报.jpg')"><div class="media-icon-box image">🖼️</div><div class="media-name">欢迎海报.jpg</div></div>
+
+                <div class="media-grid-item" onclick="showToast('已选：景区导览图.jpg')"><div class="media-icon-box image">🖼️</div><div class="media-name">景区导览图.jpg</div></div>
+
+                <div class="media-grid-item" onclick="showToast('已选：合影背景.jpg')"><div class="media-icon-box image">🖼️</div><div class="media-name">合影背景.jpg</div></div>
+
+              </div>
+
+            </div>
+
+            <div data-tab-content="instant-create-2" style="display:none;">
+
+              <div class="media-library-title">素材库</div>
+
+              <div class="media-grid">
+
+                <div class="media-grid-item" onclick="showToast('已选：挥手.gif')"><div class="media-icon-box emoji">👋</div><div class="media-name">挥手.gif</div></div>
+
+                <div class="media-grid-item" onclick="showToast('已选：开心.gif')"><div class="media-icon-box emoji">😊</div><div class="media-name">开心.gif</div></div>
+
+                <div class="media-grid-item" onclick="showToast('已选：比心.gif')"><div class="media-icon-box emoji">❤️</div><div class="media-name">比心.gif</div></div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label class="form-label">播放方式</label>
+
+            <div class="flex gap-3">
+
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="radio" name="instant-loop" checked> 循环播放</label>
+
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="radio" name="instant-loop"> 单次播放</label>
+
+            </div>
+
+          </div>
+
+          <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--info);">
+
+            ℹ 即时广告任务创建后，需先「同步至设备」再「立即执行」；机器人进入任务态后手柄红灯亮起，执行结束自动回到遥操模式，执行中遥控器急停为最高优先级。
+
+          </div>
+
+        </div>
+
+
+
         <div style="background:var(--info-bg);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--info);margin-top:12px;">
 
-          ℹ 任务创建后处于"待下发"状态，需手动点击"下发至设备"将任务推送至机器人端执行。
+          ℹ 任务创建后处于"待同步"状态，需先手动点击"同步至设备"将任务推送至机器人端，再点击"立即执行"开始执行。
 
         </div>
 
@@ -3576,7 +3303,7 @@
 
       <div class="modal-header">
 
-        <div class="modal-title">下发任务至机器人</div>
+        <div class="modal-title">同步任务至机器人</div>
 
         <button class="modal-close" onclick="closeModal('modal-dispatch')">×</button>
 
@@ -3588,7 +3315,7 @@
 
           <div style="font-size:48px;margin-bottom:16px;">📡</div>
 
-          <div style="font-size:16px;font-weight:600;margin-bottom:8px;">确认下发任务至机器人端？</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:8px;">确认同步任务至机器人端？</div>
 
           <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">任务名称：巡游路线A-跟随编队</div>
 
@@ -3610,12 +3337,29 @@
 
         <button class="btn btn-outline" onclick="closeModal('modal-dispatch')">取消</button>
 
-        <button class="btn btn-primary" onclick="closeModal('modal-dispatch')">确认下发</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-dispatch')">确认同步</button>
 
       </div>
 
     </div>
 
+  </div>
+
+
+
+  <!-- 弹窗：脚本虚拟仿真校验结果 -->
+  <div class="modal-overlay" id="modal-sync-sim">
+    <div class="modal-box" style="width:480px;">
+      <div class="modal-header">
+        <div class="modal-title" id="sync-sim-title">虚拟仿真校验结果</div>
+        <button class="modal-close" onclick="closeModal('modal-sync-sim')">×</button>
+      </div>
+      <div class="modal-body" id="sync-sim-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-sync-sim')">暂不同步</button>
+        <button class="btn btn-primary" id="sync-sim-confirm" onclick="syncConfirmRisk()">继续同步</button>
+      </div>
+    </div>
   </div>
 
 
@@ -3662,7 +3406,7 @@
 
             <div style="color:var(--text-secondary);">任务状态</div>
 
-            <div><span class="tag tag-success"><span class="status-dot online"></span>已下发</span></div>
+            <div><span class="tag tag-success"><span class="status-dot online"></span>已同步</span></div>
 
             <div style="color:var(--text-secondary);">创建时间</div>
 
@@ -3702,11 +3446,43 @@
 
             <div style="color:var(--text-secondary);">任务状态</div>
 
-            <div><span class="tag tag-warning"><span class="status-dot warning"></span>待下发</span></div>
+            <div><span class="tag tag-warning"><span class="status-dot warning"></span>待同步</span></div>
 
             <div style="color:var(--text-secondary);">创建时间</div>
 
             <div>2026-08-05 15:05:32</div>
+
+          </div>
+
+        </div>
+
+        <div id="task-detail-instant" style="display:none;">
+
+          <div style="display:grid;grid-template-columns:100px 1fr;gap:12px 16px;font-size:13px;">
+
+            <div style="color:var(--text-secondary);">任务名称</div>
+
+            <div style="font-weight:500;">开业大促-即时广告</div>
+
+            <div style="color:var(--text-secondary);">任务类型</div>
+
+            <div><span class="tag" style="background:#fef2f2;color:#dc2626;">⚡ 即时广告任务</span></div>
+
+            <div style="color:var(--text-secondary);">目标设备</div>
+
+            <div>小镋-07（1台）</div>
+
+            <div style="color:var(--text-secondary);">广告媒体</div>
+
+            <div>🎵 迎宾舞曲.mp3（循环播放）</div>
+
+            <div style="color:var(--text-secondary);">任务状态</div>
+
+            <div><span class="tag tag-warning"><span class="status-dot warning"></span>待同步</span></div>
+
+            <div style="color:var(--text-secondary);">创建时间</div>
+
+            <div>2026-08-06 09:12:00</div>
 
           </div>
 
@@ -3718,7 +3494,7 @@
 
         <button class="btn btn-outline" onclick="closeModal('modal-task-detail')">关闭</button>
 
-        <button class="btn btn-primary" onclick="closeModal('modal-task-detail');openModal('modal-dispatch');">下发至设备</button>
+        <button class="btn btn-primary" onclick="syncFromDetail('巡游路线A-跟随编队','follow','小镋-01、小镋-02、小镋-03、小镋-04')">同步至设备</button>
 
       </div>
 
@@ -4908,7 +4684,7 @@
 
           </div>
 
-          
+
 
           <!-- R1 耳朵轨道 -->
 
@@ -4950,7 +4726,7 @@
 
           </div>
 
-          
+
 
         </div>
 
@@ -5032,7 +4808,7 @@
 
           </div>
 
-          
+
 
           <!-- R2 耳朵轨道 -->
 
@@ -5074,7 +4850,7 @@
 
           </div>
 
-          
+
 
         </div>
 
@@ -5156,7 +4932,7 @@
 
             </div>
 
-            
+
 
             <div class="timeline-track">
 
@@ -5192,7 +4968,7 @@
 
             </div>
 
-            
+
 
           </div>
 
@@ -5272,7 +5048,7 @@
 
             </div>
 
-            
+
 
             <div class="timeline-track">
 
@@ -5308,7 +5084,7 @@
 
             </div>
 
-            
+
 
           </div>
 
@@ -5338,7 +5114,7 @@
 
               <label class="form-label">动作幅度倍数</label>
 
-              <select class="form-select"><option>100%</option><option>80%</option><option>60%</option><option>40%</option><option>20%</option></select>
+              <select class="form-select se-amplitude"><option>100%</option><option>80%</option><option>60%</option><option>40%</option><option>20%</option></select>
 
             </div>
 
@@ -5346,19 +5122,21 @@
 
               <label class="form-label">动作速率倍数</label>
 
-              <select class="form-select"><option>100%</option><option>80%</option><option>60%</option><option>40%</option><option>20%</option></select>
+              <input class="form-input se-rate" type="number" value="100" min="1" max="100" step="1" oninput="seSyncRateDuration(this,'rate')">
 
             </div>
 
             <div class="form-group">
 
-              <label class="form-label">换算时长（秒）</label>
+              <label class="form-label">动作时间（秒）</label>
 
-              <input class="form-input" type="number" value="2.5" disabled style="background:var(--bg-tag);">
+              <input class="form-input se-duration" type="number" value="2.5" min="0.5" max="30" step="0.1" oninput="seSyncRateDuration(this,'duration')">
 
             </div>
 
           </div>
+
+          <div style="font-size:12px;color:#8b5cf6;margin:-4px 0 10px;">🔁 速率 ↔ 时间 互为变量：调整速率自动计算时间，调整时间自动反算速率；幅度独立设置</div>
 
           <div style="background:var(--success-bg);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--success);">
 
@@ -5374,7 +5152,7 @@
 
       <!-- 位置移动属性配置面板（优化3：路径编辑+目标点） -->
 
-      
+
 
     </div>
 
@@ -5600,6 +5378,38 @@
 
         </div>
 
+        <!-- 4. 动作执行姿态保持（规则1） -->
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent-bg);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">4</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:2px;">动作执行姿态保持（规则1）</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;">
+              动作执行完毕后<strong>保持最后一帧姿态，不自动回正</strong>；如需回正，需显式添加回正动作。多个连续动作之间直接衔接，<strong>以上一动作末帧为起点</strong>继续执行下一动作。
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. 组合动作缩放踩点（规则2） -->
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent-bg);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">5</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:2px;">组合动作缩放踩点（规则2）</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;">
+              支持自定义组合动作在轨道上以<strong>缩放编辑</strong>方式自动同比例调整动作时间，以满足音乐节拍匹配、精准踩点需求；但<strong>每个原子动作的执行时间不得小于该动作对应关节运动能力的下限</strong>。
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. 自定义动作二次编辑新UUID（规则3） -->
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent-bg);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">6</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:2px;">自定义动作二次编辑（规则3）</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;">
+              自定义动作支持二次编辑且<strong>不影响历史脚本</strong>：每次修改保存后<strong>生成新 UUID</strong>，已有脚本引用的仍为旧版本快照，保证历史脚本执行不受影响。
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -6664,7 +6474,7 @@
 
           </div>
 
-          
+
 
           <!-- R1 耳朵轨道 -->
 
@@ -6722,7 +6532,7 @@
 
           </div>
 
-          
+
 
         </div>
 
@@ -6800,7 +6610,7 @@
 
           </div>
 
-          
+
 
           <!-- R2 耳朵轨道 -->
 
@@ -6855,7 +6665,7 @@
 
           </div>
 
-          
+
 
         </div>
 
@@ -6933,7 +6743,7 @@
 
             </div>
 
-            
+
 
             <div class="timeline-track">
 
@@ -6979,7 +6789,7 @@
 
             </div>
 
-            
+
 
           </div>
 
@@ -7055,7 +6865,7 @@
 
             </div>
 
-            
+
 
             <div class="timeline-track">
 
@@ -7104,7 +6914,7 @@
 
             </div>
 
-            
+
 
           </div>
 
@@ -7134,7 +6944,7 @@
 
               <label class="form-label">动作幅度倍数</label>
 
-              <select class="form-select"><option>100%</option><option>80%</option><option>60%</option><option>40%</option><option>20%</option></select>
+              <select class="form-select se-amplitude"><option>100%</option><option>80%</option><option>60%</option><option>40%</option><option>20%</option></select>
 
             </div>
 
@@ -7142,19 +6952,21 @@
 
               <label class="form-label">动作速率倍数</label>
 
-              <select class="form-select"><option>100%</option><option>80%</option><option>60%</option><option>40%</option><option>20%</option></select>
+              <input class="form-input se-rate" type="number" value="100" min="1" max="100" step="1" oninput="seSyncRateDuration(this,'rate')">
 
             </div>
 
             <div class="form-group">
 
-              <label class="form-label">换算时长（秒）</label>
+              <label class="form-label">动作时间（秒）</label>
 
-              <input class="form-input" type="number" value="2.5" disabled style="background:var(--bg-tag);">
+              <input class="form-input se-duration" type="number" value="2.5" min="0.5" max="30" step="0.1" oninput="seSyncRateDuration(this,'duration')">
 
             </div>
 
           </div>
+
+          <div style="font-size:12px;color:#8b5cf6;margin:-4px 0 10px;">🔁 速率 ↔ 时间 互为变量：调整速率自动计算时间，调整时间自动反算速率；幅度独立设置</div>
 
           <div style="background:var(--success-bg);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--success);">
 
@@ -7949,9 +7761,11 @@
 
             <div style="font-size:13px;color:var(--text-secondary);">点击或拖拽文件到此处上传</div>
 
-            <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">支持 PNG/JPG/MP3/MP4 等格式</div>
+            <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">支持 PNG/JPG/MP3/MP4 等格式 · 单个素材大小需 ≤ 2G</div>
 
           </div>
+
+          <div style="font-size:11px;color:var(--warning);margin-top:6px;">⚠ 单个素材文件大小不可超过 2G，超出将无法上传</div>
 
         </div>
 
@@ -10363,9 +10177,9 @@
 
       <div class="modal-header">
 
-        <div class="modal-title">➕ 创建自定义动作</div>
+        <div class="modal-title" id="ca-modal-title">➕ 创建自定义动作</div>
 
-        <button class="modal-close" onclick="closeModal('modal-custom-action')">×</button>
+        <button class="modal-close" onclick="closeCustomActionEditor()">×</button>
 
       </div>
 
@@ -10467,21 +10281,27 @@
 
 
 
+        <!-- 动作描述 -->
+        <div class="form-group">
+          <label class="form-label">动作描述</label>
+          <input class="form-input" type="text" id="ca-desc" placeholder="如：用于开场问好场景" maxlength="60">
+        </div>
+
         <!-- 原子动作组合区 -->
 
         <div class="form-group" style="margin-bottom:0;">
 
-          <label class="form-label">原子动作组合 <span style="font-size:11px;color:var(--text-tertiary);font-weight:400;">（从左侧拖拽原子动作到时序图的不轨道，每个位置默认多条轨道，不互斥的动作可同时执行；点击块可调整幅度和速度，时长由幅度和速度自动计算，单位：秒）</span></label>
+          <label class="form-label">原子动作组合 <span style="font-size:11px;color:var(--text-tertiary);font-weight:400;">（右侧为左侧每个原子动作对应的同名轨道；从左侧拖拽原子动作到其同名轨道，不同原子动作轨道可同时执行；点击块可设置幅度、速度、时间，速度与时间互为变量：调速度自动输出时间，调时间自动反算速度）</span></label>
 
           <div style="display:flex;gap:14px;margin-bottom:8px;font-size:11px;flex-wrap:wrap;">
 
-            <span style="color:#3b82f6;">🔗 并线：不同轨道上的原子动作可同时执行</span>
+            <span style="color:#3b82f6;">🔗 并线：不同原子动作轨道同时执行</span>
 
-            <span style="color:#ef4444;">🚫 互斥：同一轨道内的原子动作按顺序执行</span>
+            <span style="color:#ef4444;">🚫 互斥：同一原子动作轨道内按顺序执行</span>
 
-            <span style="color:var(--text-tertiary);">📊 点击时序块可调整幅度和速度</span>
+            <span style="color:var(--text-tertiary);">📊 点击时序块可设置幅度/速度/时间</span>
 
-            <span style="color:#8b5cf6;">⏱ 时长 = f(幅度, 速度)，自动计算，不支持滑动</span>
+            <span style="color:#8b5cf6;">🔁 速度↔时间 互为变量（单位：秒）</span>
 
           </div>
 
@@ -10527,7 +10347,9 @@
 
       <div class="modal-footer">
 
-        <button class="btn btn-outline" onclick="closeModal('modal-custom-action')">取消</button>
+        <button class="btn btn-outline" onclick="closeCustomActionEditor()">取消</button>
+
+        <button class="btn btn-outline" onclick="previewCurrentCustomAction()">👁 预览</button>
 
         <button class="btn btn-primary" onclick="saveCustomAction()">保存动作</button>
 
@@ -10536,6 +10358,50 @@
     </div>
 
   </div>
+
+<!-- 自定义动作预览（只读） -->
+<div class="modal-overlay" id="modal-custom-action-preview">
+    <div class="modal-box" style="width:680px;">
+      <div class="modal-header">
+        <div class="modal-title" id="ca-preview-title">👁 动作预览</div>
+        <button class="modal-close" onclick="closeModal('modal-custom-action-preview')">×</button>
+      </div>
+      <div class="modal-body" style="padding:20px 24px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border-light);">
+          <div id="ca-preview-icon" style="font-size:48px;width:80px;height:80px;background:linear-gradient(135deg,#f5f3ff,#ede9fe);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;">🤖</div>
+          <div style="flex:1;">
+            <div id="ca-preview-name" style="font-size:18px;font-weight:600;margin-bottom:4px;">动作名称</div>
+            <div id="ca-preview-meta" style="font-size:12px;color:var(--text-secondary);">头部 · 3个原子动作 · 总时长 8.5s</div>
+            <div id="ca-preview-desc" style="font-size:12px;color:var(--text-tertiary);margin-top:6px;">动作描述</div>
+          </div>
+        </div>
+        <div id="ca-preview-effect">
+          <!-- 实际动作效果预览屏（样式对齐脚本编辑器右侧效果预览） -->
+          <div id="ca-preview-screen" style="background:#0f0f1a;height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border-radius:var(--radius-md);overflow:hidden;">
+            <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:22px 22px;"></div>
+            <div id="ca-preview-robot" style="font-size:96px;filter:drop-shadow(0 4px 20px rgba(139,92,246,0.35));transition:all .3s;z-index:1;">🤖</div>
+            <div id="ca-preview-act" style="font-size:14px;font-weight:600;color:#e2e8f0;margin-top:10px;z-index:1;">点击下方「播放动作效果」查看实际姿态</div>
+            <div style="position:absolute;left:12px;right:12px;bottom:10px;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;z-index:2;overflow:hidden;">
+              <div id="ca-preview-progress" style="height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#6366f1);border-radius:3px;transition:width .25s;"></div>
+            </div>
+            <div id="ca-preview-ptime" style="position:absolute;bottom:22px;right:12px;background:rgba(0,0,0,0.6);padding:2px 8px;border-radius:4px;font-size:11px;color:#a0a0b8;font-family:monospace;z-index:3;">0:00</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+            <button class="btn btn-primary btn-sm" onclick="caPlayPreview()">▶ 播放动作效果</button>
+            <button class="btn btn-outline btn-sm" onclick="caStopPreview()">⏹ 停止</button>
+            <span id="ca-preview-hint" style="font-size:12px;color:var(--text-tertiary);">按编排顺序逐帧展示机器人姿态（幅度影响幅度、速度影响节奏）</span>
+          </div>
+          <div style="margin-top:14px;">
+            <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">动作序列（按编排顺序）</div>
+            <div id="ca-preview-seq" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-custom-action-preview')">关闭</button>
+      </div>
+    </div>
+</div>
 
 <div class="modal-overlay" id="modal-agent-create">
 
@@ -11235,7 +11101,7 @@
 
 
 
-// ===== 镗钯RaaS 租户管理平台 - 内联脚本（迁移自 main.js，去除 Leaflet 依赖） =====
+// ===== 镋钯RaaS 租户管理平台 - 内联脚本（迁移自 main.js，去除 Leaflet 依赖） =====
 
 // 页面导航
 
@@ -11697,6 +11563,8 @@ function switchTaskType(type) {
 
   var followConfig = document.getElementById('task-follow-config');
 
+  var instantConfig = document.getElementById('task-instant-config');
+
   var labels = document.querySelectorAll('input[name="task-type"]');
 
   labels.forEach(function(lbl){
@@ -11717,6 +11585,18 @@ function switchTaskType(type) {
 
   if (followConfig) followConfig.style.display = (type === 'follow') ? '' : 'none';
 
+  if (instantConfig) instantConfig.style.display = (type === 'instant') ? '' : 'none';
+
+}
+
+// 打开任务详情（按类型切换子面板）
+function openTaskDetail(type){
+  var panels = { script:'task-detail-script', follow:'task-detail-follow', instant:'task-detail-instant' };
+  Object.keys(panels).forEach(function(k){
+    var el = document.getElementById(panels[k]);
+    if (el) el.style.display = (k === type) ? '' : 'none';
+  });
+  openModal('modal-task-detail');
 }
 
 
@@ -12265,6 +12145,10 @@ var extraTimelineLanes = {};
 
 var caCombinerData = {};
 
+var CUSTOM_ACTIONS = [];
+
+var caEditingId = null;
+
 
 
 function onCaPositionChange() {
@@ -12343,6 +12227,22 @@ function calcDuration(amplitude, speed) {
 
 }
 
+// 反算速度：给定幅度与期望时长，输出速度（速度与时间互为变量）
+
+function calcSpeed(amp, dur) {
+
+  var spd = 100 - 100 * (dur - 0.5 - (amp / 100) * 2.5) / 2.0;
+
+  if (spd < 0) spd = 0;
+
+  if (spd > 100) spd = 100;
+
+  spd = Math.round(spd);
+
+  return { speed: spd, duration: calcDuration(amp, spd) };
+
+}
+
 
 
 function getTotalTime() {
@@ -12397,93 +12297,57 @@ function getBarCls(laneKey) {
 
 
 
-function getCurrentLanes(pos) {
+// 获取当前位置下的全部原子动作（每条轨道对应一个原子动作，轨道名即原子动作名）
 
-  // 默认轨道 + 用户额外添加的轨道
+function getCaPositionAtomicActions(pos) {
 
-  var defaults = POSITION_LANES[pos] || [];
+  var groups = [];
 
-  var extras = extraTimelineLanes[pos] || [];
+  if (pos === 'head' || pos === 'full') groups.push('head');
 
-  return defaults.concat(extras);
+  if (pos === 'torso' || pos === 'full') groups.push('torso');
 
-}
+  if (pos === 'ear' || pos === 'full') { groups.push('ear-left'); groups.push('ear-right'); }
 
+  var list = [];
 
+  groups.forEach(function(g){
 
-function addTimelineLane(pos) {
+    (ATOMIC_ACTIONS[g] || []).forEach(function(a){
 
-  if (!extraTimelineLanes[pos]) extraTimelineLanes[pos] = [];
+      list.push({ id: a.id, name: a.name, icon: a.icon, group: g });
 
-  var defaults = POSITION_LANES[pos] || [];
+    });
 
-  // 从默认轨道推断部位标签和颜色
+  });
 
-  var posLabel = pos;
-
-  var posCls = 'cb-head';
-
-  if (defaults.length > 0) {
-
-    posLabel = (defaults[0].label || pos).replace(/[^\u4e00-\u9fa5a-zA-Z]/g,'').replace(/\s*\d+$/,'').trim();
-
-    posCls = defaults[0].cls || 'cb-head';
-
-  }
-
-  // 序号：默认轨道数 + 已添加的额外轨道数 + 1
-
-  var idx = defaults.length + extraTimelineLanes[pos].length + 1;
-
-  // 生成唯一的 lane key
-
-  var prefix = pos + '-x';
-
-  var n = 1;
-
-  while (caCombinerData[prefix + n]) n++;
-
-  var newKey = prefix + n;
-
-  extraTimelineLanes[pos].push({key:newKey, label: posLabel + ' ' + idx, cls: posCls});
-
-  renderTimeline();
+  return list;
 
 }
 
 
 
-function removeTimelineLane(pos, laneKey) {
+function caGetTotalTime() {
 
-  // 不允许删除默认轨道
+  var maxEnd = 0;
 
-  var defaults = POSITION_LANES[pos] || [];
+  Object.keys(caCombinerData).forEach(function(k){
 
-  for (var i = 0; i < defaults.length; i++) {
+    (caCombinerData[k] || []).forEach(function(b){
 
-    if (defaults[i].key === laneKey) return;
+      var end = b.startTime + b.duration;
 
-  }
+      if (end > maxEnd) maxEnd = end;
 
-  if (extraTimelineLanes[pos]) {
+    });
 
-    extraTimelineLanes[pos] = extraTimelineLanes[pos].filter(function(l){ return l.key !== laneKey; });
+  });
 
-    if (extraTimelineLanes[pos].length === 0) delete extraTimelineLanes[pos];
+  var total = Math.ceil(maxEnd);
 
-  }
+  if (total < 5) total = 5;
 
-  if (caCombinerData[laneKey]) delete caCombinerData[laneKey];
-
-  if (selectedBlock && selectedBlock.lane === laneKey) {
-
-    selectedBlock = null;
-
-    hideBlockEditor();
-
-  }
-
-  renderTimeline();
+  return total;
 
 }
 
@@ -12491,21 +12355,19 @@ function removeTimelineLane(pos, laneKey) {
 
 function renderTimeline() {
 
-  var preview = document.getElementById('ca-tl-preview');
-
   var body = document.getElementById('ca-tl-body');
 
-  if (!preview || !body) return;
+  if (!body) return;
 
   var pos = document.getElementById('ca-position').value;
 
-  var lanes = getCurrentLanes(pos);
+  // 右侧轨道：左侧每个原子动作对应一条以原子动作命名的轨道
+
+  var actions = getCaPositionAtomicActions(pos);
+
+  var totalTime = caGetTotalTime();
 
   var html = '';
-
-  // Ruler
-
-  var totalTime = getTotalTime();
 
   html += '<div class="ca-tl-ruler">';
 
@@ -12519,41 +12381,29 @@ function renderTimeline() {
 
   html += '</div>';
 
-  // Lanes
+  actions.forEach(function(a, i){
 
-  lanes.forEach(function(lane, i){
+    if (i > 0) html += '<div class="ca-tl-parallel-hint">🔗 可并线（不同原子动作轨道同时执行）</div>';
 
-    if (i > 0) html += '<div class="ca-tl-parallel-hint">\u{1F517} \u53EF\u5E76\u7EBF\uFF08\u4E0D\u4E92\u65A5\uFF09</div>';
+    var blocks = caCombinerData[a.id] || [];
 
-    var blocks = caCombinerData[lane.key] || [];
+    var barCls = 'bar-head';
 
-    var barCls = getBarCls(lane.key);
+    if (a.group === 'torso') barCls = 'bar-torso';
 
-    var laneLabel = lane.label.replace(/[^\u4e00-\u9fa5a-zA-Z\d\s]/g,'');
+    else if (a.group === 'ear-left') barCls = 'bar-ear-l';
 
-    // 是否为额外轨道（可删除）
-
-    var isExtra = false;
-
-    if (extraTimelineLanes[pos]) {
-
-      for (var e = 0; e < extraTimelineLanes[pos].length; e++) {
-
-        if (extraTimelineLanes[pos][e].key === lane.key) { isExtra = true; break; }
-
-      }
-
-    }
+    else if (a.group === 'ear-right') barCls = 'bar-ear-r';
 
     html += '<div class="ca-tl-lane-row">';
 
-    html += '<div class="ca-tl-lane-label">' + laneLabel + (isExtra ? '<span class="ca-tl-lane-del" onclick="removeTimelineLane(\'' + pos + '\',\'' + lane.key + '\')" title="\u5220\u9664\u8F68\u9053">\u00d7</span>' : '') + '</div>';
+    html += '<div class="ca-tl-lane-label">' + a.icon + ' ' + a.name + '</div>';
 
-    html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '" data-lane="' + lane.key + '" ondragover="onDragOverTimeline(event)" ondragleave="onDragLeaveTimeline(event)" ondrop="onDropToTimeline(event,\'' + lane.key + '\')">';
+    html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '" data-lane="' + a.id + '" ondragover="onDragOverTimeline(event)" ondragleave="onDragLeaveTimeline(event)" ondrop="onDropToTimeline(event,\'' + a.id + '\')">';
 
     if (blocks.length === 0) {
 
-      html += '<div class="ca-tl-lane-hint">\u62D6\u62FD\u539F\u5B50\u52A8\u4F5C\u5230\u6B64</div>';
+      html += '<div class="ca-tl-lane-hint">拖拽「' + a.name + '」到此轨道</div>';
 
     } else {
 
@@ -12563,11 +12413,11 @@ function renderTimeline() {
 
         var width = Math.max(3, Math.min(100 - left, (b.duration / totalTime) * 100));
 
-        var selCls = (selectedBlock && selectedBlock.lane === lane.key && selectedBlock.idx === idx) ? ' selected' : '';
+        var selCls = (selectedBlock && selectedBlock.lane === a.id && selectedBlock.idx === idx) ? ' selected' : '';
 
-        var delHtml = '<span class="bar-del" onclick="event.stopPropagation();removeAtomicBlock(\'' + lane.key + '\',' + idx + ')"\u00d7</span>';
+        var delHtml = '<span class="bar-del" onclick="event.stopPropagation();removeAtomicBlock(\'' + a.id + '\',' + idx + ')">×</span>';
 
-        html += '<div class="ca-tl-bar ' + barCls + selCls + '" style="left:' + left + '%;width:' + width + '%;" onclick="selectTimelineBlock(\'' + lane.key + '\',' + idx + ')" title="' + b.name + ' (' + fmtTime(b.startTime) + '\u2192' + fmtTime(b.startTime + b.duration) + ')">' + b.icon + ' ' + b.name.substring(0,4) + delHtml + '</div>';
+        html += '<div class="ca-tl-bar ' + barCls + selCls + '" style="left:' + left + '%;width:' + width + '%;" onclick="selectTimelineBlock(\'' + a.id + '\',' + idx + ')" title="' + b.name + ' (' + fmtTime(b.startTime) + '→' + fmtTime(b.startTime + b.duration) + ')">' + b.icon + ' ' + b.name.substring(0,4) + delHtml + '</div>';
 
       });
 
@@ -12577,11 +12427,9 @@ function renderTimeline() {
 
   });
 
-  // Add lane button
-
-  html += '<div class="ca-tl-add-lane" onclick="addTimelineLane(\'' + pos + '\')"><span>+</span> \u6DFB\u52A0\u65B0\u8F68\u9053\uFF08\u53EF\u5E76\u7EBF\uFF09</div>';
-
   body.innerHTML = html;
+
+  renderCaLivePreview();
 
 }
 
@@ -12615,7 +12463,7 @@ function onDragLeaveTimeline(e) {
 
 
 
-function onDropToTimeline(e, laneKey) {
+function onDropToTimeline(e, actionId) {
 
   e.preventDefault();
 
@@ -12623,37 +12471,31 @@ function onDropToTimeline(e, laneKey) {
 
   document.querySelectorAll('.ca-palette-item.dragging').forEach(function(el){ el.classList.remove('dragging'); });
 
-  try {
+  var data;
 
-    var data = JSON.parse(e.dataTransfer.getData('text/plain'));
-
-  } catch(err) { return; }
-
-  // 计算落点百分比
+  try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch(err) { return; }
 
   var rect = e.currentTarget.getBoundingClientRect();
 
   var x = e.clientX - rect.left;
 
-  var totalTime = getTotalTime();
+  var totalTime = caGetTotalTime();
 
   var startSec = Math.round((x / rect.width) * totalTime * 10) / 10;
 
   startSec = Math.max(0, Math.min(totalTime - 0.5, startSec));
 
-  // 使用目标轨道的 laneKey（支持多轨道并存时落点准确）
-
-  addAtomicBlock(laneKey, data.actionId, data.actionName, data.icon, startSec);
+  addAtomicBlock(actionId, data.actionName, data.icon, startSec);
 
 }
 
 
 
-function addAtomicBlock(laneKey, actionId, actionName, icon, startSec) {
+function addAtomicBlock(actionId, actionName, icon, startSec) {
 
-  if (!caCombinerData[laneKey]) caCombinerData[laneKey] = [];
+  if (!caCombinerData[actionId]) caCombinerData[actionId] = [];
 
-  var blocks = caCombinerData[laneKey];
+  var blocks = caCombinerData[actionId];
 
   var amplitude = 80;
 
@@ -12661,7 +12503,7 @@ function addAtomicBlock(laneKey, actionId, actionName, icon, startSec) {
 
   var duration = calcDuration(amplitude, speed);
 
-  var totalTime = getTotalTime();
+  var totalTime = caGetTotalTime();
 
   var startTime;
 
@@ -12671,15 +12513,11 @@ function addAtomicBlock(laneKey, actionId, actionName, icon, startSec) {
 
   } else {
 
-    // Subsequent blocks: append after last block (sequential, mutex)
-
     var last = blocks[blocks.length - 1];
 
     startTime = Math.max(startSec, last.startTime + last.duration);
 
   }
-
-  // Clamp to not exceed 100%
 
   startTime = Math.min(startTime, totalTime - 0.5);
 
@@ -12727,13 +12565,13 @@ function recalcLaneTimings(laneKey) {
 
   var blocks = caCombinerData[laneKey] || [];
 
+  var totalTime = caGetTotalTime();
+
   for (var i = 1; i < blocks.length; i++) {
 
     var prev = blocks[i - 1];
 
     var minStart = prev.startTime + prev.duration;
-
-    var totalTime = getTotalTime();
 
     if (blocks[i].startTime < minStart) {
 
@@ -12744,6 +12582,10 @@ function recalcLaneTimings(laneKey) {
   }
 
 }
+
+
+
+var selectedBlock = null;
 
 
 
@@ -12779,35 +12621,37 @@ function showBlockEditor() {
 
   var endSec = Math.round((b.startTime + b.duration) * 10) / 10;
 
-  editor.innerHTML = '' +
+  editor.innerHTML = ''
 
-    '<div class="ca-editor-title">' +
+    + '<div class="ca-editor-title">'
 
-      '<span>' + b.icon + ' ' + b.name + '</span>' +
+    +   '<span>' + b.icon + ' ' + b.name + '</span>'
 
-      '<span style="font-size:11px;font-weight:400;color:var(--text-tertiary);">\u{1F4CC} ' + selectedBlock.lane + ' #' + (selectedBlock.idx + 1) + '</span>' +
+    +   '<span style="font-size:11px;font-weight:400;color:var(--text-tertiary);">📌 ' + selectedBlock.lane + ' #' + (selectedBlock.idx + 1) + '</span>'
 
-    '</div>' +
+    + '</div>'
 
-    '<div class="ca-editor-props">' +
+    + '<div class="ca-editor-props">'
 
-      '<div class="ca-editor-prop"><label>\u5E45\u5EA6</label><input type="range" min="0" max="100" value="' + b.amplitude + '" oninput="updateBlockProp(\'' + selectedBlock.lane + '\',' + selectedBlock.idx + ',\'amplitude\',this.value)"><span class="ep-val">' + b.amplitude + '</span></div>' +
+    +   '<div class="ca-editor-prop"><label>幅度</label><input type="range" min="0" max="100" value="' + b.amplitude + '" oninput="updateBlockProp(\'' + selectedBlock.lane + '\',' + selectedBlock.idx + ',\'amplitude\',this.value)"><span class="ep-val">' + b.amplitude + '</span></div>'
 
-      '<div class="ca-editor-prop"><label>\u901F\u5EA6</label><input type="range" min="0" max="100" value="' + b.speed + '" oninput="updateBlockProp(\'' + selectedBlock.lane + '\',' + selectedBlock.idx + ',\'speed\',this.value)"><span class="ep-val">' + b.speed + '</span></div>' +
+    +   '<div class="ca-editor-prop"><label>速度</label><input type="range" min="0" max="100" value="' + b.speed + '" oninput="updateBlockProp(\'' + selectedBlock.lane + '\',' + selectedBlock.idx + ',\'speed\',this.value)"><span class="ep-val">' + b.speed + '</span></div>'
 
-    '</div>' +
+    +   '<div class="ca-editor-prop"><label>时间(秒)</label><input type="number" min="0.5" max="20" step="0.1" value="' + b.duration + '" oninput="updateBlockProp(\'' + selectedBlock.lane + '\',' + selectedBlock.idx + ',\'duration\',this.value)"><span class="ep-val">' + b.duration + 's</span></div>'
 
-    '<div class="ca-editor-info">' +
+    + '</div>'
 
-      '<span>\u{23F1} \u65F6\u957F: ' + fmtTime(b.duration) + ' (\u81EA\u52A8\u8BA1\u7B97)</span>' +
+    + '<div class="ca-editor-info">'
 
-      '<span>\u{1F552} \u8D77\u59CB: ' + fmtTime(b.startTime) + '</span>' +
+    +   '<span>🕐 起始: ' + fmtTime(b.startTime) + '</span>'
 
-      '<span>\u{2705} \u7ED3\u675F: ' + fmtTime(endSec) + '</span>' +
+    +   '<span>✅ 结束: ' + fmtTime(endSec) + '</span>'
 
-      '<span style="color:#ef4444;cursor:pointer;" onclick="removeAtomicBlock(\'' + selectedBlock.lane + '\',' + selectedBlock.idx + ')">\u{1F5D1} \u5220\u9664</span>' +
+    +   '<span style="color:#8b5cf6;">🔁 速度↔时间 互为变量，改其一自动计算另一个</span>'
 
-    '</div>';
+    +   '<span style="color:#ef4444;cursor:pointer;" onclick="removeAtomicBlock(\'' + selectedBlock.lane + '\',' + selectedBlock.idx + ')">🗑 删除</span>'
+
+    + '</div>';
 
 }
 
@@ -12827,29 +12671,43 @@ function updateBlockProp(laneKey, idx, prop, val) {
 
   if (!caCombinerData[laneKey] || !caCombinerData[laneKey][idx]) return;
 
-  caCombinerData[laneKey][idx][prop] = parseInt(val);
-
-  // Recalculate duration from amplitude and speed
-
   var b = caCombinerData[laneKey][idx];
 
-  b.duration = calcDuration(b.amplitude, b.speed);
+  if (prop === 'amplitude') {
 
-  // Cascade: push subsequent same-lane blocks forward if needed
+    b.amplitude = parseInt(val);
+
+    b.duration = calcDuration(b.amplitude, b.speed);
+
+  } else if (prop === 'speed') {
+
+    b.speed = parseInt(val);
+
+    b.duration = calcDuration(b.amplitude, b.speed);
+
+  } else if (prop === 'duration') {
+
+    var dur = parseFloat(val);
+
+    if (isNaN(dur)) dur = 0.5;
+
+    dur = Math.max(0.5, Math.min(20, dur));
+
+    var calc = calcSpeed(b.amplitude, dur);
+
+    b.speed = calc.speed;
+
+    b.duration = calc.duration;
+
+  }
 
   recalcLaneTimings(laneKey);
-
-  // Update editor display without full re-render (preserve slider focus)
 
   renderTimeline();
 
   showBlockEditor();
 
 }
-
-
-
-var selectedBlock = null;
 
 
 
@@ -12867,53 +12725,59 @@ function saveCustomAction() {
 
   var icon = selectedActionIcon;
 
+  var descEl = document.getElementById('ca-desc');
 
+  var desc = descEl ? (descEl.value || '').trim() : '';
 
   var totalBlocks = 0;
 
-  var parts = [];
-
-  Object.keys(caCombinerData).forEach(function(k){
-
-    (caCombinerData[k] || []).forEach(function(b){ totalBlocks++; parts.push(b.name); });
-
-  });
+  Object.keys(caCombinerData).forEach(function(k){ totalBlocks += (caCombinerData[k] || []).length; });
 
   if (totalBlocks === 0) { alert('请至少添加一个原子动作'); return; }
 
-  var summary = parts.join(' → ');
+  var record = {
+
+    id: caEditingId || ('ca-' + (++customActionCount)),
+
+    name: name,
+
+    icon: icon,
+
+    position: positionVal,
+
+    positionText: positionText,
+
+    desc: desc,
+
+    blocks: JSON.parse(JSON.stringify(caCombinerData))
+
+  };
+
+  if (caEditingId) {
+
+    var idx = -1;
+
+    for (var i = 0; i < CUSTOM_ACTIONS.length; i++) { if (CUSTOM_ACTIONS[i].id === caEditingId) { idx = i; break; } }
+
+    if (idx >= 0) CUSTOM_ACTIONS[idx] = record;
+
+  } else {
+
+    CUSTOM_ACTIONS.push(record);
+
+  }
+
+  closeCustomActionEditor();
+
+  renderCustomActionListFromData();
+
+  showToast(caEditingId ? '动作已更新（已编排脚本不受影响）' : '动作已保存');
+
+}
 
 
 
-  customActionCount++;
-
-  var list = document.getElementById('custom-action-list');
-
-  var item = document.createElement('div');
-
-  item.className = 'custom-action-item';
-
-  item.setAttribute('data-id', 'ca-' + customActionCount);
-
-  item.setAttribute('data-position', positionVal);
-
-  item.setAttribute('draggable', 'true');
-
-  item.setAttribute('ondragstart', 'dragCustomAction(event)');
-
-  item.setAttribute('title', '组合: ' + summary);
-
-  item.innerHTML = '<span>' + icon + '</span><span>' + name + '</span>' +
-
-    '<span style="font-size:10px;color:var(--text-tertiary);background:var(--bg-tag);padding:1px 6px;border-radius:3px;">' + positionText + '</span>' +
-
-    '<span style="font-size:10px;color:var(--text-tertiary);">📋 ' + totalBlocks + '个原子</span>' +
-
-    '<span class="ca-delete" onclick="deleteCustomAction(this, event)" title="删除">×</span>';
-
-  list.appendChild(item);
-
-
+function closeCustomActionEditor() {
 
   closeModal('modal-custom-action');
 
@@ -12929,6 +12793,8 @@ function resetCustomActionForm() {
 
   document.getElementById('ca-position').value = 'head';
 
+  var descEl = document.getElementById('ca-desc'); if (descEl) descEl.value = '';
+
   document.querySelectorAll('.icon-pick-item').forEach(function(it){ it.classList.remove('selected'); });
 
   var defaultIcon = document.querySelector('.icon-pick-item[data-icon="🤖"]');
@@ -12939,9 +12805,13 @@ function resetCustomActionForm() {
 
   caCombinerData = {};
 
-  extraTimelineLanes = {};
-
   selectedBlock = null;
+
+  caEditingId = null;
+
+  var titleEl = document.getElementById('ca-modal-title');
+
+  if (titleEl) titleEl.textContent = '➕ 创建自定义动作';
 
   renderAtomicPalette();
 
@@ -12959,7 +12829,380 @@ function deleteCustomAction(el, e) {
 
   var item = el.closest('.custom-action-item');
 
-  if (item) item.remove();
+  if (!item) return;
+
+  var id = item.getAttribute('data-id');
+
+  if (id) CUSTOM_ACTIONS = CUSTOM_ACTIONS.filter(function(x){ return x.id !== id; });
+
+  renderCustomActionListFromData();
+
+}
+
+
+
+function openCustomActionEditor(id) {
+
+  var a = null;
+
+  for (var i = 0; i < CUSTOM_ACTIONS.length; i++) { if (CUSTOM_ACTIONS[i].id === id) { a = CUSTOM_ACTIONS[i]; break; } }
+
+  if (!a) return;
+
+  caEditingId = id;
+
+  document.getElementById('ca-name').value = a.name;
+
+  document.getElementById('ca-position').value = a.position;
+
+  var descEl = document.getElementById('ca-desc'); if (descEl) descEl.value = a.desc || '';
+
+  document.querySelectorAll('.icon-pick-item').forEach(function(it){
+
+    if (it.getAttribute('data-icon') === a.icon) it.classList.add('selected'); else it.classList.remove('selected');
+
+  });
+
+  selectedActionIcon = a.icon;
+
+  caCombinerData = JSON.parse(JSON.stringify(a.blocks || {}));
+
+  selectedBlock = null;
+
+  var titleEl = document.getElementById('ca-modal-title');
+
+  if (titleEl) titleEl.textContent = '✏️ 编辑自定义动作';
+
+  renderAtomicPalette();
+
+  renderTimeline();
+
+  hideBlockEditor();
+
+  openModal('modal-custom-action');
+
+}
+
+
+
+function renderCustomActionListFromData() {
+
+  var list = document.getElementById('custom-action-list');
+
+  if (!list) return;
+
+  list.innerHTML = '';
+
+  CUSTOM_ACTIONS.forEach(function(a){
+
+    var totalBlocks = 0;
+
+    Object.keys(a.blocks || {}).forEach(function(k){ totalBlocks += (a.blocks[k] || []).length; });
+
+    var item = document.createElement('div');
+
+    item.className = 'custom-action-item';
+
+    item.setAttribute('data-id', a.id);
+
+    item.setAttribute('data-position', a.position);
+
+    item.setAttribute('draggable', 'true');
+
+    item.setAttribute('ondragstart', 'dragCustomAction(event)');
+
+    item.innerHTML = '<span>' + a.icon + '</span><span>' + a.name + '</span>'
+
+      + '<span style="font-size:10px;color:var(--text-tertiary);background:var(--bg-tag);padding:1px 6px;border-radius:3px;">' + (a.positionText || a.position) + '</span>'
+
+      + '<span style="font-size:10px;color:var(--text-tertiary);">📋 ' + totalBlocks + '个原子</span>'
+
+      + '<span class="ca-edit" onclick="openCustomActionEditor(\'' + a.id + '\')" title="编辑">✎</span>'
+
+      + '<span class="ca-delete" onclick="deleteCustomAction(this, event)" title="删除">×</span>';
+
+    list.appendChild(item);
+
+  });
+
+}
+
+
+
+function renderCaLivePreview() {
+
+  var meta = document.getElementById('ca-live-preview-meta');
+
+  var body = document.getElementById('ca-live-preview-tl-body');
+
+  if (!body) return;
+
+  var nameEl = document.getElementById('ca-name');
+
+  var name = nameEl ? (nameEl.value || '').trim() : '';
+
+  var position = (document.getElementById('ca-position') || {}).value || 'head';
+
+  var totalBlocks = 0;
+
+  Object.keys(caCombinerData).forEach(function(k){ totalBlocks += (caCombinerData[k] || []).length; });
+
+  if (totalBlocks === 0) {
+
+    if (meta) meta.textContent = '未添加原子动作';
+
+    body.innerHTML = '<div class="ca-tl-lane-hint" style="padding:18px;text-align:center;">🪄 从左侧拖拽原子动作到轨道后，此处实时显示预览</div>';
+
+    return;
+
+  }
+
+  var posText = position === 'head' ? '头部' : position === 'torso' ? '躯体' : position === 'ear' ? '耳朵' : '全身';
+
+  if (meta) meta.textContent = (name || '未命名动作') + ' · ' + posText + ' · ' + totalBlocks + '个原子 · 总时长 ' + fmtTime(caGetTotalTime());
+
+  var actions = getCaPositionAtomicActions(position);
+
+  var totalTime = caGetTotalTime();
+
+  var html = '<div class="ca-tl-ruler">';
+
+  for (var i = 0; i <= 5; i++) {
+
+    var t = (totalTime / 5) * i;
+
+    html += '<div class="ca-tl-ruler-tick">' + fmtTime(t) + '</div>';
+
+  }
+
+  html += '</div>';
+
+  actions.forEach(function(act, i){
+
+    if (i > 0) html += '<div class="ca-tl-parallel-hint">🔗 可并线（不互斥）</div>';
+
+    var blocks = caCombinerData[act.id] || [];
+
+    var barCls = 'bar-head';
+
+    if (act.group === 'torso') barCls = 'bar-torso';
+
+    else if (act.group === 'ear-left') barCls = 'bar-ear-l';
+
+    else if (act.group === 'ear-right') barCls = 'bar-ear-r';
+
+    html += '<div class="ca-tl-lane-row">';
+
+    html += '<div class="ca-tl-lane-label">' + act.icon + ' ' + act.name + '</div>';
+
+    html += '<div class="ca-tl-lane-track' + (blocks.length > 0 ? ' has-blocks' : '') + '">';
+
+    blocks.forEach(function(b){
+
+      var left = Math.max(0, Math.min(95, (b.startTime / totalTime) * 100));
+
+      var width = Math.max(3, Math.min(100 - left, (b.duration / totalTime) * 100));
+
+      html += '<div class="ca-tl-bar ' + barCls + '" style="left:' + left + '%;width:' + width + '%;cursor:default;" title="' + b.name + ' (' + fmtTime(b.startTime) + '→' + fmtTime(b.startTime + b.duration) + ')">' + b.icon + ' ' + b.name.substring(0,4) + '</div>';
+
+    });
+
+    if (blocks.length === 0) html += '<div class="ca-tl-lane-hint">无原子动作</div>';
+
+    html += '</div></div>';
+
+  });
+
+  body.innerHTML = html;
+
+}
+
+
+
+var caPreviewTimer = null;
+
+function caGetPreviewSeq() {
+
+  var seq = [];
+
+  Object.keys(caCombinerData).forEach(function(k){
+
+    (caCombinerData[k] || []).forEach(function(b){ seq.push(b); });
+
+  });
+
+  seq.sort(function(a, b){ return (a.startTime || 0) - (b.startTime || 0); });
+
+  return seq;
+
+}
+
+function previewCurrentCustomAction() {
+
+  var name = (document.getElementById('ca-name').value || '').trim() || '未命名动作';
+
+  var position = document.getElementById('ca-position').value;
+
+  var posText = position === 'head' ? '头部' : position === 'torso' ? '躯体' : position === 'ear' ? '耳朵' : '全身';
+
+  var totalBlocks = 0;
+
+  Object.keys(caCombinerData).forEach(function(k){ totalBlocks += (caCombinerData[k] || []).length; });
+
+  if (totalBlocks === 0) { alert('请先添加至少一个原子动作再预览'); return; }
+
+  caStopPreview();
+
+  document.getElementById('ca-preview-title').textContent = '👁 动作效果预览 · ' + name;
+
+  document.getElementById('ca-preview-icon').textContent = selectedActionIcon;
+
+  document.getElementById('ca-preview-name').textContent = name;
+
+  document.getElementById('ca-preview-meta').textContent = posText + ' · ' + totalBlocks + '个原子动作 · 总时长 ' + fmtTime(caGetTotalTime());
+
+  var descEl = document.getElementById('ca-desc');
+
+  document.getElementById('ca-preview-desc').textContent = (descEl && descEl.value ? descEl.value.trim() : '') || '（无描述）';
+
+  // 渲染动作序列列表
+  var seq = caGetPreviewSeq();
+
+  var seqHtml = seq.map(function(b, i){
+
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border-light);border-radius:var(--radius-sm);background:#fafafa;">'
+
+      + '<span style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">' + (i + 1) + '</span>'
+
+      + '<span style="font-size:18px;">' + (b.icon || '🤖') + '</span>'
+
+      + '<span style="flex:1;font-size:13px;font-weight:500;">' + b.name + '</span>'
+
+      + '<span style="font-size:12px;color:var(--text-secondary);">幅度 ' + b.amplitude + ' · 速度 ' + b.speed + ' · ' + b.duration + 's</span>'
+
+      + '</div>';
+
+  }).join('');
+
+  document.getElementById('ca-preview-seq').innerHTML = seqHtml;
+
+  // 重置播放画面
+  document.getElementById('ca-preview-robot').textContent = selectedActionIcon || '🤖';
+
+  document.getElementById('ca-preview-robot').style.transform = 'none';
+
+  document.getElementById('ca-preview-act').textContent = '点击下方「播放动作效果」查看实际姿态';
+
+  document.getElementById('ca-preview-progress').style.width = '0%';
+
+  document.getElementById('ca-preview-ptime').textContent = '0:00';
+
+  openModal('modal-custom-action-preview');
+
+}
+
+// 播放：按编排顺序逐帧展示机器人姿态（幅度影响幅度、速度影响节奏）
+function caPlayPreview() {
+
+  caStopPreview();
+
+  var seq = caGetPreviewSeq();
+
+  if (!seq.length) return;
+
+  var total = caGetTotalTime() || 1;
+
+  var robotEl = document.getElementById('ca-preview-robot');
+
+  var actEl = document.getElementById('ca-preview-act');
+
+  var progEl = document.getElementById('ca-preview-progress');
+
+  var timeEl = document.getElementById('ca-preview-ptime');
+
+  var idx = 0;
+
+  function showStep() {
+
+    if (idx >= seq.length) { caStopPreview(); actEl.textContent = '✅ 播放完成'; return; }
+
+    var b = seq[idx];
+
+    robotEl.textContent = b.icon || '🤖';
+
+    var scale = 0.8 + (b.amplitude / 100) * 0.5;
+
+    robotEl.style.transform = 'scale(' + scale.toFixed(2) + ') rotate(' + ((idx % 2) ? 3 : -3) + 'deg)';
+
+    actEl.textContent = (idx + 1) + '/' + seq.length + ' · ' + b.name + '（幅度' + b.amplitude + ' · 速度' + b.speed + '）';
+
+    progEl.style.width = Math.min(100, (b.startTime / total) * 100) + '%';
+
+    timeEl.textContent = fmtTime(b.startTime);
+
+    var realMs = Math.max(600, (b.duration || 1) * 500);
+
+    idx++;
+
+    caPreviewTimer = setTimeout(showStep, realMs);
+
+  }
+
+  showStep();
+
+}
+
+function caStopPreview() {
+
+  if (caPreviewTimer) { clearTimeout(caPreviewTimer); caPreviewTimer = null; }
+
+}
+
+
+
+// ===== 脚本编辑器：动作属性 速率↔时间 互为变量 =====
+
+var SE_BASE_DURATION = 2.5; // 100% 速率对应的基准时长（秒）
+
+function seSyncRateDuration(el, src) {
+
+  var grid = el.closest('.grid-4');
+
+  if (!grid) return;
+
+  var rateEl = grid.querySelector('.se-rate');
+
+  var durEl = grid.querySelector('.se-duration');
+
+  if (!rateEl || !durEl) return;
+
+  if (src === 'rate') {
+
+    var rate = parseFloat(rateEl.value);
+
+    if (isNaN(rate) || rate < 1) { rate = 1; rateEl.value = 1; }
+
+    if (rate > 100) { rate = 100; rateEl.value = 100; }
+
+    var dur = SE_BASE_DURATION * 100 / rate;
+
+    durEl.value = Math.round(dur * 10) / 10;
+
+  } else {
+
+    var dur = parseFloat(durEl.value);
+
+    if (isNaN(dur) || dur < 0.5) { dur = 0.5; durEl.value = 0.5; }
+
+    if (dur > 30) { dur = 30; durEl.value = 30; }
+
+    var rate = 100 * SE_BASE_DURATION / dur;
+
+    if (rate > 100) rate = 100;
+
+    rateEl.value = Math.round(rate);
+
+  }
 
 }
 
@@ -13025,15 +13268,11 @@ function dropCustomAction(e) {
 
   var label = track.querySelector('.timeline-track-label').textContent.trim();
 
-
-
   var isHead = label.indexOf('头部') !== -1;
 
   var isTorso = label.indexOf('躯体') !== -1;
 
   var isEar = label.indexOf('耳朵') !== -1;
-
-
 
   var canDrop = false;
 
@@ -13044,8 +13283,6 @@ function dropCustomAction(e) {
   else if (data.position === 'torso' && isTorso) canDrop = true;
 
   else if (data.position === 'ear' && isEar) canDrop = true;
-
-
 
   if (!canDrop) {
 
@@ -13059,8 +13296,6 @@ function dropCustomAction(e) {
 
   }
 
-
-
   var rect = area.getBoundingClientRect();
 
   var x = e.clientX - rect.left;
@@ -13072,8 +13307,6 @@ function dropCustomAction(e) {
   var blockStyle = 'left:' + pct + '%;width:10%;background:linear-gradient(135deg,#6366f1,#a855f7);z-index:2;';
 
   var blockText = data.icon + ' ' + data.name;
-
-
 
   if (data.position === 'full') {
 
@@ -13119,8 +13352,6 @@ function dropCustomAction(e) {
 
   }
 
-
-
   document.querySelectorAll('.custom-action-item.dragging').forEach(function(el){ el.classList.remove('dragging'); });
 
 }
@@ -13128,6 +13359,22 @@ function dropCustomAction(e) {
 
 
 function initCustomActionSystem() {
+
+  if (CUSTOM_ACTIONS.length === 0) {
+
+    CUSTOM_ACTIONS = [
+
+      {id:'ca-1', name:'打招呼点头', icon:'👋', position:'head', positionText:'头部', desc:'开场问好', blocks:{'nod':[{id:'nod',name:'点头1次',icon:'👍',amplitude:80,speed:60,startTime:0,duration:2.5}], 'shake':[{id:'shake',name:'摇头1次',icon:'👎',amplitude:80,speed:60,startTime:2.5,duration:2.5}]}},
+
+      {id:'ca-2', name:'蹲下问好', icon:'🙇', position:'full', positionText:'全身', desc:'迎宾致意', blocks:{'squat-hold':[{id:'squat-hold',name:'下蹲后保持',icon:'⬇️',amplitude:80,speed:60,startTime:0,duration:3}], 'nod':[{id:'nod',name:'点头1次',icon:'👍',amplitude:80,speed:60,startTime:3,duration:2.5}], 'left-antenna':[{id:'left-antenna',name:'左耳天线角度',icon:'👂',amplitude:80,speed:60,startTime:0,duration:3}]}},
+
+      {id:'ca-3', name:'双耳交替', icon:'👂', position:'ear', positionText:'耳朵', desc:'互动反馈', blocks:{'left-antenna':[{id:'left-antenna',name:'左耳天线角度',icon:'👂',amplitude:80,speed:60,startTime:0,duration:2.5}], 'right-antenna':[{id:'right-antenna',name:'右耳天线角度',icon:'👂',amplitude:80,speed:60,startTime:2.5,duration:2.5}]}}
+
+    ];
+
+    customActionCount = 3;
+
+  }
 
   renderAtomicPalette();
 
@@ -13143,55 +13390,9 @@ function initCustomActionSystem() {
 
   });
 
-  var list = document.getElementById('custom-action-list');
-
-  if (list && list.children.length === 0) {
-
-    var examples = [
-
-      {name:'打招呼点头', icon:'👋', position:'head', positionText:'头部', count:2, summary:'点头1次 → 摇头1次'},
-
-      {name:'蹲下问好', icon:'🙇', position:'full', positionText:'全身', count:3, summary:'下蹲后保持 → 点头1次 → 左耳天线角度'},
-
-      {name:'双耳交替', icon:'👂', position:'ear', positionText:'耳朵', count:2, summary:'左耳天线角度 → 右耳天线角度'}
-
-    ];
-
-    examples.forEach(function(ex){
-
-      customActionCount++;
-
-      var item = document.createElement('div');
-
-      item.className = 'custom-action-item';
-
-      item.setAttribute('data-id', 'ca-' + customActionCount);
-
-      item.setAttribute('data-position', ex.position);
-
-      item.setAttribute('draggable', 'true');
-
-      item.setAttribute('ondragstart', 'dragCustomAction(event)');
-
-      item.setAttribute('title', '组合: ' + ex.summary);
-
-      item.innerHTML = '<span>' + ex.icon + '</span><span>' + ex.name + '</span>' +
-
-        '<span style="font-size:10px;color:var(--text-tertiary);background:var(--bg-tag);padding:1px 6px;border-radius:3px;">' + ex.positionText + '</span>' +
-
-        '<span style="font-size:10px;color:var(--text-tertiary);">📋 ' + ex.count + '个原子</span>' +
-
-        '<span class="ca-delete" onclick="deleteCustomAction(this, event)" title="删除">×</span>';
-
-      list.appendChild(item);
-
-    });
-
-  }
+  renderCustomActionListFromData();
 
 }
-
-
 
 // ===== 智能体 / 知识库 =====
 
@@ -13393,31 +13594,196 @@ const MODE_BG   = { remote:['#dbeafe','#2563eb'], script:['#ede9fe','#7c3aed'], 
 
 // 下发至设备：根据目标设备可用性提醒下发成功/失败；成功后状态转「已下发」并出现「执行任务」
 
+function simulateScript(name){
+  // 脚本任务的仿真校验：群控/方阵类脚本默认仿真不通过（存在轨迹风险），其余通过
+  if (name.indexOf('群控') >= 0 || name.indexOf('方阵') >= 0){
+    return { ok:false, reason:'仿真未通过：检测到 ' + name + ' 中 4 台机器人初始间距不足、轨迹存在重叠，执行时存在碰撞风险，建议调整初始位置后再同步。' };
+  }
+  return { ok:true, reason:'轨迹、初始位置、朝向校验均通过' };
+}
+
+// 同步至设备（第一步）：在线校验 + 脚本仿真 + 成功后切换为「立即执行」
 function validateAndDispatch(btn, name, type, target){
 
   var devices = target.split('、').map(function(s){ return s.trim(); });
 
+  // 设备可用性检查（故障/离线视为不可用）
   var bad = devices.filter(function(d){ var m = deviceModeMap[d]; return m === 'fault' || m === 'offline'; });
 
-  if (bad.length){
+  // 非脚本任务：设备不可用直接拦截；脚本任务先弹仿真校验弹窗（设备可用性作为弹窗内提示）
+  if (type !== 'script' && bad.length){
 
     var state = deviceModeMap[bad[0]] === 'fault' ? '故障' : '离线';
 
-    showToast('下发失败：目标设备 ' + bad.join('、') + ' 处于' + state + '状态，无法接收任务');
+    showToast('同步失败：目标设备 ' + bad.join('、') + ' 处于' + state + '状态，无法接收任务');
 
     return;
 
   }
 
-  showToast('下发成功：任务「' + name + '」已推送至 ' + devices.length + ' 台设备执行');
+  // 校验2：脚本任务需先虚拟仿真校验，弹出仿真结果弹窗（无论通过与否）
+  if (type === 'script'){
 
-  var tr = btn.closest('tr');
+    var sim = simulateScript(name);
 
-  var statusTd = tr.querySelectorAll('td')[4];
+    window.__pendingSync = { btn:btn, name:name, type:type, target:target, bad:bad };
 
-  if (statusTd) statusTd.innerHTML = '<span class="tag tag-success"><span class="status-dot online"></span>已下发</span>';
+    renderSyncSimResult(sim, bad);
 
-  btn.outerHTML = '<button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);" onclick="validateExecuteScript(\'' + name + '\',\'' + type + '\',\'' + target + '\')">执行任务</button>';
+    openModal('modal-sync-sim');
+
+    return;
+
+  }
+
+  doSync(btn, name, type, target);
+
+}
+
+// 填充虚拟仿真校验结果弹窗（无论通过与否都展示，用户可继续同步或暂不同步）
+function renderSyncSimResult(sim, bad){
+
+  var titleEl = document.getElementById('sync-sim-title');
+
+  var bodyEl = document.getElementById('sync-sim-body');
+
+  var confirmBtn = document.getElementById('sync-sim-confirm');
+
+  var name = window.__pendingSync ? window.__pendingSync.name : '';
+  var devHint = '';
+  if (bad && bad.length){
+    var bs = bad.map(function(d){ return d + '（' + (deviceModeMap[d] === 'fault' ? '故障' : '离线') + '）'; }).join('、');
+    devHint = '<div style="background:#fffbeb;border-radius:10px;padding:12px;font-size:13px;color:#d97706;text-align:left;line-height:1.6;margin-top:10px;">⚠ 目标设备 ' + bs + ' 当前不可用，确认同步时将跳过，仅同步其余可用设备。</div>';
+  }
+
+  if (sim.ok){
+
+    titleEl.textContent = '✅ 虚拟仿真校验通过';
+
+    bodyEl.innerHTML =
+      '<div style="text-align:center;padding:8px 0;">'
+      + '<div style="font-size:44px;margin-bottom:12px;">✅</div>'
+      + '<div style="font-size:15px;font-weight:600;margin-bottom:8px;">虚拟仿真校验通过</div>'
+      + '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">任务：' + name + '</div>'
+      + '<div style="background:#f0fdf4;border-radius:10px;padding:12px;font-size:13px;color:#16a34a;text-align:left;line-height:1.6;">' + sim.reason + '</div>'
+      + '<div style="font-size:12px;color:var(--text-tertiary);margin-top:10px;">校验通过，可继续同步至设备执行。</div>'
+      + devHint
+      + '</div>';
+
+    confirmBtn.textContent = '继续同步';
+
+    confirmBtn.style.background = '';
+
+    confirmBtn.style.borderColor = '';
+
+  } else {
+
+    titleEl.textContent = '⚠️ 虚拟仿真校验未通过';
+
+    bodyEl.innerHTML =
+      '<div style="text-align:center;padding:8px 0;">'
+      + '<div style="font-size:44px;margin-bottom:12px;">⚠️</div>'
+      + '<div style="font-size:15px;font-weight:600;margin-bottom:8px;">虚拟仿真校验未通过（存在风险）</div>'
+      + '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">任务：' + name + '</div>'
+      + '<div style="background:#fef2f2;border-radius:10px;padding:12px;font-size:13px;color:#dc2626;text-align:left;line-height:1.6;">' + sim.reason + '</div>'
+      + '<div style="font-size:12px;color:var(--text-tertiary);margin-top:10px;">如确认继续执行将带风险同步；建议调整后重新校验再同步。</div>'
+      + devHint
+      + '</div>';
+
+    confirmBtn.textContent = '带风险继续同步';
+
+    confirmBtn.style.background = 'var(--warning)';
+
+    confirmBtn.style.borderColor = 'var(--warning)';
+
+  }
+
+}
+
+// 仿真弹窗中「继续同步 / 带风险继续同步」的确认
+function syncConfirmRisk(){
+
+  closeModal('modal-sync-sim');
+
+  var p = window.__pendingSync; window.__pendingSync = null;
+
+  if (!p) return;
+
+  if (p.detail) finishDetailSync(p.name, p.type, p.target, p.bad);
+
+  else doSync(p.btn, p.name, p.type, p.target, p.bad);
+
+}
+
+// 执行实际同步：提示成功并将状态改为「已同步」、按钮改为「立即执行」
+function doSync(btn, name, type, target, bad){
+
+  var devices = target.split('、').map(function(s){ return s.trim(); });
+
+  var avail = (bad && bad.length) ? devices.filter(function(d){ return bad.indexOf(d) < 0; }) : devices;
+  showToast('同步成功：任务「' + name + '」已同步至 ' + avail.length + ' 台设备' + ((bad && bad.length) ? '（已跳过 ' + bad.length + ' 台不可用设备）' : ''));
+
+  var statusHtml = '<span class="tag tag-success"><span class="status-dot online"></span>已同步</span>';
+
+  var btnHtml = '<button class="btn btn-primary btn-sm" onclick="validateExecuteScript(\'' + name + '\',\'' + type + '\',\'' + target + '\')">立即执行</button>';
+
+  if (btn && btn.closest){
+
+    var tr = btn.closest('tr');
+
+    if (tr){ var statusTd = tr.querySelectorAll('td')[4]; if (statusTd) statusTd.innerHTML = statusHtml; btn.outerHTML = btnHtml; }
+
+  }
+
+}
+
+// 任务详情弹窗内的「同步至设备」
+function syncFromDetail(name, type, target){
+
+  var devices = target.split('、').map(function(s){ return s.trim(); });
+
+  var bad = devices.filter(function(d){ var m = deviceModeMap[d]; return m === 'fault' || m === 'offline'; });
+
+  // 非脚本任务：设备不可用直接拦截；脚本任务先弹仿真校验弹窗
+  if (type !== 'script' && bad.length){
+
+    var state = deviceModeMap[bad[0]] === 'fault' ? '故障' : '离线';
+
+    showToast('同步失败：目标设备处于' + state + '状态，无法接收任务');
+
+    return;
+
+  }
+
+  if (type === 'script'){
+
+    var sim = simulateScript(name);
+
+    window.__pendingSync = { detail:true, name:name, type:type, target:target, bad:bad };
+
+    renderSyncSimResult(sim, bad);
+
+    openModal('modal-sync-sim');
+
+    return;
+
+  }
+
+  finishDetailSync(name, type, target);
+
+}
+
+function finishDetailSync(name, type, target, bad){
+
+  showToast('同步成功：任务「' + name + '」已同步至设备' + ((bad && bad.length) ? '（已跳过 ' + bad.length + ' 台不可用设备）' : ''));
+
+  var visible = document.querySelector('#task-detail-script:not([style*="display: none"]), #task-detail-follow:not([style*="display: none"])');
+
+  if (visible){ var st = visible.querySelector('.tag'); if (st){ st.className = 'tag tag-success'; st.innerHTML = '<span class="status-dot online"></span>已同步'; } }
+
+  var footer = document.querySelector('#modal-task-detail .modal-footer');
+
+  if (footer){ footer.innerHTML = '<button class="btn btn-outline" onclick="closeModal(\'modal-task-detail\')">关闭</button><button class="btn btn-primary" onclick="validateExecuteScript(\'' + name + '\',\'' + type + '\',\'' + target + '\')">立即执行</button>'; }
 
 }
 
@@ -13499,7 +13865,7 @@ function validateExecuteScript(name, type, target){
 
   if (allow){
 
-    showToast('校验通过，已下发执行任务指令');
+    showToast('校验通过，已下发立即执行指令');
 
   } else if (primary){
 
@@ -13673,6 +14039,101 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="yumei-meta">Yumei Studio · 原型设计</div>
   </div>
 </div>
+
+
+  <!-- 弹窗：执行任务校验（移至全局，避免嵌套在 page 内被 display:none 隐藏） -->
+
+  <!-- 弹窗：执行任务校验确认 -->
+
+  <div class="modal-overlay" id="modal-execute-script-confirm">
+
+    <div class="modal-box" style="width:460px;">
+
+      <div class="modal-header">
+
+        <div class="modal-title">⚠ 执行任务确认</div>
+
+        <button class="modal-close" onclick="closeModal('modal-execute-script-confirm')">×</button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+
+          <span style="font-size:28px;color:var(--warning);">⚠</span>
+
+          <div style="flex:1;">
+
+            <div style="font-size:14px;font-weight:600;margin-bottom:8px;">即将向目标设备下发并执行任务</div>
+
+            <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
+
+              请确认以下信息无误：
+
+            </div>
+
+            <div style="margin-top:10px;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px;">
+
+              <div style="color:var(--text-tertiary);">任务名称</div>
+
+              <div style="font-weight:500;">迎宾舞蹈-单机版 v2.1</div>
+
+              <div style="color:var(--text-tertiary);">目标设备</div>
+
+              <div style="font-weight:500;">4 台</div>
+
+              <div style="color:var(--text-tertiary);">执行方式</div>
+
+              <div style="font-weight:500;">重复执行 · 3次</div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button class="btn btn-outline" onclick="closeModal('modal-execute-script-confirm')">取消</button>
+
+        <button class="btn btn-primary" style="background:var(--danger);" onclick="closeModal('modal-execute-script-confirm');showToast('脚本已下发，正在执行…')">确认执行</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- 弹窗：执行任务状态机校验结果 -->
+
+  <div class="modal-overlay" id="modal-execute-result">
+
+    <div class="modal-box" style="width:600px;">
+
+      <div class="modal-header">
+
+        <div class="modal-title" id="exec-result-title">⚙ 执行任务校验</div>
+
+        <button class="modal-close" onclick="closeModal('modal-execute-result')">×</button>
+
+      </div>
+
+      <div class="modal-body" id="exec-result-body"></div>
+
+      <div class="modal-footer">
+
+        <button class="btn btn-outline" onclick="closeModal('modal-execute-result')">关闭</button>
+
+      </div>
+
+    </div>
+
+  </div>
 
 </body>
 
